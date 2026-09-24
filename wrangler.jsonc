@@ -1,0 +1,36 @@
+// Configuración del Worker: https://developers.cloudflare.com/workers/wrangler/configuration/
+// Sin secretos: el botón "Deploy to Cloudflare" se los pediría a cada organizador.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nativox",
+  "main": "servidor/entrada/index.ts",
+  "compatibility_date": "2026-09-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "not_found_handling": "single-page-application",
+    // Sin esto, una navegación directa a /api/* recibiría el index.html de la app.
+    "run_worker_first": ["/api/*"],
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "upload_source_maps": true,
+  // Sin database_id: el despliegue crea la base en la cuenta de cada organizador.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nativox",
+      "migrations_dir": "migraciones",
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "SALA", "class_name": "Sala" },
+      { "name": "PRODUCCION", "class_name": "Produccion" },
+    ],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Sala", "Produccion"] }],
+  "ai": {
+    "binding": "AI",
+  },
+}

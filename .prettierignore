@@ -1,0 +1,4 @@
+# Los documentos se escriben a mano (tablas incluidas): Prettier no los reformatea.
+*.md
+package-lock.json
+servidor/plataforma/env.d.ts

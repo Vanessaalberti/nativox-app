@@ -1,0 +1,44 @@
+{
+  "name": "nativox-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "construir": "tsc -b && vite build",
+    "probar": "vitest run",
+    "revisar": "npm run revisar:formato && npm run revisar:lint && npm run revisar:tipos && npm run probar && npm run revisar:muerto && npm run revisar:duplicado",
+    "revisar:formato": "prettier --check .",
+    "revisar:lint": "eslint .",
+    "revisar:tipos": "tsc -b",
+    "revisar:muerto": "knip",
+    "revisar:duplicado": "jscpd",
+    "formatear": "prettier --write .",
+    "tipos": "wrangler types servidor/plataforma/env.d.ts",
+    "deploy": "npm run construir && wrangler d1 migrations apply DB --remote && wrangler deploy"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "valibot": "1.5.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.59.0",
+    "@types/node": "24.13.6",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@vitejs/plugin-react": "6.1.1",
+    "eslint": "10.11.0",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-boundaries": "7.2.0",
+    "jscpd": "5.3.2",
+    "knip": "6.38.0",
+    "prettier": "3.9.9",
+    "typescript": "6.0.2",
+    "typescript-eslint": "8.70.1",
+    "vite": "8.3.0",
+    "vitest": "5.0.1",
+    "wrangler": "4.138.0"
+  }
+}

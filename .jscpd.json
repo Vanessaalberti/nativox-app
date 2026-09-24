@@ -1,0 +1,9 @@
+{
+  "path": ["navegador", "compartido", "servidor"],
+  "format": ["typescript", "tsx"],
+  "ignore": ["**/env.d.ts"],
+  "minLines": 5,
+  "minTokens": 50,
+  "exitCode": 1,
+  "reporters": ["console"]
+}

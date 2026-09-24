@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.pruebas.tsbuildinfo",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "node"],
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "navegador/**/*.test.ts",
+    "navegador/**/*.test.tsx",
+    "compartido/**/*.test.ts",
+    "servidor/**/*.test.ts"
+  ]
+}
