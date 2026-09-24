@@ -1,0 +1,59 @@
+# Dependencias
+node_modules/
+
+# Construcción
+dist/
+build/
+*.tsbuildinfo
+
+# Cloudflare (estado local de wrangler: D1, Durable Objects y caché de desarrollo)
+.wrangler/
+
+# Secretos y variables locales: nunca se suben
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+
+# Pruebas
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Registros
+*.log
+npm-debug.log*
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+
+# Archivos de agentes de IA (Claude, Cursor, Copilot, Gemini, etc.): quedan en cada computadora, no se suben
+AGENTS.md
+CLAUDE.md
+CLAUDE.local.md
+GEMINI.md
+.claude/
+.cursor/
+.cursorrules
+.cursorignore
+.windsurf/
+.windsurfrules
+.clinerules
+.roo/
+.roomodes
+.continue/
+.aider*
+.codex/
+.gemini/
+.mcp.json
+.github/copilot-instructions.md
+.github/instructions/
+.github/prompts/

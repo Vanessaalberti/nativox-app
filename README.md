@@ -1,0 +1,53 @@
+# Nativox
+
+**Transcripción y traducción en vivo, de código abierto, para conferencias.** El audio del escenario se convierte en subtítulos en el idioma original y traducidos (español ↔ inglés ↔ portugués): en las pantallas del escenario, en el stream (vMix/OBS) y en los celulares.
+
+> En construcción durante la Vibeathon Nerdearla 2026. Las secciones marcadas *(a completar)* se completan al construir.
+
+## Por qué es distinto
+
+- **Corre en el navegador, gratis y sin internet:** Whisper large-v3 turbo + Bergamot en la computadora de cada sala (WebGPU). Sin API keys. El costo no crece con la cantidad de salas.
+- **"Evaluar esta computadora":** un clic mide el equipo y elige el modelo, la velocidad y el traductor.
+- **Salas sin nadie al lado:** arrancan y paran con la agenda, se reparan solas y avisan por **Discord con un botón para reiniciar la sala desde el celular**. Nadie tiene que estar al lado de la computadora ni entrar por escritorio remoto.
+- **Glosario técnico en tres capas:** guía a Whisper, corrige la transcripción y se protege al traducir.
+- **Despliegue de un clic** en tu propia cuenta de Cloudflare.
+
+## Despliegue *(a completar)*
+
+Botón "Deploy to Cloudflare": crea el Worker, la base D1, los Durable Objects y la conexión con Workers AI. No pide secretos.
+
+## Requisitos *(a completar)*
+
+- Una cuenta de Cloudflare y una de GitHub o GitLab.
+- Para el modo local: Chrome 124 o posterior con WebGPU en la computadora de cada sala.
+
+## Cómo escalar *(a completar)*
+
+Una computadora por sala corre en local (gratis). Las salas que una computadora no llega a cubrir pasan solas a Workers AI (~$0,037 por hora de sala). Ver `documentacion/escalado-y-costos.md`.
+
+## Desarrollo
+
+Necesitás Node 22 o posterior.
+
+```bash
+npm install
+npm run dev
+```
+
+`npm run dev` levanta la app y el Worker en `http://localhost:5173`, **sin internet y sin cuenta de Cloudflare** (D1 y los Durable Objects corren en local; Workers AI se prueba en la versión desplegada).
+
+| Comando | Qué hace |
+| --- | --- |
+| `npm run dev` | App + Worker en local, con recarga en caliente |
+| `npm run revisar` | Formato · lint (incluye límites de import) · tipos · pruebas · código muerto (`knip`) · duplicación (`jscpd`). Lo corre la integración continua |
+| `npm run probar` | Solo las pruebas (Vitest) |
+| `npm run construir` | Construcción de producción en `dist/` |
+| `npm run formatear` | Aplica el formato de Prettier |
+| `npm run tipos` | Regenera `servidor/plataforma/env.d.ts` con `wrangler types` (después de tocar `wrangler.jsonc`) |
+| `npm run deploy` | Construye, aplica las migraciones de D1 y despliega en tu cuenta de Cloudflare |
+
+Reglas y convenciones: `documentacion/convenciones.md` y `documentacion/guardas-ia.md`.
+
+## Licencia
+
+MIT — ver `LICENSE`.
