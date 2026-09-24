@@ -77,10 +77,9 @@ export default defineConfig(
     languageOptions: {
       parserOptions: {
         project: [
-          "./tsconfig.navegador.json",
-          "./tsconfig.servidor.json",
-          "./tsconfig.node.json",
-          "./tsconfig.pruebas.json",
+          "./configuracion/tsconfig.navegador.json",
+          "./configuracion/tsconfig.servidor.json",
+          "./configuracion/tsconfig.herramientas.json",
         ],
         tsconfigRootDir: import.meta.dirname,
       },
@@ -107,7 +106,10 @@ export default defineConfig(
       "boundaries/elements": zonas,
       "import/resolver": {
         typescript: {
-          project: ["./tsconfig.navegador.json", "./tsconfig.servidor.json"],
+          project: [
+            "./configuracion/tsconfig.navegador.json",
+            "./configuracion/tsconfig.servidor.json",
+          ],
           noWarnOnMultipleProjects: true,
         },
       },

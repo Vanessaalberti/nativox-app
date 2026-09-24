@@ -5,7 +5,7 @@ import { defineConfig, type Plugin } from "vite";
 
 const rutaAbsoluta = (ruta: string) => fileURLToPath(new URL(ruta, import.meta.url));
 
-// Los mismos alias que tsconfig.base.json; también los usa vitest.config.ts.
+// Los mismos alias que tsconfig.json; también los usa vitest.config.ts.
 export const alias = {
   "@navegador": rutaAbsoluta("./navegador"),
   "@compartido": rutaAbsoluta("./compartido"),

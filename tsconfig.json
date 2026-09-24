@@ -1,9 +1,38 @@
 {
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "@navegador/*": ["./navegador/*"],
+      "@compartido/*": ["./compartido/*"],
+      "@servidor/*": ["./servidor/*"]
+    }
+  },
   "files": [],
   "references": [
-    { "path": "./tsconfig.navegador.json" },
-    { "path": "./tsconfig.servidor.json" },
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.pruebas.json" }
+    {
+      "path": "./configuracion/tsconfig.navegador.json"
+    },
+    {
+      "path": "./configuracion/tsconfig.servidor.json"
+    },
+    {
+      "path": "./configuracion/tsconfig.herramientas.json"
+    }
   ]
 }

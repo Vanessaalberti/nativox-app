@@ -4,12 +4,9 @@ Como las carpetas están en español, la configuración apunta a ellas:
 
 | Archivo | Qué fija |
 | --- | --- |
-| `package.json` | Scripts: `dev`, `construir`, `revisar`, `probar`, `formatear`, `tipos`, `deploy` (migraciones D1 + `wrangler deploy`; el nombre `deploy` lo espera el botón de Cloudflare). Versiones fijadas |
-| `tsconfig.json` (+ `tsconfig.base.json`, `.navegador`, `.servidor`, `.node`, `.pruebas`: las pruebas usan `?raw` de Vite para leer `muestras/`) | Un proyecto por zona (el servidor sin DOM, con los tipos de `wrangler types`). `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`; alias `@navegador/*`, `@compartido/*`, `@servidor/*` |
+| `package.json` | Además de las dependencias, la configuración de Prettier (`prettier`), knip (`knip`: código muerto; `compartido/*/index.ts` cuentan como entrada) y jscpd (`jscpd`: duplicación de 5 líneas o más). Scripts: `dev`, `construir`, `revisar`, `probar`, `formatear`, `tipos`, `deploy` (migraciones D1 + `wrangler deploy`; el nombre `deploy` lo espera el botón de Cloudflare). Versiones fijadas |
+| `tsconfig.json` + `configuracion/` | Opciones comunes en la raíz y un proyecto por zona en `configuracion/` (ver su README). `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`; alias `@navegador/*`, `@compartido/*`, `@servidor/*` |
 | `eslint.config.js` | `typescript-eslint` (con tipos), `eslint-plugin-boundaries` (reglas de `arquitectura.md`), `no-floating-promises`, `no-explicit-any`, `max-lines`, `complexity`, `no-console` |
-| `.prettierrc.json` | Formato único |
-| `knip.json` | Código muerto: exports, archivos y dependencias sin uso |
-| `.jscpd.json` | Umbral de duplicación |
 | `.gitleaks.toml` | Detección de secretos *(falta crearlo)* |
 | `vite.config.ts` | React + `@cloudflare/vite-plugin` (sin bindings remotos: el desarrollo funciona sin internet) + PWA *(falta)*; encabezados COOP/COEP en desarrollo (en producción los pone `publico/_headers`, solo en las rutas que corren modelos); `publicDir: "publico"`; compila también el componente embebible |
 | `wrangler.jsonc` | `main: "servidor/entrada/index.ts"`, assets, D1 `DB` con `migrations_dir: "migraciones"`, Durable Object `SALA`, binding `AI`; `compatibility_date` del día de creación y `nodejs_compat`. **Sin secretos declarados** (el botón se los pediría a cada organizador) |

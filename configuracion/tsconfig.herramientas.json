@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.herramientas.tsbuildinfo",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "node"],
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "../vite.config.ts",
+    "../vitest.config.ts",
+    "../navegador/**/*.test.ts",
+    "../navegador/**/*.test.tsx",
+    "../compartido/**/*.test.ts",
+    "../servidor/**/*.test.ts"
+  ]
+}
