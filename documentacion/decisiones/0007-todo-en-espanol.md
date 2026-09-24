@@ -4,7 +4,7 @@
 
 **Contexto:** Vanessa trabaja en español y quiere entender y mantener todo el proyecto.
 
-**Decisión:** Carpetas, documentos, comentarios, textos e identificadores en español (sin tildes ni ñ en los identificadores). Solo conservan su nombre los archivos que las herramientas reconocen (`README.md`, `LICENSE`, `CHANGELOG.md`, `CONTRIBUTING.md`, `.github/`; los archivos locales de agentes no se suben) y los nombres propios de APIs y librerías.
+**Decisión:** Carpetas, documentos, comentarios, textos e identificadores en español (sin tildes ni ñ en los identificadores). Solo conservan su nombre los archivos que las herramientas reconocen (`README.md`, `LICENSE`, `CHANGELOG.md`, `.github/`) y los nombres propios de APIs y librerías.
 
 **Alternativas descartadas:** Código en inglés con documentación en español.
 

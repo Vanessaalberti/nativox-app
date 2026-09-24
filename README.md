@@ -48,6 +48,10 @@ npm run dev
 
 Reglas y convenciones: `documentacion/convenciones.md` y `documentacion/guardas-ia.md`.
 
+## Contribuir
+
+¿Encontraste un error o tenés una idea? Abrí un issue o un pull request.
+
 ## Licencia
 
 MIT — ver `LICENSE`.

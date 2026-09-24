@@ -27,4 +27,4 @@ Como las carpetas están en español, la configuración apunta a ellas:
 | Tipos | `@types/node`, `@types/react`, `@types/react-dom` |
 | Calidad | `typescript`, `eslint`, `typescript-eslint`, `eslint-plugin-boundaries`, `eslint-import-resolver-typescript` (para que los límites de import entiendan los alias `@navegador/*`…), `prettier`, `knip`, `jscpd`, `vitest`, `@playwright/test` |
 
-Cualquier otra dependencia se propone en el PR, se verifica en npm (paquete oficial, mantenido, sin `postinstall` raro) y se suma a esta tabla.
+Cualquier otra dependencia se aprueba antes de sumarla, se verifica en npm (paquete oficial, mantenido, sin `postinstall` raro) y se suma a esta tabla.

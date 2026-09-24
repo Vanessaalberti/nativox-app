@@ -41,7 +41,7 @@
 - Solo importa `compartido/` (y lo que su README declare). **Nunca** `funcionalidades/`, `rutas/`, `interfaz/` ni `arranque/`.
 - Las dependencias externas (motor, traductor, reloj, almacenamiento) entran por parámetro: se prueban sin navegador real.
 - Sin React. Si hace falta un hook, va en la funcionalidad que lo usa.
-- Todo cambio de API pública actualiza el `README.md` del módulo en el mismo PR.
+- Todo cambio de API pública actualiza el `README.md` del módulo en el mismo commit.
 
 ## Servidor (Cloudflare)
 

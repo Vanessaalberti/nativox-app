@@ -10,4 +10,3 @@
 | `operacion.md` | Operar un evento: computadoras de sala, avisos por Discord, modo caos |
 | `escalado-y-costos.md` | Cuántas salas, cuánto cuesta y cómo escalar (lo cita el README) |
 | `decisiones/` | Decisiones de arquitectura, una por archivo |
-| `plantillas/` | Plantillas (README de módulo) |
