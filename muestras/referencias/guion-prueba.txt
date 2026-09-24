@@ -1,0 +1,12 @@
+Hoy en Nerdearla, desde el Konex en Buenos Aires, vamos a hablar de observabilidad en microservicios.
+Antes de hacer el merge, revisen el pull request y corran los tests del pipeline de CI/CD.
+Si el deploy falla en producción, hacemos rollback a la versión anterior y abrimos un issue en GitHub.
+La API devolvió un error HTTP 429 porque superamos el rate limit de doscientos pedidos por minuto.
+El modelo pesa tres coma cinco gigas y corre con WebGPU, pero en esta placa de video tarda casi dos segundos.
+Clonamos la rama main, ejecutamos npm install y levantamos el servidor en localhost, puerto cinco mil ciento setenta y tres.
+Che, se cayó el server justo en la demo; le pifiamos al configurar la API key, pero lo arreglamos a las chapas.
+El circuit breaker detecta que Whisper tarda más de lo normal y pasa el tráfico a Gemini hasta que se recupera.
+No es que el LLM no entienda el prompt; el problema es que el contexto supera la ventana de tokens.
+El banco guardó la llave en la nube, y la rama que se cayó rompió el techo del banco de la plaza.
+La charla empieza el veinticuatro de septiembre a las quince horas UTC y la disponibilidad fue del noventa y nueve coma nueve por ciento.
+Aunque Hugging Face y Mozilla publican modelos abiertos, que puedas correrlos en tu propio navegador sin instalar nada, y gratis, es lo que realmente cambia las reglas del juego para eventos como este.

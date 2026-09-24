@@ -1,0 +1,31 @@
+# Glosario del guion de prueba (12 frases con jerga, siglas, nombres propios y ambigüedades).
+Nerdearla ~ nerd earla, ner de arla, nerdeárla
+Konex
+Buenos Aires
+merge
+pull request
+pipeline
+CI/CD
+deploy
+rollback
+issue
+GitHub
+API
+HTTP 429
+rate limit
+WebGPU
+npm install
+localhost
+API key
+circuit breaker
+Whisper
+Gemini
+LLM
+prompt
+Hugging Face
+Mozilla
+UTC
+Workers AI
+Cloudflare
+tests
+rama main => en: main branch | pt: branch main
