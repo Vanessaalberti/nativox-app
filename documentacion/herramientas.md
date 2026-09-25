@@ -7,10 +7,9 @@ Como las carpetas están en español, la configuración apunta a ellas:
 | `package.json` | Además de las dependencias, la configuración de Prettier (`prettier`), knip (`knip`: dead code; `compartido/*/index.ts` cuentan como entrada) y jscpd (`jscpd`: duplicación de 5 líneas o más). Scripts: `dev`, `construir`, `revisar`, `probar`, `formatear`, `tipos`, `deploy` (migraciones D1 + `wrangler deploy`; el nombre `deploy` lo espera el botón de Cloudflare). Versiones fijadas |
 | `tsconfig.json` + `configuracion/` | Opciones comunes en la raíz y un proyecto por zona en `configuracion/` (ver su README). `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`; alias `@navegador/*`, `@compartido/*`, `@servidor/*` |
 | `eslint.config.js` | `typescript-eslint` (con tipos), `eslint-plugin-boundaries` (reglas de `arquitectura.md`), `no-floating-promises`, `no-explicit-any`, `max-lines`, `complexity`, `no-console` |
-| `.gitleaks.toml` | Detección de secretos *(falta crearlo)* |
-| `vite.config.ts` | React + `@cloudflare/vite-plugin` (sin bindings remotos: el desarrollo funciona sin internet) + PWA *(falta)*; encabezados COOP/COEP en desarrollo (en producción los pone `publico/_headers`, solo en las rutas que corren modelos); `publicDir: "publico"`; compila también el componente embebible |
+| `vite.config.ts` | React + `@cloudflare/vite-plugin` (sin bindings remotos: el desarrollo funciona sin internet); encabezados COOP/COEP en desarrollo (en producción los pone `publico/_headers`, solo en las rutas que corren modelos); `publicDir: "publico"` |
 | `wrangler.jsonc` | `main: "servidor/entrada/index.ts"`, assets, D1 `DB` con `migrations_dir: "migraciones"`, Durable Object `SALA`, binding `AI`; `compatibility_date` del día de creación y `nodejs_compat`. **Sin secretos declarados** (el botón se los pediría a cada organizador) |
-| `vitest.config.ts` · `playwright.config.ts` | Pruebas unitarias y de punta a punta *(Playwright: falta)* |
+| `vitest.config.ts` | Pruebas unitarias |
 
 ## Dependencias aprobadas
 

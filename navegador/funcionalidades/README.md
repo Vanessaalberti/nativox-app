@@ -8,7 +8,7 @@ Una carpeta por funcionalidad. Cada una tiene `componentes/`, `hooks/` y `api.ts
 | -------------------- | -------------------------------------------------------------------------------------- |
 | `crear-evento`       | Roles, cuenta, "Tu evento y la IA", estimador de costo                                 |
 | `acceso`             | Entrada de administrador y operador, sesión, sin acceso                                |
-| `paneles`            | Paneles: estado de las salas                                                           |
+| `paneles`            | Paneles del administrador (una sola página con pestañas) y del operador                |
 | `salas`              | Crear, editar y listar salas                                                           |
 | `operadores`         | Operadores e invitaciones                                                              |
 | `agenda`             | Calendario, charlas, glosario por charla, términos sugeridos, transcripción y exportar |
@@ -16,6 +16,6 @@ Una carpeta por funcionalidad. Cada una tiene `componentes/`, `hooks/` y `api.ts
 | `pantalla-escenario` | Pantalla del escenario a pantalla completa                                             |
 | `subtitulos-stream`  | Subtítulos para vMix/OBS: estilo por sala y página transparente                        |
 | `produccion`         | Salidas fijas para vMix/OBS y selector de qué sala sale al aire (opcional)             |
-| `monitoreo`          | Monitoreo, acciones a distancia, modo caos                                             |
+| `monitoreo`          | Monitoreo, acciones a distancia y una demostración local de fallas (modo caos)         |
 | `ajustes`            | Avisos por Discord, operación desatendida, consumo, calidad, acceso, instancia         |
 | `audiencia`          | Elegir sala e idioma y ver los subtítulos en el celular                                |

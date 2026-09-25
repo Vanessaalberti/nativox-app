@@ -15,7 +15,7 @@
 ## Dependencias
 
 - **Puede importar:** `compartido/contratos` (`Resultado`).
-- **Lo usan:** `sesion-en-vivo`; `autorreparacion` (vigila `alTerminar`, paso 8).
+- **Lo usan:** `sesion-en-vivo` (que vuelve a abrir la entrada si `alTerminar` avisa que se cortó).
 
 ## Archivos
 

@@ -13,9 +13,10 @@ Discord → Ajustes del servidor → Integraciones → Webhooks → Nuevo webhoo
 
 ## Durante el evento
 
-- Las salas arrancan y paran con la agenda y se reparan solas.
-- Solo llega un aviso rojo si algo no se pudo reparar, con botones para reiniciar la sala o pasarla al equipo de reserva desde el celular.
+- Quien opera inicia la sala desde su pantalla de control; la sala guarda lo que se transcribe en la charla que toca según la agenda.
+- Si se corta la entrada de audio, la sala vuelve a abrirla sola (hasta 3 veces).
+- Llega un aviso rojo si la sala se queda sin señal, con un botón (link de un solo uso, que vence a los 15 minutos) para reiniciarla desde el celular.
 
 ## Modo caos (para probar y para el video)
 
-En el monitoreo de una sala: modelo trabado, sin internet, cable desconectado y computadora apagada. Cada falla muestra cómo se detecta, qué hace la sala sola y qué llega a Discord.
+En el monitoreo de una sala hay una demostración local, que no toca la sala real: modelo trabado, sin internet, cable desconectado y computadora apagada. Cada falla muestra cómo se detecta y qué llegaría a Discord.

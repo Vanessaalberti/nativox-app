@@ -49,8 +49,8 @@ export interface Recomendacion {
   motivos: Motivo[];
 }
 
-// Una pasada por debajo de esto se puede repetir bien seguido; por encima, forma cola. Umbrales del
-// laboratorio (placa AMD sin f16: ~2,5 s por pasada, por eso rinde como el nivel 2).
+// Una pasada por debajo de esto se puede repetir bien seguido; por encima, forma cola. Umbrales
+// medidos (placa AMD sin f16: ~2,5 s por pasada, por eso rinde como el nivel 2).
 const UMBRAL_NIVEL_4_MS = 600;
 const UMBRAL_NIVEL_3_MS = 1200;
 const UMBRAL_NIVEL_2_MS = 2500;

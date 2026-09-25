@@ -2,7 +2,7 @@
 
 **Qué hace:** Carga Whisper large-v3 turbo (Transformers.js + WebGPU) **una vez** en un worker y atiende los pedidos de transcripción de a uno, en orden (hay una sola placa de video). Elige la versión según la placa: con `shader-f16`, codificador sin comprimir (fp16); sin eso, comprimido (q4, ~0,76 GB). La primera pasada, que compila los shaders, se hace al cargar. Los archivos quedan en la caché del navegador: la segunda vez carga sin internet.
 
-**Qué NO hace:** Decidir qué modelo usar según la velocidad (eso es `evaluar-equipo`, paso 11). Todavía es un Web Worker por pestaña; el SharedWorker para varias salas va en el paso 11.
+**Qué NO hace:** Decidir qué modelo usar según la velocidad (eso es `evaluar-equipo`). Es un Web Worker por pestaña: varias salas en una computadora cargan una copia cada una.
 
 ## API pública (solo desde `index.ts`)
 

@@ -35,7 +35,7 @@ Ninguna forma cruza comas ni puntos. Si dos coincidencias se pisan, gana la más
 
 ## Pruebas
 
-Casos reales del laboratorio: "Workers Day de AI" → "Workers AI", "CI y CD" → "CI/CD", "pul request" → "pull request", sin comerse palabras vecinas ("rollback a"), y una palabra corta del término no cambia entera por parecido ("Workers Day" no se vuelve "Workers AI": eso lo resuelve la corrección del límite entre líneas). Protección: los 56 términos del guion (28 en inglés y 28 en portugués) vuelven con las tres marcas. El guion bien escrito no se "corrige".
+Casos reales medidos: "Workers Day de AI" → "Workers AI", "CI y CD" → "CI/CD", "pul request" → "pull request", sin comerse palabras vecinas ("rollback a"), y una palabra corta del término no cambia entera por parecido ("Workers Day" no se vuelve "Workers AI": eso lo resuelve la corrección del límite entre líneas). Protección: los 56 términos del guion (28 en inglés y 28 en portugués) vuelven con las tres marcas. El guion bien escrito no se "corrige".
 
 ## Referencia
 

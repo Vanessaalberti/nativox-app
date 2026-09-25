@@ -24,7 +24,7 @@
 ## Archivos
 
 - `idiomas.ts` · `validar.ts` · `socket-sala.ts` · `socket-produccion.ts` · `api/errores.ts` · `index.ts`
-- `api/acceso.ts` · `api/evento.ts` · `api/salas.ts` · `api/charlas.ts`. Previstos: `ajustes.ts`, `avisos.ts`…
+- `api/acceso.ts` · `api/evento.ts` · `api/salas.ts` · `api/charlas.ts` · `api/operadores.ts` · `api/ajustes.ts` · `api/audiencia.ts` · `api/produccion.ts` · `api/transcribir.ts`
 
 ## Reglas
 

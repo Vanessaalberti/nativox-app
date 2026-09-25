@@ -6,13 +6,13 @@
 
 ## API pública (solo desde `index.ts`)
 
-- `crearFlujoSubtitulos(opciones) → { agregarAudio(bloque), terminar() }`
+- `crearFlujoSubtitulos(opciones) → { agregarAudio(bloque), terminar(), corregirLinea(id, { original, traducciones }) }` — `corregirLinea` es para cuando alguien corrige una frase a mano: se publica como cualquier cambio, pasa a ser el contexto de lo que sigue, rehace las traducciones que no se escribieron a mano y lo escrito a mano no se pisa después.
   - Piezas: `cortador`, `transcribir` (ya sin alucinaciones), `quitarRepetido`, `crearAcuerdo`, `traducir` (ya con glosario, contexto y cola).
   - Opciones: `idSesion`, `idiomaOriginal`, `idiomasDestino`, `glosario`, `pasadaProvisoriaCadaMs` (0 = solo frases enteras), `ahoraMs`.
   - Avisos: `alCambiarLinea(linea)` (la línea completa, con `compartido/contratos`), `alMedir({ numero, transcripcionMs, traduccionMs, retrasoConfirmacionSegundos, retrasoTraduccionSegundos })`, `alFallar(motivo)`.
 - `corregirLimite(anterior, nuevo, glosario)` — "…como Workers Day" | "de AI de Cloudflare" → "…como Workers AI" | "de Cloudflare".
 
-Orden: en local cada fragmento se procesa después del anterior (una sola placa). Primero se traduce la línea nueva y después la corrección de la anterior. El reordenamiento de respuestas desordenadas de la nube llega con el motor de Workers AI (paso 11).
+Orden: en local cada fragmento se procesa después del anterior (una sola placa). Primero se traduce la línea nueva y después la corrección de la anterior. En la nube también se procesa en orden (un pedido por frase, uno después del otro), así que no hay respuestas desordenadas que reordenar.
 
 ## Dependencias
 

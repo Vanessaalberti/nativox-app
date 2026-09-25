@@ -1,6 +1,6 @@
 import { buscarPausas } from "./pausas";
 
-// Márgenes medidos en el laboratorio: 0,25 s en los bordes, y los silencios internos de más de
+// Márgenes medidos: 0,25 s en los bordes, y los silencios internos de más de
 // 0,5 s quedan en 0,2 s (el equivalente local del `vad_filter` de Workers AI).
 const MARGEN_BORDES = 0.25;
 const SILENCIO_INTERNO_MAXIMO = 0.5;

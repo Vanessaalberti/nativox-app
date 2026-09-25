@@ -13,7 +13,7 @@
 - `borrarSuperposicion(anterior, nuevo)` — busca el final de lo anterior (hasta 10 palabras) al principio de lo nuevo, con hasta 2 palabras sueltas antes (el contexto puede empezar a mitad de una palabra). Una sola palabra repetida solo se borra si tiene 4 letras o más.
 - `crearAcuerdoLocal()` → `agregarPasada(texto) → { estable, provisorio }` y `reiniciar()`: lo que dos pasadas seguidas dicen igual al principio queda estable y no retrocede.
 
-Previsto (paso 11): `crearWorkersAi(cliente, { formato })`.
+- `crearWhisperNube(servicio)` — Whisper large-v3 turbo en Workers AI, por frases de 4 a 8 s (WAV, con el horario de cada palabra para sacar el audio de contexto). El `servicio` que manda la frase al servidor lo pone quien arma la sesión.
 
 ## Dependencias
 

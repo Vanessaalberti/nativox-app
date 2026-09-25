@@ -4,7 +4,7 @@
 
 | Zona | Corre en | Contiene |
 | --- | --- | --- |
-| `navegador/` | Navegador | La app React: `arranque/`, `rutas/` (páginas finas), `funcionalidades/` (dominio), `modulos/` ♻, `interfaz/` ♻, `componente-embebible/` ♻, `segundo-plano/` (Web Workers) |
+| `navegador/` | Navegador | La app React: `arranque/`, `rutas/` (páginas finas), `funcionalidades/` (dominio), `modulos/` ♻, `interfaz/` ♻, `segundo-plano/` (Web Workers) |
 | `compartido/` | Navegador **y** servidor | Código puro, sin DOM ni APIs de Cloudflare: `contratos/` (API y WebSocket) y módulos ♻ puros (glosario, exportar subtítulos, métricas) |
 | `servidor/` | Cloudflare | Un solo Worker: `entrada/` (enrutador), `api/`, `objetos-durables/`, `modulos/` ♻, `plataforma/` |
 | `migraciones/` | D1 | Esquema de la base: única fuente de verdad |
@@ -19,14 +19,13 @@ flowchart TD
   funcionalidades --> compartido
   modulos --> compartido
   interfaz --> compartido
-  embebible[componente-embebible] --> compartido
   segundo_plano[segundo-plano] --> modulos
   api[servidor/api] --> modulos_servidor[servidor/modulos]
   api --> compartido
   modulos_servidor --> compartido
 ```
 
-- `modulos/`, `interfaz/`, `componente-embebible/`, `servidor/modulos/` y los módulos de `compartido/` son ♻: **no importan nada de fuera de su carpeta, salvo `compartido/contratos` cuando hace falta**.
+- `modulos/`, `interfaz/`, `servidor/modulos/` y los módulos de `compartido/` son ♻: **no importan nada de fuera de su carpeta, salvo `compartido/contratos` cuando hace falta**.
 - Un módulo ♻ **no importa a otro módulo ♻** salvo que su README lo declare (por ejemplo, `flujo-subtitulos` recibe el transcriptor y el traductor por parámetro; no los importa).
 - `navegador/` y `servidor/` **nunca** se importan entre sí: se hablan por `compartido/contratos` (HTTP y WebSocket), validado en los dos lados.
 - Una funcionalidad no importa a otra; lo que comparten sube a `modulos/`, `interfaz/` o `compartido/`.
@@ -45,13 +44,10 @@ flowchart LR
   tl --> flujo
   flujo --> esc[Pantalla del escenario]
   flujo --> ws[cliente-sala → Durable Object de la sala]
-  ws --> aud[Audiencia · vMix/OBS · componente embebible]
-  rep[autorreparacion] -.vigila.-> cap
-  rep -.vigila.-> tr
-  rep -.vigila.-> ws
+  ws --> aud[Audiencia · vMix/OBS · pantalla del escenario]
 ```
 
-En modo nube, `transcripcion` usa el motor de Workers AI (a través de `servidor/api/ia`) con audio en Opus (`codificador-opus`); todo lo demás es igual.
+En modo nube, `transcripcion` usa el motor de Workers AI (a través de `servidor/api/transcribir`, con una frase en WAV por pedido); todo lo demás es igual. La sala vuelve a abrir sola la entrada de audio si se corta (hasta 3 veces).
 
 ## Reparto a la audiencia: se genera una vez por sala, no por espectador
 
@@ -63,8 +59,8 @@ En modo nube, `transcripcion` usa el motor de Workers AI (a través de `servidor
 
 ## Operación desatendida
 
-- La pestaña manda señales al Durable Object de la sala; el Durable Object usa una **alarma** para detectar si la sala se calló y para arrancar/parar con la agenda.
-- Los avisos salen **del servidor** (`servidor/modulos/avisos`), nunca de la computadora de la sala: llegan aunque esté apagada.
-- Los botones de los avisos son links de un solo uso (`servidor/modulos/links-de-accion`).
+- La pestaña manda señales al Durable Object de la sala; el Durable Object usa una **alarma** para detectar si la sala se calló, y sabe qué charla de la agenda está en curso para guardar lo que se transcribe.
+- Los avisos salen **del servidor** (`servidor/modulos/avisos`, `servidor/plataforma/avisos-por-webhook.ts`), nunca de la computadora de la sala: llegan aunque esté apagada.
+- Los botones de los avisos son links de un solo uso que vencen a los 15 minutos (`servidor/api/acciones.ts`).
 
 Detalle y decisiones: documento de decisiones → "Operación desatendida y diferenciales".
