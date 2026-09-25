@@ -109,6 +109,8 @@ export function PanelDelOperador() {
           <div className="flex flex-col gap-3">
             <Link
               to={`/sala/${abierta.id}/control`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="border-[3px] border-[#b8241f] bg-naranja px-5 py-3 text-center font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:bg-[#e67b00]"
             >
               Entrar en vivo →

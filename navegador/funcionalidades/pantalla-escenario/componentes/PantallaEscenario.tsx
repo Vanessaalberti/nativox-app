@@ -12,7 +12,11 @@ export interface PropiedadesPantallaEscenario {
   idiomaOriginal: Idioma;
   idiomasDestino: readonly Idioma[];
   enVivo: boolean;
-  alSalir: () => void;
+  // Sin esto la pantalla vive en su propia pestaña: no hay "Salir" y la pantalla completa se pide
+  // con un botón.
+  alSalir?: () => void;
+  // Cómo abre: el idioma, si muestra el original y el tamaño (lo que trae el link).
+  inicial?: { idioma?: Idioma; mostrarOriginal?: boolean; tamano?: TamanoSubtitulo };
 }
 
 // Las pantallas frente al escenario muestran este mismo navegador: los subtítulos salen directo
@@ -23,13 +27,16 @@ export function PantallaEscenario({
   idiomasDestino,
   enVivo,
   alSalir,
+  inicial,
 }: PropiedadesPantallaEscenario) {
   const contenedor = useRef<HTMLDivElement>(null);
   const { visibles, mostrar } = useControlesQueSeEsconden();
   usePantallaCompleta(contenedor, alSalir);
-  const [idioma, setIdioma] = useState<Idioma>(idiomasDestino[0] ?? idiomaOriginal);
-  const [mostrarOriginal, setMostrarOriginal] = useState(true);
-  const [tamano, setTamano] = useState<TamanoSubtitulo>("M");
+  const [idioma, setIdioma] = useState<Idioma>(
+    inicial?.idioma ?? idiomasDestino[0] ?? idiomaOriginal,
+  );
+  const [mostrarOriginal, setMostrarOriginal] = useState(inicial?.mostrarOriginal ?? true);
+  const [tamano, setTamano] = useState<TamanoSubtitulo>(inicial?.tamano ?? "M");
   const idiomas = [idiomaOriginal, ...idiomasDestino];
 
   return (
@@ -80,13 +87,23 @@ export function PantallaEscenario({
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={alSalir}
-          className="ml-auto font-bold uppercase tracking-widest text-canvas/70 hover:text-canvas"
-        >
-          ✕ Salir (Esc)
-        </button>
+        {alSalir ? (
+          <button
+            type="button"
+            onClick={alSalir}
+            className="ml-auto font-bold tracking-widest text-canvas/70 uppercase hover:text-canvas"
+          >
+            ✕ Salir (Esc)
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void contenedor.current?.requestFullscreen().catch(() => undefined)}
+            className="ml-auto font-bold tracking-widest text-canvas/70 uppercase hover:text-canvas"
+          >
+            ⛶ Pantalla completa
+          </button>
+        )}
       </div>
       <div className="flex flex-1 items-end justify-center px-[6vw] pb-[8vh]">
         <VistaSubtitulos

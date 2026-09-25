@@ -79,6 +79,8 @@ export function DetalleDeCharla({
       </p>
       <Link
         to={`/sala/${charla.salaId}/control?charla=${charla.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
         className="mb-6 block border-[3px] border-[#b8241f] bg-naranja px-4 py-2.5 text-center font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:bg-[#e67b00]"
       >
         {soloLectura ? "Ver en vivo esta charla →" : "Transcribir esta charla →"}

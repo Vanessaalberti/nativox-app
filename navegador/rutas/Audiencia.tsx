@@ -3,6 +3,7 @@ import { GuardaDeSesion } from "@navegador/funcionalidades/acceso";
 import { PaginaDeAccion } from "@navegador/funcionalidades/ajustes";
 import { ListaDeSalasPublicas, PantallaDeAudiencia } from "@navegador/funcionalidades/audiencia";
 import { MonitoreoDeSala } from "@navegador/funcionalidades/monitoreo";
+import { PantallaDeLaSala } from "@navegador/funcionalidades/pantalla-escenario";
 import {
   ConfiguradorDeSala,
   PaginaTransparente,
@@ -17,6 +18,12 @@ export function Audiencia() {
 export function PantallaDeSala() {
   const { id = "" } = useParams();
   return <PantallaDeAudiencia salaId={id} />;
+}
+
+// /sala/:id/escenario — la pantalla del escenario en su propia pestaña (sin sesión).
+export function EscenarioDeSala() {
+  const { id = "" } = useParams();
+  return <PantallaDeLaSala salaId={id} />;
 }
 
 // /sala/:id/transmision — la página transparente de una sala para vMix/OBS (sin sesión).

@@ -9,3 +9,5 @@
 **Estructura:** `componentes/PantallaEscenario.tsx` · `hooks/useControlesQueSeEsconden.ts` · `hooks/usePantallaCompleta.ts` · `index.ts`.
 
 **Maqueta de referencia:** `sesion-operador.html` (botón "⛶ Pantalla del escenario").
+
+**En su propia pestaña:** `PantallaDeLaSala({ salaId })` (ruta `/sala/:id/escenario`, sin sesión) se conecta a la sala como espectador y muestra la misma pantalla. El link trae `?idioma=en&tamano=L&original=0`; se arma desde la pantalla de control ("Link de la pantalla del escenario"). Sin `alSalir` no hay "Salir": la pantalla completa la pide un botón.

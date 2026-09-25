@@ -2,11 +2,11 @@
 
 **Transcripción y traducción en vivo, de código abierto, para conferencias.** El audio del escenario se convierte en subtítulos en el idioma original y traducidos (español ↔ inglés ↔ portugués): en las pantallas del escenario, en el stream (vMix/OBS) y en los celulares.
 
-> En construcción durante la Vibeathon Nerdearla 2026. Las secciones marcadas *(a completar)* se completan en el build.
+> En construcción durante la Vibeathon Nerdearla 2026.
 
 ## Por qué es distinto
 
-- **Corre en el navegador, gratis y sin internet:** Whisper large-v3 turbo + Bergamot en la computadora de cada sala (WebGPU). Sin API keys. El costo no crece con la cantidad de salas.
+- **Corre en el navegador, gratis y sin internet:** Whisper large-v3 turbo + Bergamot en la placa de video de tu computadora (WebGPU). Sin API keys. El costo no crece con la cantidad de salas. Si preferís no usar tu computadora, hay un modo en la nube (Workers AI) que se elige por sala.
 - **"Evaluar esta computadora":** un clic mide el equipo y elige el modelo, la velocidad y el traductor.
 - **Salas sin nadie al lado:** arrancan y paran con la agenda, se reparan solas y avisan por **Discord con un botón para reiniciar la sala desde el celular**. Nadie tiene que estar al lado de la computadora ni entrar por escritorio remoto.
 - **Glosario técnico en tres capas:** guía a Whisper, corrige la transcripción y se protege al traducir.
@@ -26,14 +26,36 @@ Cloudflare crea el Worker pero **no le enciende la dirección pública**, así q
 4. **Abrila enseguida y creá el evento:** la primera persona que completa el asistente queda como dueña de la instancia. No dejes la dirección abierta sin usar.
 5. **Para que aparezca en tu repositorio de GitHub:** en la página del repositorio, el engranaje junto a *About* → *Website* → pegá tu dirección. Cloudflare no lo completa solo.
 
-## Requisitos *(a completar)*
+## Requisitos
 
-- Una cuenta de Cloudflare y una de GitHub o GitLab.
-- Para el modo local: Chrome 124 o posterior con WebGPU en la computadora de cada sala.
+- Una cuenta de **Cloudflare** y una de **GitHub**. Nada más para desplegar y usar la instancia.
 
-## Cómo escalar *(a completar)*
+### Solo si transcribís en local (opcional)
 
-Una computadora por sala corre en local (gratis). Las salas que una computadora no llega a cubrir pasan solas a Workers AI (~$0,037 por hora de sala). Ver `documentacion/escalado-y-costos.md`.
+Con el modo local, la transcripción corre en el navegador de la computadora que la use; no importa cuántas salas atienda cada una (ver *Cómo escalar*). Esa computadora necesita:
+
+- **Chrome o Edge 124 o posterior**, con **WebGPU** (una placa de video compatible).
+- **Memoria y disco:** unos 8 GB de RAM (con 4 GB o menos conviene cerrar todo lo demás) y ~1 GB libre para el modelo de Whisper, que se baja una sola vez y queda guardado. TranslateGemma, el traductor opcional de más calidad, pide ~2 a 3 GB más y una placa con margen.
+- **Entrada de audio:** la salida de la consola de sonido o un micrófono. Para probar alcanza con un archivo, un link a un video o el audio de otra pestaña.
+
+No hace falta saber si tu computadora alcanza: **"Evaluar esta computadora"** (en el asistente y en la pantalla de control) la mide en unos segundos y te dice qué nivel de velocidad usar, o si conviene la nube. Con el modo en la nube no hace falta WebGPU ni una placa: alcanza con un navegador.
+
+## Cómo escalar
+
+Hay dos modos de transcribir y se elige **por sala**, en la pantalla de control.
+
+| | Local (por defecto) | En la nube (Workers AI, opcional) |
+| --- | --- | --- |
+| **Dónde corre** | En la placa de video de la computadora que abre la sala | En Cloudflare (Whisper large-v3 turbo) |
+| **Costo** | $0 | ~$0,037 por hora de sala, con una cuota gratis diaria (~3 h) |
+| **Qué limita** | La potencia de la computadora | Los pedidos por minuto de tu cuenta y tu presupuesto |
+| **Cómo se ve** | Texto provisorio mientras se habla (según el nivel de velocidad) | Por frases de 4 a 8 s: el texto aparece al cerrarse cada frase |
+
+**En local, escalás con la computadora.** Una computadora puede atender una sala o varias: depende de qué tan rápido resuelve cada pasada de Whisper. Como regla, cuántas salas entran ≈ largo de una frase (~6 s) ÷ lo que tarda una pasada. Una placa que hace la pasada en ~1 s alcanza para varias salas en frases completas; una de ~3 s, para una o dos. Es una estimación: "Evaluar esta computadora" te da tu número real. Para más salas, sumá computadoras: el costo sigue en $0.
+
+**En la nube, escalás con el presupuesto.** Cada sala transcripta en la nube cuesta ~$0,037 por hora, así que el gasto es *horas de sala × $0,037* (una sala en vivo 8 h por día durante 3 días ≈ $0,89). Un evento con 10 salas, 8 h por día y 2 días son 160 horas de sala ≈ $5,92. Cloudflare descuenta primero la cuota gratis diaria de Workers AI, así que lo real suele ser menos. Cada sala manda una frase cada 4 a 8 s, y el límite de la cuenta (720 pedidos por minuto) alcanza para unas 60 salas a la vez. Podés dejarla apagada y activarla solo para las salas que la necesiten (Ajustes → Consumo).
+
+**Los espectadores no suman costo de IA**: cada sala genera sus subtítulos una sola vez y el servidor los reparte; quien mira solo recibe texto. Los detalles y las fuentes están en `documentacion/escalado-y-costos.md`.
 
 ## Desarrollo
 

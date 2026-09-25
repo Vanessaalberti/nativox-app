@@ -113,6 +113,8 @@ export function CalendarioDeLaSala({
           <div className="flex shrink-0 flex-wrap items-center gap-3">
             <Link
               to={`/sala/${sala.id}/control`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 border-[1.5px] border-[#443d30] px-5 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:border-ink hover:bg-ink hover:text-canvas"
             >
               Ver como operador →

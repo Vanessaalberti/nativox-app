@@ -2,9 +2,14 @@ import { useEffect, type RefObject } from "react";
 
 // Pide pantalla completa al abrir. Si el navegador la bloquea, la vista igual ocupa toda la
 // ventana (es `fixed inset-0`), así que no es un error. Esc o salir de la pantalla completa
-// cierran la vista.
-export function usePantallaCompleta(elemento: RefObject<HTMLElement | null>, alSalir: () => void) {
+// cierran la vista. Sin `alSalir` (una pantalla que vive en su propia pestaña) no pide nada sola:
+// la pantalla completa la pide un botón.
+export function usePantallaCompleta(
+  elemento: RefObject<HTMLElement | null>,
+  alSalir: (() => void) | undefined,
+) {
   useEffect(() => {
+    if (!alSalir) return;
     const nodo = elemento.current;
     if (nodo && !document.fullscreenElement) {
       nodo.requestFullscreen().catch(() => {

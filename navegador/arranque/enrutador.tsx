@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router";
 import {
   AccionDeAviso,
   Audiencia,
+  EscenarioDeSala,
   Monitoreo,
   PantallaDeSala,
   Subtitulos,
@@ -35,6 +36,7 @@ export const enrutador = createBrowserRouter([
   { path: "/a/:token", element: <Audiencia /> },
   { path: "/accion/:token", element: <AccionDeAviso /> },
   { path: "/sala/:id/pantalla", element: <PantallaDeSala /> },
+  { path: "/sala/:id/escenario", element: <EscenarioDeSala /> },
   { path: "/sala/:id/transmision", element: <TransmisionDeSala /> },
   { path: "/sala/:id/subtitulos", element: <Subtitulos /> },
   { path: "/sala/:id/monitoreo", element: <Monitoreo /> },

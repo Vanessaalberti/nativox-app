@@ -79,6 +79,8 @@ export function PanelDeSalas({ conEquipo, visible }: { conEquipo: boolean; visib
                   </h3>
                   <Link
                     to={`/sala/${sala.id}/control`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="mb-4 font-mono text-xs font-bold tracking-widest text-verde uppercase hover:underline"
                   >
                     Entrar en vivo →
