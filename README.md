@@ -16,12 +16,15 @@
 
 Botón "Deploy to Cloudflare": crea el Worker, la base D1, los Durable Objects y la conexión con Workers AI. No pide secretos.
 
-### Cuando termina: tu dirección
+### Cuando termina: activá tu dirección (un paso a mano)
 
-1. **Tu dirección** es `https://<nombre-del-worker>.<tu-subdominio>.workers.dev` (el Worker se llama `nativox` salvo que hayas elegido otro nombre). La ves en Cloudflare: *Workers y Pages* → tu Worker → **Visitar** (*Visit*). La primera vez, Cloudflare puede pedirte que elijas el subdominio `workers.dev` de tu cuenta.
-2. **Si no abre,** en ese mismo Worker mirá *Settings → Domains & Routes*: `workers.dev` tiene que decir *Enabled*. `wrangler.jsonc` ya lo pide activado en cada deploy.
-3. **Abrila enseguida y creá el evento:** la primera persona que completa el asistente queda como dueña de la instancia. No dejes la dirección abierta sin usar.
-4. **Para que la dirección aparezca en tu repositorio de GitHub:** en la página del repositorio, el engranaje junto a *About* → *Website* → pegá tu dirección. Cloudflare no lo completa solo.
+Cloudflare crea el Worker pero **no le enciende la dirección pública**, así que al terminar el deploy todavía no hay a dónde entrar. Hacé esto una vez:
+
+1. En Cloudflare abrí *Workers y Pages* → tu Worker (se llama `nativox` salvo que hayas elegido otro nombre).
+2. Entrá a **Settings → Domains & Routes** (arriba, *Dominios y rutas*) y activá **workers.dev** (*Enable*).
+3. Tu dirección queda así: `https://<nombre-del-worker>.<tu-subdominio>.workers.dev`. El subdominio es el nombre de tu cuenta de Cloudflare y no se puede evitar con `workers.dev`; para una dirección sin tu usuario hace falta un dominio propio. La primera vez, Cloudflare puede pedirte que elijas ese subdominio.
+4. **Abrila enseguida y creá el evento:** la primera persona que completa el asistente queda como dueña de la instancia. No dejes la dirección abierta sin usar.
+5. **Para que aparezca en tu repositorio de GitHub:** en la página del repositorio, el engranaje junto a *About* → *Website* → pegá tu dirección. Cloudflare no lo completa solo.
 
 ## Requisitos *(a completar)*
 
