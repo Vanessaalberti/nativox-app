@@ -9,3 +9,5 @@ export {
   type Recomendacion,
 } from "./recomendacion";
 export { NIVELES, pasadaProvisoriaDelNivel, type InfoNivel, type Nivel } from "./niveles";
+export { NOMBRES_DE_NIVEL, explicarMotivo, segundos } from "./textos-es";
+export { useEvaluacion, type EstadoEvaluacion } from "./useEvaluacion";

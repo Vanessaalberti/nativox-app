@@ -8,16 +8,19 @@ import {
   type Captura,
   type OpcionesCaptura,
 } from "@navegador/modulos/captura-audio";
+import { pasadaProvisoriaDelNivel, type Nivel } from "@navegador/modulos/evaluar-equipo";
 import { crearCortador } from "@navegador/modulos/cortador-audio";
 import {
   crearFlujoSubtitulos,
   type FlujoSubtitulos,
   type Medicion,
 } from "@navegador/modulos/flujo-subtitulos";
+import { transcribirEnLaNube } from "@navegador/modulos/cliente-instancia";
 import {
   borrarSuperposicion,
   crearAcuerdoLocal,
   crearWhisperLocal,
+  crearWhisperNube,
   transcribirSinAlucinaciones,
 } from "@navegador/modulos/transcripcion";
 import {
@@ -25,7 +28,7 @@ import {
   traducirConContexto,
   ultimoTramoSinCerrar,
 } from "@navegador/modulos/traduccion";
-import type { ModelosListos } from "./preparar-modelos";
+import type { DondeSeTranscribe, ElegirTraductor, ModelosListos } from "./preparar-modelos";
 
 type Fuente =
   | { tipo: "entrada"; idDispositivo: string | null }
@@ -38,8 +41,13 @@ export interface ConfiguracionSesion {
   idiomaOriginal: Idioma;
   idiomasDestino: Idioma[];
   glosario: string;
-  // Texto provisorio mientras se habla (transcripción en vivo de verdad).
-  textoEnVivo: boolean;
+  // La barra de velocidad: cada cuánto se muestra lo que se viene diciendo (1 = solo frases completas).
+  nivel: Nivel;
+  traductor: ElegirTraductor;
+  // Dónde se transcribe: en esta computadora o en la nube, por frases de 4 a 8 s.
+  donde: DondeSeTranscribe;
+  // Una prueba: se ve y se mide acá, pero no se publica en la sala ni se guarda.
+  prueba: boolean;
 }
 
 export interface EventosSesion {
@@ -54,15 +62,29 @@ export interface EventosSesion {
 export interface SesionArmada {
   captura: Captura;
   flujo: FlujoSubtitulos;
+  // Suma términos al glosario de la sesión que está corriendo: valen desde la próxima frase, para
+  // transcribir y para proteger la traducción.
+  agregarAlGlosario: (texto: string) => void;
 }
-
-const PASADA_PROVISORIA_MS = 1000;
 
 // El valor más alto del bloque, de 0 a 1: alcanza para una barra de nivel.
 function picoDe(bloque: Float32Array): number {
   let pico = 0;
   for (const muestra of bloque) pico = Math.max(pico, Math.abs(muestra));
   return Math.min(1, pico);
+}
+
+// Frases de 4 a 8 s: cuida el límite de pedidos y le da a Whisper el contexto que necesita. El
+// mínimo es fijo (el ajuste por velocidad es del motor local).
+const MINIMO_EN_LA_NUBE_SEGUNDOS = 4;
+const MAXIMO_EN_LA_NUBE_SEGUNDOS = 8;
+
+function cortadorDeLaNube() {
+  const cortador = crearCortador({
+    minimoSegundos: MINIMO_EN_LA_NUBE_SEGUNDOS,
+    maximoSegundos: MAXIMO_EN_LA_NUBE_SEGUNDOS,
+  });
+  return { ...cortador, cambiarMinimo: () => undefined };
 }
 
 function abrirFuente(fuente: Fuente, opciones: OpcionesCaptura): Promise<Resultado<Captura>> {
@@ -84,7 +106,14 @@ export async function armarSesion(
   eventos: EventosSesion,
 ): Promise<Resultado<SesionArmada>> {
   const glosario = leerGlosario(configuracion.glosario);
-  const transcriptor = crearWhisperLocal(modelos);
+  const enLaNube = configuracion.donde === "nube";
+  if (!enLaNube && !modelos) {
+    return { ok: false, motivo: "No se cargó Whisper en esta computadora." };
+  }
+  const transcriptor =
+    enLaNube || !modelos
+      ? crearWhisperNube({ transcribir: transcribirEnLaNube })
+      : crearWhisperLocal(modelos);
   const cola = crearCola();
 
   const flujo = crearFlujoSubtitulos({
@@ -92,10 +121,12 @@ export async function armarSesion(
     idiomaOriginal: configuracion.idiomaOriginal,
     idiomasDestino: configuracion.idiomasDestino,
     glosario,
-    pasadaProvisoriaCadaMs: configuracion.textoEnVivo ? PASADA_PROVISORIA_MS : 0,
-    cortador: crearCortador({ minimoSegundos: 1.5 }),
+    // Por frases enteras: la nube no hace texto provisorio (cada pasada se factura).
+    pasadaProvisoriaCadaMs: enLaNube ? 0 : pasadaProvisoriaDelNivel(configuracion.nivel),
+    cortador: enLaNube ? cortadorDeLaNube() : crearCortador({ minimoSegundos: 1.5 }),
     transcribir: (audio, opciones) => transcribirSinAlucinaciones(transcriptor, audio, opciones),
-    quitarRepetido: borrarSuperposicion,
+    // La nube ya saca el audio de contexto por el horario de cada palabra.
+    quitarRepetido: enLaNube ? (_anterior, nuevo) => nuevo : borrarSuperposicion,
     crearAcuerdo: crearAcuerdoLocal,
     traducir: ({ texto, anterior, de, a }) =>
       cola(() =>
@@ -122,5 +153,13 @@ export async function armarSesion(
   };
   const captura = await abrirFuente(configuracion.fuente, opcionesCaptura);
   if (!captura.ok) return captura;
-  return { ok: true, valor: { captura: captura.valor, flujo } };
+  return {
+    ok: true,
+    valor: {
+      captura: captura.valor,
+      flujo,
+      // El flujo y la traducción leen este mismo arreglo: lo que se le suma llega a los dos.
+      agregarAlGlosario: (texto) => glosario.push(...leerGlosario(texto)),
+    },
+  };
 }

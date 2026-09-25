@@ -7,6 +7,7 @@ import type { AlmacenOperadores } from "@servidor/plataforma/almacen-operadores"
 import type { AlmacenProduccion } from "@servidor/plataforma/almacen-produccion";
 import type { Avisos } from "@servidor/plataforma/avisos";
 import type { TiempoReal } from "@servidor/plataforma/tiempo-real";
+import type { Transcriptor } from "@servidor/plataforma/transcriptor";
 import { responderError } from "@servidor/plataforma/errores";
 
 // Lo que cada pedido necesita saber de su entorno: dónde guardar, qué hora es y quién pregunta.
@@ -19,6 +20,7 @@ export interface ContextoApi {
   ajustes: AlmacenAjustes;
   avisos: Avisos;
   tiempoReal: TiempoReal;
+  transcriptor: Transcriptor;
   ahora: () => number;
   // Para frenar intentos en cadena por origen (CF-Connecting-IP en Cloudflare).
   ip: string;

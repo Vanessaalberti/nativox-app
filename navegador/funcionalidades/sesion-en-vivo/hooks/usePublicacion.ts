@@ -31,7 +31,9 @@ export function usePublicacion(
   const enviarRef = useRef<ConexionSala | null>(null);
   const mandadas = useRef(new Map<string, string>());
   const nivel = sesion.nivelDeAudio;
-  const ultima = useRef({ fase: sesion.estado.fase, retrasoMs: 0 });
+  // Una prueba se ve y se mide en esta pantalla, pero no se publica ni se guarda.
+  const prueba = sesion.configuracion?.prueba ?? false;
+  const ultima = useRef({ fase: sesion.estado.fase, retrasoMs: 0, prueba: false });
 
   useEffect(() => {
     const sala = conectarSala({
@@ -54,27 +56,29 @@ export function usePublicacion(
 
   // Las líneas se mandan al cambiar (provisoria → confirmada → traducida), sin repetir las iguales.
   useEffect(() => {
+    if (prueba) return;
     for (const linea of sesion.lineas) {
       const texto = JSON.stringify(linea);
       if (mandadas.current.get(linea.id) === texto) continue;
       mandadas.current.set(linea.id, texto);
       enviarRef.current?.enviar(linea);
     }
-  }, [sesion.lineas]);
+  }, [sesion.lineas, prueba]);
 
   useEffect(() => {
     const ultimaMedicion = sesion.mediciones.at(-1);
     ultima.current = {
       fase: sesion.estado.fase,
       retrasoMs: ultimaMedicion ? Math.round(ultimaMedicion.retrasoTraduccionSegundos * 1000) : 0,
+      prueba,
     };
-  }, [sesion.estado.fase, sesion.mediciones]);
+  }, [sesion.estado.fase, sesion.mediciones, prueba]);
 
   // La sesión pasa a "en vivo" → empieza la charla; deja de estarlo → termina.
   const enVivo = sesion.estado.fase === "en-vivo";
   const avisada = useRef(false);
   useEffect(() => {
-    if (!charla) return;
+    if (!charla || prueba) return;
     if (enVivo && !avisada.current) {
       avisada.current = true;
       enviarRef.current?.enviar({
@@ -94,7 +98,7 @@ export function usePublicacion(
         idioma: charla.idioma,
       });
     }
-  }, [enVivo, charla]);
+  }, [enVivo, charla, prueba]);
 
   useEffect(() => {
     const avisar = () => {
@@ -102,7 +106,8 @@ export function usePublicacion(
       nivel.current = 0;
       enviarRef.current?.enviar({
         tipo: "senal",
-        estado: ultima.current.fase === "en-vivo" ? "en-vivo" : "detenida",
+        estado:
+          ultima.current.fase === "en-vivo" && !ultima.current.prueba ? "en-vivo" : "detenida",
         nivelAudio: pico,
         latenciaMs: ultima.current.retrasoMs,
       });

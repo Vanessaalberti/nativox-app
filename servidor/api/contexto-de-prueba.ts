@@ -10,6 +10,7 @@ import type { Avisos } from "@servidor/plataforma/avisos";
 import { crearAlmacenAjustesEnMemoria } from "@servidor/plataforma/almacen-ajustes-en-memoria";
 import { crearAlmacenAgendaEnMemoria } from "@servidor/plataforma/almacen-agenda-en-memoria";
 import type { TiempoReal } from "@servidor/plataforma/tiempo-real";
+import type { Transcriptor } from "@servidor/plataforma/transcriptor";
 import { crearAlmacenProduccionEnMemoria } from "@servidor/plataforma/almacen-produccion-en-memoria";
 import { crearAlmacenOperacionEnMemoria } from "@servidor/plataforma/almacen-operacion-en-memoria";
 import { crearAlmacenOperadoresEnMemoria } from "@servidor/plataforma/almacen-operadores-en-memoria";
@@ -25,6 +26,28 @@ export const CONTRASENA_DE_PRUEBA = "una frase bien larga";
 
 // La sala en tiempo real de mentira: guarda a qué sala y con qué rol se conectaron y qué salas
 // están "en vivo".
+// Un transcriptor de mentira: devuelve siempre el mismo texto y anota qué se le pidió.
+export interface TranscriptorFalso extends Transcriptor {
+  pedidos: { idioma: string; prompt: string; bytes: number }[];
+  falla: boolean;
+}
+
+function crearTranscriptorFalso(): TranscriptorFalso {
+  const falso: TranscriptorFalso = {
+    pedidos: [],
+    falla: false,
+    transcribir: ({ audio, idioma, prompt }) => {
+      falso.pedidos.push({ idioma, prompt, bytes: audio.length });
+      if (falso.falla) return Promise.reject(new Error("el modelo no contestó"));
+      return Promise.resolve({
+        texto: "hola a todos",
+        palabras: [{ palabra: " hola", inicio: 0, fin: 0.4 }],
+      });
+    },
+  };
+  return falso;
+}
+
 export interface TiempoRealFalso extends TiempoReal {
   conexiones: { salaId: string; rol: string | null }[];
   enVivo: Set<string>;
@@ -73,6 +96,7 @@ function crearTiempoRealFalso(): TiempoRealFalso {
 export function crearContextoDePrueba(): ContextoApi & {
   reloj: number;
   tiempoReal: TiempoRealFalso;
+  transcriptor: TranscriptorFalso;
   avisos: AvisosFalsos;
 } {
   const agenda = crearAlmacenAgendaEnMemoria();
@@ -85,6 +109,7 @@ export function crearContextoDePrueba(): ContextoApi & {
     ),
     operadores: crearAlmacenOperadoresEnMemoria(),
     tiempoReal: crearTiempoRealFalso(),
+    transcriptor: crearTranscriptorFalso(),
     operacion: crearAlmacenOperacionEnMemoria(),
     ajustes: crearAlmacenAjustesEnMemoria(),
     avisos: crearAvisosFalsos(),

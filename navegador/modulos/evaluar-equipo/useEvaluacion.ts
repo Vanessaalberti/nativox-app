@@ -1,9 +1,5 @@
 import { useCallback, useState } from "react";
-import {
-  evaluarEquipo,
-  type AvanceEvaluacion,
-  type Evaluacion,
-} from "@navegador/modulos/evaluar-equipo";
+import { evaluarEquipo, type AvanceEvaluacion, type Evaluacion } from "./evaluar";
 
 export type EstadoEvaluacion =
   | { fase: "inactiva" }
@@ -15,7 +11,7 @@ export type EstadoEvaluacion =
 export function useEvaluacion() {
   const [estado, setEstado] = useState<EstadoEvaluacion>({ fase: "inactiva" });
 
-  const evaluar = useCallback(async () => {
+  const evaluar = useCallback(async (): Promise<Evaluacion | null> => {
     setEstado({ fase: "evaluando", avance: { etapa: "detectando" } });
     const resultado = await evaluarEquipo((avance) => setEstado({ fase: "evaluando", avance }));
     setEstado(
@@ -23,6 +19,7 @@ export function useEvaluacion() {
         ? { fase: "lista", evaluacion: resultado.valor }
         : { fase: "error", motivo: resultado.motivo },
     );
+    return resultado.ok ? resultado.valor : null;
   }, []);
 
   return { estado, evaluar };

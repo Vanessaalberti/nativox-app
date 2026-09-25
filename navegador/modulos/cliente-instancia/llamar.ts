@@ -9,12 +9,25 @@ const MENSAJE_SIN_CONEXION =
 export async function llamar<E extends v.GenericSchema<unknown, unknown>>(
   ruta: string,
   esquema: E,
-  { metodo = "GET", cuerpo }: { metodo?: "GET" | "POST" | "PUT" | "DELETE"; cuerpo?: unknown } = {},
+  {
+    metodo = "GET",
+    cuerpo,
+    audio,
+  }: {
+    metodo?: "GET" | "POST" | "PUT" | "DELETE";
+    cuerpo?: unknown;
+    // Un audio en lugar de JSON (la transcripción en la nube): el tipo y, aparte, lo que se manda.
+    audio?: { tipo: string; datos: Uint8Array<ArrayBuffer>; encabezados: Record<string, string> };
+  } = {},
 ): Promise<Resultado<v.InferOutput<E>>> {
   const init: RequestInit = { method: metodo, credentials: "same-origin" };
   if (cuerpo !== undefined) {
     init.headers = { "Content-Type": "application/json" };
     init.body = JSON.stringify(cuerpo);
+  }
+  if (audio) {
+    init.headers = { "Content-Type": audio.tipo, ...audio.encabezados };
+    init.body = audio.datos;
   }
 
   let respuesta: Response;

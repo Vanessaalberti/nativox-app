@@ -66,7 +66,7 @@ function armar(textos: string[], cambios: Partial<OpcionesFlujo> = {}) {
     const porId = new Map(lineas.map((linea) => [linea.id, linea]));
     return [...porId.values()];
   };
-  return { decir, lineas, traducciones, fallas, ultimaVersion };
+  return { decir, lineas, traducciones, fallas, ultimaVersion, flujo };
 }
 
 describe("crearFlujoSubtitulos", () => {
@@ -112,6 +112,33 @@ describe("crearFlujoSubtitulos", () => {
     ]);
     // Primero la línea nueva, después la corrección de la anterior.
     expect(traducciones.slice(-2)).toEqual(["de Cloudflare", "usamos modelos como Workers AI"]);
+  });
+
+  it("una corrección a mano cambia la línea, rehace la traducción y no pisa lo escrito a mano", async () => {
+    const { decir, flujo, ultimaVersion, traducciones } = armar(["Usamos una nube."], {
+      idiomasDestino: ["en", "pt"],
+    });
+    await decir(fragmento(0, 0, 2));
+
+    const aceptada = flujo.corregirLinea("s-0", {
+      original: "Usamos una nube pública.",
+      traducciones: { en: "We use a cloud, my way", pt: "pt:Usamos una nube." },
+    });
+    await flujo.terminar();
+
+    expect(aceptada).toBe(true);
+    // El inglés se escribió a mano y se conserva; el portugués se rehizo con el texto corregido.
+    expect(ultimaVersion()[0]).toMatchObject({
+      original: "Usamos una nube pública.",
+      traducciones: { en: "We use a cloud, my way", pt: "pt:Usamos una nube pública." },
+    });
+    expect(traducciones.at(-1)).toBe("Usamos una nube pública.");
+  });
+
+  it("no corrige una línea que no existe ni una provisoria", () => {
+    const { flujo } = armar([]);
+
+    expect(flujo.corregirLinea("nada", { original: "x", traducciones: {} })).toBe(false);
   });
 
   it("nunca publica dos líneas para el mismo segmento", async () => {

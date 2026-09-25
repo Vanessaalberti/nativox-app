@@ -8,6 +8,15 @@ export interface FlujoSubtitulos {
   agregarAudio(bloque: Float32Array): void;
   // Corta lo que quedó, termina de transcribir y traducir, y resuelve cuando no queda nada.
   terminar(): Promise<void>;
+  // Alguien corrigió a mano una línea ya confirmada: se avisa como cualquier otro cambio, el
+  // texto corregido pasa a ser el contexto de las frases que siguen y lo escrito a mano no se
+  // pisa después. Si cambió el original, las traducciones que no se corrigieron se rehacen.
+  corregirLinea(id: string, cambios: CorreccionDeLinea): boolean;
+}
+
+export interface CorreccionDeLinea {
+  original: string;
+  traducciones: Linea["traducciones"];
 }
 
 const FRECUENCIA = 16_000;
@@ -24,12 +33,31 @@ export function crearFlujoSubtitulos(o: OpcionesFlujo): FlujoSubtitulos {
   let provisoriaEnCurso = false;
   let ultimaProvisoriaMs = Number.NEGATIVE_INFINITY;
   let siguienteNumero = 0;
+  // Las líneas corregidas a mano: su original y las traducciones escritas a mano no se pisan.
+  const corregidas = new Map<number, Set<string>>();
 
   const segundosDeCaptura = () => (o.ahoraMs() - (inicioMs ?? o.ahoraMs())) / 1000;
 
-  const publicar = (numero: number, linea: Linea) => {
+  const aplicar = (numero: number, linea: Linea) => {
     lineas.set(numero, linea);
     o.alCambiarLinea({ ...linea, traducciones: { ...linea.traducciones } });
+  };
+
+  const publicar = (numero: number, linea: Linea) => {
+    const actual = lineas.get(numero);
+    const fijas = corregidas.get(numero);
+    if (!actual || !fijas) {
+      aplicar(numero, linea);
+      return;
+    }
+    // Una línea corregida a mano: lo que llegue después solo puede sumar traducciones nuevas.
+    const escritas = Object.fromEntries(
+      Object.entries(actual.traducciones).filter(([idioma]) => fijas.has(idioma)),
+    );
+    aplicar(numero, {
+      ...actual,
+      traducciones: { ...linea.traducciones, ...escritas },
+    });
   };
 
   // La última línea confirmada con texto antes de `numero`: con ella se une el límite y se toma
@@ -192,6 +220,32 @@ export function crearFlujoSubtitulos(o: OpcionesFlujo): FlujoSubtitulos {
       inicioMs ??= o.ahoraMs() - (bloque.length / FRECUENCIA) * 1000;
       for (const fragmento of o.cortador.agregar(bloque)) encolar(fragmento);
       quizasPasadaProvisoria();
+    },
+    corregirLinea(id, cambios) {
+      const encontrada = [...lineas.entries()].find(([, linea]) => linea.id === id);
+      if (!encontrada || encontrada[1].provisoria) return false;
+      const [numero, actual] = encontrada;
+      const cambioElOriginal = cambios.original !== actual.original;
+      const anteriores = actual.traducciones as Record<string, string | undefined>;
+      const escritas = Object.entries(cambios.traducciones).filter(
+        (entrada): entrada is [string, string] =>
+          entrada[1] !== undefined && entrada[1] !== anteriores[entrada[0]],
+      );
+      const fijas = corregidas.get(numero) ?? new Set<string>();
+      for (const [idioma] of escritas) fijas.add(idioma);
+      corregidas.set(numero, fijas);
+      const conservadas = Object.entries(actual.traducciones).filter(
+        ([idioma]) => !cambioElOriginal || fijas.has(idioma),
+      );
+      aplicar(numero, {
+        ...actual,
+        original: cambios.original,
+        traducciones: { ...Object.fromEntries(conservadas), ...Object.fromEntries(escritas) },
+      });
+      if (cambioElOriginal && cambios.original.trim() !== "") {
+        cadena = cadena.then(() => traducirLinea(numero).then(() => undefined));
+      }
+      return true;
     },
     async terminar() {
       for (const fragmento of o.cortador.terminar()) encolar(fragmento);

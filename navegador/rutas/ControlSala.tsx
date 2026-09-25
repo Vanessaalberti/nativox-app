@@ -1,10 +1,12 @@
 import { useCallback, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import { GuardaDeSesion } from "@navegador/funcionalidades/acceso";
 import { PantallaEscenario } from "@navegador/funcionalidades/pantalla-escenario";
 import {
   SesionEnVivo,
+  charlaDeAhora,
   type CharlaEnCurso,
+  type EleccionDeCharla,
   type DatosDeLaSala,
   useDatosDeLaSala,
   usePreferencias,
@@ -16,11 +18,18 @@ import {
 // audiencia, vMix/OBS y el monitoreo lo reciben) y, arriba, abre la pantalla del escenario.
 export function ControlSala() {
   const { id = "" } = useParams();
-  return <GuardaDeSesion>{() => <ControlDeUnaSala salaId={id} />}</GuardaDeSesion>;
+  return (
+    <GuardaDeSesion>
+      {(rol) => (
+        <ControlDeUnaSala salaId={id} volverA={rol === "operador" ? "/operador" : "/panel/salas"} />
+      )}
+    </GuardaDeSesion>
+  );
 }
 
-function ControlDeUnaSala({ salaId }: { salaId: string }) {
+function ControlDeUnaSala({ salaId, volverA }: { salaId: string; volverA: string }) {
   const datos = useDatosDeLaSala(salaId);
+  const [parametros] = useSearchParams();
   if (datos.fase === "cargando") {
     return (
       <main className="grilla-fondo grid min-h-screen place-items-center font-mono text-sm">
@@ -37,35 +46,52 @@ function ControlDeUnaSala({ salaId }: { salaId: string }) {
       </main>
     );
   }
-  const { charlaAhora, sala } = datos;
+  const { charlaAhora, charlas, sala } = datos;
+  // Desde el calendario se llega con una charla elegida: la sesión arranca con la suya.
+  const pedida = charlas.find((charla) => charla.id === parametros.get("charla")) ?? null;
+  const inicial = pedida ?? charlaAhora;
   return (
     <SesionDeLaSala
       sala={sala}
-      glosarioInicial={charlaAhora?.glosario ?? ""}
-      charla={
-        charlaAhora
-          ? {
-              id: charlaAhora.id,
-              titulo: charlaAhora.titulo,
-              idioma: charlaAhora.idioma ?? sala.idiomaOriginal,
-            }
-          : null
-      }
+      charlas={charlas}
+      glosarioInicial={inicial?.glosario ?? ""}
+      idiomaInicial={inicial?.idioma ?? sala.idiomaOriginal}
+      charlaInicial={pedida?.id ?? "agenda"}
+      volverA={volverA}
     />
   );
 }
 
-type SalaDeLaSesion = Extract<DatosDeLaSala, { fase: "lista" }>["sala"];
+type DatosListos = Extract<DatosDeLaSala, { fase: "lista" }>;
+type SalaDeLaSesion = DatosListos["sala"];
+type Charla = DatosListos["charlas"][number];
+type Idioma = SalaDeLaSesion["idiomaOriginal"];
 
 function SesionDeLaSala({
   sala,
+  charlas,
   glosarioInicial,
-  charla,
+  idiomaInicial,
+  charlaInicial,
+  volverA,
 }: {
   sala: SalaDeLaSesion;
+  charlas: Charla[];
   glosarioInicial: string;
-  charla: CharlaEnCurso | null;
+  idiomaInicial: Idioma;
+  charlaInicial: EleccionDeCharla;
+  volverA: string;
 }) {
+  const [eleccionDeCharla, setEleccionDeCharla] = useState<EleccionDeCharla>(charlaInicial);
+  const elegida =
+    eleccionDeCharla === "agenda"
+      ? charlaDeAhora(charlas)
+      : eleccionDeCharla === "ninguna"
+        ? null
+        : (charlas.find((candidata) => candidata.id === eleccionDeCharla) ?? null);
+  const charla: CharlaEnCurso | null = elegida
+    ? { id: elegida.id, titulo: elegida.titulo, idioma: elegida.idioma ?? sala.idiomaOriginal }
+    : null;
   const preferencias = usePreferencias();
   const sesion = useSesionEnVivo({ autorreparar: preferencias?.autorreparacion ?? false });
   const { conexion, comando } = usePublicacion(sala.id, sesion, charla);
@@ -79,11 +105,15 @@ function SesionDeLaSala({
         conexion={conexion}
         comando={comando}
         inicial={{
-          original: sala.idiomaOriginal,
-          destino: sala.idiomasDestino,
+          original: idiomaInicial,
+          destino: sala.idiomasDestino.filter((idioma) => idioma !== idiomaInicial),
           glosario: glosarioInicial,
         }}
         nombreSala={sala.nombre}
+        charlas={charlas}
+        eleccionDeCharla={eleccionDeCharla}
+        alElegirCharla={setEleccionDeCharla}
+        volverA={volverA}
         sesion={sesion}
         alAbrirEscenario={() => setConEscenario(true)}
       />

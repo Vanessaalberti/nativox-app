@@ -55,3 +55,4 @@ export {
   leerTranscripcion,
   verAccionDeAviso,
 } from "./operacion";
+export { transcribirEnLaNube } from "./transcribir";

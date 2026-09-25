@@ -5,12 +5,12 @@ import { leerSala, listarCharlas } from "@navegador/modulos/cliente-instancia";
 export type DatosDeLaSala =
   | { fase: "cargando" }
   | { fase: "error"; motivo: string }
-  | { fase: "lista"; sala: Sala; charlaAhora: Charla | null };
+  | { fase: "lista"; sala: Sala; charlas: Charla[]; charlaAhora: Charla | null };
 
 const dosDigitos = (numero: number) => String(numero).padStart(2, "0");
 
 // La charla que está en su horario ahora mismo (hora de esta computadora), si hay una.
-function charlaDeAhora(charlas: readonly Charla[], ahora = new Date()): Charla | null {
+export function charlaDeAhora(charlas: readonly Charla[], ahora = new Date()): Charla | null {
   const fecha = `${String(ahora.getFullYear())}-${dosDigitos(ahora.getMonth() + 1)}-${dosDigitos(ahora.getDate())}`;
   const minutos = ahora.getHours() * 60 + ahora.getMinutes();
   return (
@@ -29,7 +29,13 @@ export function useDatosDeLaSala(salaId: string): DatosDeLaSala {
     void Promise.all([leerSala(salaId), listarCharlas(salaId)]).then(([sala, charlas]) => {
       if (!sala.ok) setDatos({ fase: "error", motivo: sala.motivo });
       else if (!charlas.ok) setDatos({ fase: "error", motivo: charlas.motivo });
-      else setDatos({ fase: "lista", sala: sala.valor, charlaAhora: charlaDeAhora(charlas.valor) });
+      else
+        setDatos({
+          fase: "lista",
+          sala: sala.valor,
+          charlas: charlas.valor,
+          charlaAhora: charlaDeAhora(charlas.valor),
+        });
     });
   }, [salaId]);
 

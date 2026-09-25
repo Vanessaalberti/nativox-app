@@ -5,13 +5,14 @@ import { comoAdministrador, sesionDe, type ContextoApi } from "./sesion";
 
 const CLAVE_DEL_ENLACE = "enlace_audiencia";
 
-// Quien conoce el link (/a/<token>) o el administrador. El link lo genera el administrador y lo
+// Quien conoce el link (/a/<token>) o quien ya tiene sesión (el administrador y los operadores,
+// que llegan desde su propio panel y no tienen el link). El link lo genera el administrador y lo
 // comparte a mano: la pantalla de entrada de la instancia no lleva a la audiencia.
 async function puedeVerLaAudiencia(pedido: Request, contexto: ContextoApi): Promise<boolean> {
   const token = new URL(pedido.url).searchParams.get("t");
   const guardado = await contexto.ajustes.leer(CLAVE_DEL_ENLACE);
   if (token !== null && guardado !== null && token === guardado) return true;
-  return (await sesionDe(pedido, contexto))?.rol === "administrador";
+  return (await sesionDe(pedido, contexto)) !== null;
 }
 
 async function tokenDelEnlace(contexto: ContextoApi, renovar: boolean): Promise<string> {

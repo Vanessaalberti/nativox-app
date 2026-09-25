@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import type { Charla, DatosDeCharla } from "@compartido/contratos";
 import { Aviso } from "@navegador/interfaz/sistema-diseno";
 import { aDatos } from "../datos-de-charla";
@@ -76,6 +77,12 @@ export function DetalleDeCharla({
         {nombreDelDia(charla.fecha)} · {formatearMinutos(charla.inicioMin)} –{" "}
         {formatearMinutos(charla.finMin)}
       </p>
+      <Link
+        to={`/sala/${charla.salaId}/control?charla=${charla.id}`}
+        className="mb-6 block border-[3px] border-[#b8241f] bg-naranja px-4 py-2.5 text-center font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:bg-[#e67b00]"
+      >
+        {soloLectura ? "Ver en vivo esta charla →" : "Transcribir esta charla →"}
+      </Link>
       {charla.oradores !== "" && (
         <p className="mb-3 font-mono text-xs text-ink/70">Con {charla.oradores}</p>
       )}
@@ -83,7 +90,7 @@ export function DetalleDeCharla({
         {charla.resumen === "" ? "Sin descripción." : charla.resumen}
       </p>
 
-      {terminada && <BloqueDeTranscripcion charlaId={charla.id} titulo={charla.titulo} />}
+      <BloqueDeTranscripcion charlaId={charla.id} titulo={charla.titulo} />
 
       <section className="mb-8">
         <span className={subtitulo}>Glosario técnico</span>

@@ -90,6 +90,11 @@ export {
   type SalaPublica,
 } from "./api/audiencia";
 export {
+  SEGUNDOS_MAXIMOS_POR_PEDIDO,
+  esquemaTranscripcionNube,
+  type TranscripcionNube,
+} from "./api/transcribir";
+export {
   ESTILO_POR_DEFECTO,
   esquemaDatosDeSalida,
   esquemaListaDeSalidas,

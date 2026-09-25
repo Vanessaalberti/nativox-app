@@ -18,3 +18,4 @@ export { useConRecarga } from "./hooks/useConRecarga";
 export { useAlMostrarse } from "./hooks/useAlMostrarse";
 export { useFilasQueEntran } from "./hooks/useFilasQueEntran";
 export { PieDeModal } from "./componentes/PieDeModal";
+export { PiePaginado } from "./componentes/PiePaginado";

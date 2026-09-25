@@ -1,8 +1,10 @@
 import { useEffect, useState, type SyntheticEvent } from "react";
-import { IDIOMAS, esquemaIdioma, validar, type Idioma } from "@compartido/contratos";
+import { IDIOMAS, esquemaIdioma, validar, type Charla, type Idioma } from "@compartido/contratos";
 import { listarFuentes, type FuenteAudio } from "@navegador/modulos/captura-audio";
 import { Seleccion } from "@navegador/interfaz/sistema-diseno";
+import { charlaDeAhora } from "../hooks/useDatosDeLaSala";
 import type { ConfiguracionSesion } from "../motor/armar-sesion";
+import { MotorDeLaSesion, type EleccionDelMotor } from "./MotorDeLaSesion";
 
 export const NOMBRES_DE_IDIOMA: Record<Idioma, string> = {
   es: "Español",
@@ -23,14 +25,31 @@ const OPCIONES_DE_FUENTE: { valor: TipoDeFuente; texto: string }[] = [
   { valor: "archivo", texto: "Archivo de audio (prueba)" },
 ];
 
+// A qué charla de la agenda se le guarda lo que se transcribe: la que toca ahora según el horario,
+// una en particular (para transcribir una charla fuera de su horario) o ninguna.
+export type EleccionDeCharla = "agenda" | "ninguna" | (string & {});
+
 export interface PropiedadesControl {
   ocupada: boolean;
   // Con qué idiomas y qué glosario arranca el formulario (los de la sala y la charla de ahora).
   inicial?: { original: Idioma; destino: Idioma[]; glosario: string };
+  charlas: readonly Charla[];
+  eleccionDeCharla: EleccionDeCharla;
+  alElegirCharla: (eleccion: EleccionDeCharla) => void;
   alIniciar: (configuracion: ConfiguracionSesion) => void;
 }
 
-export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesControl) {
+const comoTexto = (charla: Charla) =>
+  `${charla.fecha} · ${String(Math.floor(charla.inicioMin / 60)).padStart(2, "0")}:${String(charla.inicioMin % 60).padStart(2, "0")} · ${charla.titulo}`;
+
+export function ControlSesion({
+  ocupada,
+  inicial,
+  charlas,
+  eleccionDeCharla,
+  alElegirCharla,
+  alIniciar,
+}: PropiedadesControl) {
   const [fuentes, setFuentes] = useState<FuenteAudio[]>([]);
   const [tipoFuente, setTipoFuente] = useState<TipoDeFuente>("entrada");
   const [direccion, setDireccion] = useState("");
@@ -39,7 +58,11 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
   const [idiomaOriginal, setIdiomaOriginal] = useState<Idioma>(inicial?.original ?? "es");
   const [idiomasDestino, setIdiomasDestino] = useState<Idioma[]>(inicial?.destino ?? ["en", "pt"]);
   const [glosario, setGlosario] = useState(inicial?.glosario ?? "");
-  const [textoEnVivo, setTextoEnVivo] = useState(true);
+  const [motor, setMotor] = useState<EleccionDelMotor>({
+    nivel: 2,
+    traductor: "bergamot",
+    donde: "local",
+  });
 
   useEffect(() => {
     listarFuentes().then(setFuentes, () => setFuentes([]));
@@ -58,6 +81,18 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
     );
   };
 
+  // Al elegir una charla, el glosario y el idioma pasan a ser los de esa charla.
+  const elegirCharla = (eleccion: EleccionDeCharla) => {
+    alElegirCharla(eleccion);
+    const charla =
+      eleccion === "agenda"
+        ? charlaDeAhora(charlas)
+        : (charlas.find((candidata) => candidata.id === eleccion) ?? null);
+    if (!charla) return;
+    setGlosario(charla.glosario);
+    if (charla.idioma) cambiarOriginal(charla.idioma);
+  };
+
   const faltaLaFuente =
     (tipoFuente === "archivo" && !archivo) || (tipoFuente === "enlace" && direccion.trim() === "");
 
@@ -68,16 +103,23 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
     return { tipo: "entrada", idDispositivo: idDispositivo || null };
   };
 
-  const enviar = (evento: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
-    evento.preventDefault();
+  const iniciar = (prueba: boolean) => {
     if (faltaLaFuente) return;
     alIniciar({
       fuente: fuenteElegida(),
       idiomaOriginal,
       idiomasDestino,
       glosario,
-      textoEnVivo,
+      nivel: motor.nivel,
+      traductor: motor.traductor,
+      donde: motor.donde,
+      prueba,
     });
+  };
+
+  const enviar = (evento: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
+    evento.preventDefault();
+    iniciar(false);
   };
 
   return (
@@ -85,6 +127,23 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
       onSubmit={enviar}
       className="grid gap-5 border-[1.5px] border-ink/15 bg-canvas p-5 md:grid-cols-2"
     >
+      <label className="flex flex-col gap-1.5 md:col-span-2">
+        <span className={etiqueta}>Charla (lo que se transcribe se guarda en ella)</span>
+        <select
+          value={eleccionDeCharla}
+          onChange={(evento) => elegirCharla(evento.target.value)}
+          className={campo}
+          disabled={ocupada}
+        >
+          <option value="agenda">Según la agenda: la que toca ahora</option>
+          {charlas.map((charla) => (
+            <option key={charla.id} value={charla.id}>
+              {comoTexto(charla)}
+            </option>
+          ))}
+          <option value="ninguna">Ninguna: no se guarda en una charla</option>
+        </select>
+      </label>
       <label className="flex flex-col gap-1.5">
         <span className={etiqueta}>Fuente de audio</span>
         <select
@@ -190,23 +249,24 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
           disabled={ocupada}
         />
       </label>
-      <label className="flex items-center gap-2 font-mono text-sm md:col-span-2">
-        <input
-          type="checkbox"
-          checked={textoEnVivo}
-          onChange={(evento) => setTextoEnVivo(evento.target.checked)}
-          className="accent-naranja"
-          disabled={ocupada}
-        />
-        Texto en vivo mientras se habla (gris hasta que se confirma la frase)
-      </label>
-      <button
-        type="submit"
-        disabled={ocupada || faltaLaFuente}
-        className="rounded-sm bg-naranja px-5 py-3 font-mono text-xs font-bold uppercase tracking-widest text-ink shadow-sm hover:bg-ink hover:text-canvas disabled:cursor-not-allowed disabled:opacity-40 md:col-span-2 md:justify-self-start"
-      >
-        ● Iniciar sesión
-      </button>
+      <MotorDeLaSesion eleccion={motor} ocupada={ocupada} alCambiar={setMotor} />
+      <div className="flex flex-wrap items-center gap-3 md:col-span-2">
+        <button
+          type="submit"
+          disabled={ocupada || faltaLaFuente}
+          className="rounded-sm bg-naranja px-5 py-3 font-mono text-xs font-bold uppercase tracking-widest text-ink shadow-sm hover:bg-ink hover:text-canvas disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          ● Iniciar sesión
+        </button>
+        <button
+          type="button"
+          disabled={ocupada || faltaLaFuente}
+          onClick={() => iniciar(true)}
+          className="rounded-sm border-[1.5px] border-ink px-5 py-3 font-mono text-xs font-bold uppercase tracking-widest hover:bg-ink hover:text-canvas disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Probar (no se publica ni se guarda)
+        </button>
+      </div>
     </form>
   );
 }

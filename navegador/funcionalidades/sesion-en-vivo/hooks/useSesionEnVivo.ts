@@ -31,6 +31,8 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
     original: "es",
     destino: ["en", "pt"],
   });
+  // Con qué se arrancó la sesión de ahora: el traductor, el nivel y si es una prueba.
+  const [configuracion, setConfiguracion] = useState<ConfiguracionSesion | null>(null);
   const sesion = useRef<SesionArmada | null>(null);
   // El pico de volumen desde la última vez que se leyó: se guarda en una referencia y no en el
   // estado para no redibujar la pantalla con cada bloque de audio.
@@ -75,6 +77,7 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
         pedidoDeParar.current = false;
       }
       ultimaConfiguracion.current = configuracion;
+      setConfiguracion(configuracion);
       setAvisos((anteriores) => (esReintento ? anteriores : []));
       setIdiomas({ original: configuracion.idiomaOriginal, destino: configuracion.idiomasDestino });
       setEstado({
@@ -82,14 +85,20 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
         avance: { detalle: "Revisando la placa de video", proporcion: null },
       });
       const modelos = await prepararModelos(
-        { de: configuracion.idiomaOriginal, a: configuracion.idiomasDestino },
+        {
+          de: configuracion.idiomaOriginal,
+          a: configuracion.idiomasDestino,
+          traductor: configuracion.traductor,
+          donde: configuracion.donde,
+        },
         (avance) => setEstado({ fase: "preparando", avance }),
       );
       if (!modelos.ok) {
         setEstado({ fase: "error", motivo: modelos.motivo });
         return;
       }
-      setVariante(modelos.valor.variante);
+      // Transcribiendo en la nube no hay versión de Whisper local: se conserva la anterior a la vista.
+      if (modelos.valor.variante) setVariante(modelos.valor.variante);
 
       const armada = await armarSesion(modelos.valor, configuracion, {
         alCambiarLinea: actualizarLinea,
@@ -142,6 +151,27 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
     await terminar();
   }, [terminar]);
 
+  // Alguien corrigió a mano una línea: con la sesión corriendo el flujo la actualiza (y usa el
+  // texto corregido como contexto de lo que sigue); si ya se detuvo, se corrige lo que quedó a la
+  // vista. En los dos casos el cambio se publica en la sala como cualquier otra línea.
+  const corregirLinea = useCallback(
+    (id: string, original: string, traducciones: Linea["traducciones"]) => {
+      if (sesion.current?.flujo.corregirLinea(id, { original, traducciones })) return;
+      setLineas((anteriores) =>
+        anteriores.map((linea) =>
+          linea.id === id
+            ? { ...linea, original, traducciones: { ...linea.traducciones, ...traducciones } }
+            : linea,
+        ),
+      );
+    },
+    [],
+  );
+
+  const agregarAlGlosario = useCallback((texto: string) => {
+    sesion.current?.agregarAlGlosario(texto);
+  }, []);
+
   const limpiar = useCallback(() => {
     setLineas([]);
     setMediciones([]);
@@ -153,11 +183,14 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
     mediciones,
     avisos,
     variante,
+    configuracion,
     video,
     idiomas,
     nivelDeAudio,
     iniciar: (configuracion: ConfiguracionSesion) => iniciar(configuracion),
     detener,
+    corregirLinea,
+    agregarAlGlosario,
     limpiar,
   };
 }

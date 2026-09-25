@@ -3,8 +3,10 @@ import type { EventoCompleto, Operador, Sala, SalaPublica } from "@compartido/co
 import { leerAudiencia, listarOperadores, listarSalas } from "@navegador/modulos/cliente-instancia";
 import { Link } from "react-router";
 import { EnlaceDeAudiencia } from "./EnlaceDeAudiencia";
-import { useAlMostrarse } from "@navegador/interfaz/sistema-diseno";
+import { PiePaginado, useAlMostrarse } from "@navegador/interfaz/sistema-diseno";
 
+// La tabla muestra hasta 10 salas por página y ocupa el alto que necesite.
+const SALAS_POR_PAGINA = 10;
 const CADA_CUANTO_SE_ACTUALIZA_MS = 10_000;
 
 const cabecera =
@@ -54,6 +56,7 @@ export function ResumenDelEvento({
 }) {
   const conEquipo = evento.tipo === "roles-separados";
   const [datos, setDatos] = useState<Datos | null>(null);
+  const [pagina, setPagina] = useState(0);
 
   const actualizar = useCallback(() => {
     void pedirDatos(conEquipo).then((nuevos) => {
@@ -71,6 +74,12 @@ export function ResumenDelEvento({
   const salas = datos?.salas ?? [];
   const operadoresDe = (sala: Sala) =>
     datos?.operadores.filter((operador) => operador.salaIds.includes(sala.id)).length ?? 0;
+  const totalDePaginas = Math.max(1, Math.ceil(salas.length / SALAS_POR_PAGINA));
+  const paginaActual = Math.min(pagina, totalDePaginas - 1);
+  const visibles = salas.slice(
+    paginaActual * SALAS_POR_PAGINA,
+    (paginaActual + 1) * SALAS_POR_PAGINA,
+  );
   const sinAsignar = salas.filter((sala) => operadoresDe(sala) === 0).length;
 
   return (
@@ -103,7 +112,7 @@ export function ResumenDelEvento({
       )}
 
       {salas.length > 0 && (
-        <div className="flex-1 overflow-y-auto border-[1.5px] border-[#443d30] bg-canvas">
+        <div className="border-[1.5px] border-[#443d30] bg-canvas">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-[#443d30]/30">
@@ -114,7 +123,7 @@ export function ResumenDelEvento({
               </tr>
             </thead>
             <tbody>
-              {salas.map((sala) => (
+              {visibles.map((sala) => (
                 <tr key={sala.id} className="border-b border-[#443d30]/15 last:border-0">
                   <td className="px-5 py-3.5 font-mono text-sm">{sala.nombre}</td>
                   {conEquipo && (
@@ -143,6 +152,11 @@ export function ResumenDelEvento({
               ))}
             </tbody>
           </table>
+          <PiePaginado
+            pagina={paginaActual}
+            totalDePaginas={totalDePaginas}
+            alCambiar={setPagina}
+          />
         </div>
       )}
     </div>

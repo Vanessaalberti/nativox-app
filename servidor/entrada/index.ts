@@ -45,6 +45,7 @@ import {
   responderTransmisionDeSala,
 } from "@servidor/api/produccion";
 import { responderSalud } from "@servidor/api/salud";
+import { transcribir } from "@servidor/api/transcribir";
 import { actualizarSala, borrarSala, crearSalas, leerSala, listarSalas } from "@servidor/api/salas";
 import type { ContextoApi } from "@servidor/api/sesion";
 import { abrirSala } from "@servidor/api/tiempo-real";
@@ -58,6 +59,7 @@ import { crearAvisosPorWebhook } from "@servidor/plataforma/avisos-por-webhook";
 import { crearAlmacenProduccionD1 } from "@servidor/plataforma/almacen-produccion-d1";
 import { responderError } from "@servidor/plataforma/errores";
 import { ENCABEZADO_DE_SALA, type TiempoReal } from "@servidor/plataforma/tiempo-real";
+import { crearTranscriptorWorkersAi } from "@servidor/plataforma/transcriptor-workers-ai";
 
 export { Sala } from "@servidor/objetos-durables/sala/sala";
 export { Produccion } from "@servidor/objetos-durables/produccion/produccion";
@@ -81,6 +83,7 @@ const TOKEN = "([0-9a-f]{64})";
 const RUTAS: Ruta[] = [
   { patron: /^\/api\/estado$/, metodos: { GET: responderEstado } },
   { patron: /^\/api\/audiencia$/, metodos: { GET: responderAudiencia } },
+  { patron: /^\/api\/transcribir$/, metodos: { POST: transcribir } },
   {
     patron: /^\/api\/audiencia\/enlace$/,
     metodos: { GET: responderEnlaceDeAudiencia, POST: renovarEnlaceDeAudiencia },
@@ -190,6 +193,7 @@ export default {
           agenda: crearAlmacenAgendaD1(env.DB),
           operadores: crearAlmacenOperadoresD1(env.DB),
           tiempoReal: tiempoRealDe(env),
+          transcriptor: crearTranscriptorWorkersAi(env.AI),
           produccion: crearAlmacenProduccionD1(env.DB),
           operacion: crearAlmacenOperacionD1(env.DB),
           ajustes: crearAlmacenAjustesD1(env.DB),

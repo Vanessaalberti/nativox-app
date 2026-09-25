@@ -159,9 +159,9 @@ describe("audiencia", () => {
       );
       return ((await respuesta.json()) as { token: string }).token;
     };
-    const ver = (consulta: string) =>
+    const ver = (consulta: string, cookie?: string) =>
       responderAudiencia(
-        pedido(`/api/audiencia${consulta}`, undefined, undefined, "GET"),
+        pedido(`/api/audiencia${consulta}`, undefined, cookie, "GET"),
         entorno.contexto,
       );
     const viejo = await pedirEnlace("GET");
@@ -178,7 +178,12 @@ describe("audiencia", () => {
       entorno.contexto,
     );
 
-    expect([...estados, sinSesion.status]).toEqual([404, 404, 404, 200, 401]);
+    // Un operador con sesión también la ve, sin el link: llega desde su panel.
+    const comoOperador = await ver("", await entorno.cookieDeOperador([auditorio()]));
+
+    expect([...estados, sinSesion.status, comoOperador.status]).toEqual([
+      404, 404, 404, 200, 401, 200,
+    ]);
     expect(nuevo).not.toBe(viejo);
   });
 });

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import type { Operador, OperadorConCodigo } from "@compartido/contratos";
 import {
   CargaConReintento,
+  PiePaginado,
   useAlMostrarse,
   useFilasQueEntran,
 } from "@navegador/interfaz/sistema-diseno";
@@ -206,29 +207,11 @@ export function PanelDeOperadores({
               </tbody>
             </table>
           </div>
-          {totalDePaginas > 1 && (
-            <div className="flex shrink-0 items-center justify-between border-t border-[#443d30]/20 px-5 py-3">
-              <button
-                type="button"
-                disabled={paginaActual === 0}
-                onClick={() => setPagina(paginaActual - 1)}
-                className="font-mono text-xs font-bold tracking-widest text-ink/50 uppercase transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                ← Anterior
-              </button>
-              <span className="font-mono text-xs text-ink/50">
-                Página {paginaActual + 1} de {totalDePaginas}
-              </span>
-              <button
-                type="button"
-                disabled={paginaActual >= totalDePaginas - 1}
-                onClick={() => setPagina(paginaActual + 1)}
-                className="font-mono text-xs font-bold tracking-widest text-ink/50 uppercase transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Siguiente →
-              </button>
-            </div>
-          )}
+          <PiePaginado
+            pagina={paginaActual}
+            totalDePaginas={totalDePaginas}
+            alCambiar={setPagina}
+          />
         </div>
       )}
 
