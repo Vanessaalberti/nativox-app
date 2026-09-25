@@ -29,7 +29,14 @@ const datosNuevos = (fecha: string, inicioMin: number): DatosDeCharla => ({
 
 // /sala/:id/calendario — la agenda semanal de la sala: charlas con horario, idioma, resumen y
 // oradores, y el glosario de cada una.
-export function CalendarioDeLaSala({ salaId }: { salaId: string }) {
+export function CalendarioDeLaSala({
+  salaId,
+  soloLectura = false,
+}: {
+  salaId: string;
+  // Un operador ve la agenda de sus salas pero no la cambia.
+  soloLectura?: boolean;
+}) {
   const { carga, recargar, crear, editar, eliminar } = useAgenda(salaId);
   const [semanaElegida, setSemanaElegida] = useState<string | null>(null);
   const [elegida, setElegida] = useState<string | null>(null);
@@ -78,10 +85,10 @@ export function CalendarioDeLaSala({ salaId }: { salaId: string }) {
   return (
     <MarcoDeEntrada ancho="ancho" centrado={false}>
       <Link
-        to="/panel/salas"
+        to={soloLectura ? "/operador" : "/panel/salas"}
         className="mb-6 font-mono text-[11px] tracking-widest text-ink/50 uppercase hover:text-ink"
       >
-        ← Volver a Salas
+        {soloLectura ? "← Volver a mis salas" : "← Volver a Salas"}
       </Link>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -92,17 +99,20 @@ export function CalendarioDeLaSala({ salaId }: { salaId: string }) {
             {sala.nombre}
           </h1>
         </div>
-        <Boton
-          onClick={() =>
-            setEditando({ modo: "nueva", datos: datosNuevos(semana[0] ?? hoy(), 9 * 60) })
-          }
-        >
-          + Agregar al calendario
-        </Boton>
+        {!soloLectura && (
+          <Boton
+            onClick={() =>
+              setEditando({ modo: "nueva", datos: datosNuevos(semana[0] ?? hoy(), 9 * 60) })
+            }
+          >
+            + Agregar al calendario
+          </Boton>
+        )}
       </div>
       <p className="mb-4 max-w-[760px] font-mono text-xs text-ink/60">
-        Hacé clic en un espacio vacío para crear una actividad, o usá el botón para cargarla desde
-        el formulario. Hacé clic en una actividad para ver el detalle.
+        {soloLectura
+          ? "Hacé clic en una actividad para ver el detalle."
+          : "Hacé clic en un espacio vacío para crear una actividad, o usá el botón para cargarla desde el formulario. Hacé clic en una actividad para ver el detalle."}
       </p>
 
       <div className="mb-4 flex items-center gap-4 font-mono text-xs">
@@ -139,8 +149,11 @@ export function CalendarioDeLaSala({ salaId }: { salaId: string }) {
           horaInicio={horas.inicio}
           horaFin={horas.fin}
           seleccionada={elegida}
-          alCrearEn={(fecha, minutos) =>
-            setEditando({ modo: "nueva", datos: datosNuevos(fecha, minutos) })
+          alCrearEn={
+            soloLectura
+              ? undefined
+              : (fecha, minutos) =>
+                  setEditando({ modo: "nueva", datos: datosNuevos(fecha, minutos) })
           }
           alElegir={setElegida}
         />
@@ -148,6 +161,7 @@ export function CalendarioDeLaSala({ salaId }: { salaId: string }) {
           <DetalleDeCharla
             key={charlaElegida.id}
             charla={charlaElegida}
+            soloLectura={soloLectura}
             alEditar={() => setEditando({ modo: "editar", charla: charlaElegida })}
             alGuardarGlosario={(datos) => editar(charlaElegida.id, datos)}
           />

@@ -38,12 +38,8 @@ export function ModalDeCharla({
   alCerrar: () => void;
 }) {
   const [datos, setDatos] = useState(inicial);
-  const { error, enviando, enviar } = useEnvio();
+  const { error, enviando, enviar } = useEnvio(alCerrar);
   const cambiar = (parcial: Partial<DatosDeCharla>) => setDatos({ ...datos, ...parcial });
-
-  const ejecutar = async (accion: () => Promise<string | null>) => {
-    if ((await enviar(accion)) === null) alCerrar();
-  };
 
   // Si el inicio pasa al final, la charla se corre entera para no quedar al revés.
   const cambiarInicio = (inicioMin: number) =>
@@ -69,7 +65,7 @@ export function ModalDeCharla({
         className="flex flex-col gap-5"
         onSubmit={(evento) => {
           evento.preventDefault();
-          void ejecutar(() => alGuardar(datos));
+          void enviar(() => alGuardar(datos));
         }}
       >
         <Campo
@@ -144,7 +140,7 @@ export function ModalDeCharla({
           etiqueta="Eliminar actividad"
           aviso={`Se borra «${datos.titulo}». No se puede deshacer.`}
           enviando={enviando}
-          alEliminar={() => void ejecutar(alEliminar)}
+          alEliminar={() => void enviar(alEliminar)}
         />
       )}
     </Modal>

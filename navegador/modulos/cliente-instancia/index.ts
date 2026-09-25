@@ -19,3 +19,38 @@ export {
   listarCharlas,
   listarSalas,
 } from "./salas";
+export {
+  actualizarOperador,
+  borrarOperador,
+  invitarOperadores,
+  listarOperadores,
+  nuevoCodigoDeOperador,
+} from "./operadores";
+export {
+  actualizarEvento,
+  cambiarContrasena,
+  eliminarEvento,
+  generarCodigoDeRecuperacion,
+  guardarAjustes,
+  guardarWebhook,
+  leerAjustes,
+  probarWebhook,
+  type AjustesLeidos,
+} from "./ajustes";
+export {
+  actualizarSalida,
+  borrarSalida,
+  crearSalida,
+  guardarEstiloDeSala,
+  leerAudiencia,
+  leerTransmisionDeSala,
+  leerTransmisionDeSalida,
+  listarSalidas,
+} from "./produccion";
+export {
+  confirmarAccionDeAviso,
+  leerPreferenciasDeSesion,
+  leerRegistroDeAire,
+  leerTranscripcion,
+  verAccionDeAviso,
+} from "./operacion";

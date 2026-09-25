@@ -50,5 +50,10 @@ export function crearAlmacenAgendaEnMemoria(): AlmacenAgenda {
       return Promise.resolve(true);
     },
     borrarCharla: (id) => Promise.resolve(charlas.delete(id)),
+    borrarTodo: () => {
+      charlas.clear();
+      salas.clear();
+      return Promise.resolve();
+    },
   };
 }

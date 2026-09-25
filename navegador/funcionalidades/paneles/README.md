@@ -4,7 +4,7 @@
 
 **Qué NO hace:** Mostrar datos que el rol no puede ver.
 
-**Hoy:** un panel mínimo del administrador (los datos del evento y la sala de prueba). Faltan las salas, el calendario, los operadores y el monitoreo.
+**Hoy:** el panel del administrador (Resumen, Salas y, con roles separados, Operadores) y el del operador (`/operador`: sus salas, con el calendario en solo lectura y el acceso en vivo). Falta el monitoreo.
 
 **Estructura:** `componentes/` · `hooks/` · `api.ts` (si llama a la API) · `index.ts` (lo único que importan las rutas).
 

@@ -1,7 +1,25 @@
-import { esquemaDatosEvento, type EstadoDeLaInstancia } from "@compartido/contratos";
+import {
+  LARGO_MAXIMO_DE_LOGO,
+  esquemaActualizarEvento,
+  esquemaDatosEvento,
+  esquemaEliminarEvento,
+  type EstadoDeLaInstancia,
+} from "@compartido/contratos";
 import { responderError } from "@servidor/plataforma/errores";
-import { leerCuerpo } from "@servidor/plataforma/pedido";
-import { exigirAdministrador, sesionDe, type ContextoApi } from "./sesion";
+import { conCuerpo, leerCuerpo } from "@servidor/plataforma/pedido";
+import {
+  comoAdministrador,
+  cookieVencida,
+  exigirAdministrador,
+  responderConCookie,
+  sesionDe,
+  type ContextoApi,
+} from "./sesion";
+
+// El mismo formato que al crear el evento: una imagen chica en base64 (png, jpeg o webp).
+const FORMATO_DE_LOGO = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/;
+const esquemaLogoAceptado = (logo: string) =>
+  logo.length <= LARGO_MAXIMO_DE_LOGO && FORMATO_DE_LOGO.test(logo);
 
 // Lo primero que pregunta la app al abrirse: qué falta hacer en esta instancia y quién es la
 // persona. No devuelve nada sensible (ni email ni datos de la cuenta).
@@ -46,4 +64,55 @@ export async function leerEvento(pedido: Request, contexto: ContextoApi): Promis
     return responderError(404, "sin_evento", "Todavía no se creó el evento.");
   }
   return Response.json({ ok: true, evento, email: administrador.email });
+}
+
+// Ajustes → General: nombre, logo y fechas. La estimación (salas, horas, días) no se toca acá.
+export function actualizarEvento(pedido: Request, contexto: ContextoApi): Promise<Response> {
+  return comoAdministrador(pedido, contexto, () =>
+    conCuerpo(pedido, esquemaActualizarEvento, async (cambios) => {
+      if (cambios.fechaInicio && cambios.fechaFin && cambios.fechaInicio > cambios.fechaFin) {
+        return responderError(
+          400,
+          "pedido_invalido",
+          "La fecha de fin no puede ser anterior a la de inicio.",
+        );
+      }
+      if (cambios.logo !== null && !esquemaLogoAceptado(cambios.logo)) {
+        return responderError(
+          400,
+          "pedido_invalido",
+          "El logo no es una imagen válida o pesa demasiado.",
+        );
+      }
+      return (await contexto.almacen.actualizarEvento(cambios))
+        ? Response.json({ ok: true })
+        : responderError(404, "sin_evento", "Todavía no se creó el evento.");
+    }),
+  );
+}
+
+// Elimina TODO lo de la instancia (evento, salas, charlas, equipo, salidas, ajustes y la cuenta del
+// administrador). Se pide escribir el nombre del evento, para no borrar por error.
+export function eliminarEvento(pedido: Request, contexto: ContextoApi): Promise<Response> {
+  return comoAdministrador(pedido, contexto, () =>
+    conCuerpo(pedido, esquemaEliminarEvento, async ({ nombre }) => {
+      const evento = await contexto.almacen.leerEvento();
+      if (!evento) return responderError(404, "sin_evento", "Todavía no se creó el evento.");
+      if (nombre.trim() !== evento.nombre) {
+        return responderError(
+          400,
+          "confirmacion_incorrecta",
+          "El nombre no coincide con el del evento.",
+        );
+      }
+
+      await contexto.agenda.borrarTodo();
+      await contexto.operadores.borrarTodo();
+      await contexto.produccion.borrarTodo();
+      await contexto.operacion.borrarTodo();
+      await contexto.ajustes.borrarTodo();
+      await contexto.almacen.borrarTodo();
+      return responderConCookie({ ok: true }, cookieVencida(contexto.segura));
+    }),
+  );
 }

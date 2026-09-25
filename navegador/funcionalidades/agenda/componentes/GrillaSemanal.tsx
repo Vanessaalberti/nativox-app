@@ -20,7 +20,8 @@ export function GrillaSemanal({
   horaInicio: number;
   horaFin: number;
   seleccionada: string | null;
-  alCrearEn: (fecha: string, minutos: number) => void;
+  // Sin esto (solo lectura) los espacios vacíos no hacen nada.
+  alCrearEn?: ((fecha: string, minutos: number) => void) | undefined;
   alElegir: (id: string) => void;
 }) {
   const horas = Array.from({ length: horaFin - horaInicio }, (_, indice) => horaInicio + indice);
@@ -58,9 +59,10 @@ export function GrillaSemanal({
                 key={hora}
                 type="button"
                 style={{ height: ALTO_DE_HORA_PX }}
-                aria-label={`Crear una actividad el ${NOMBRES_DE_DIA[indice] ?? ""} ${diaCorto(fecha)} a las ${formatearMinutos(hora * 60)}`}
-                onClick={() => alCrearEn(fecha, hora * 60)}
-                className="block w-full border-t border-linea hover:bg-naranja/10"
+                aria-label={`${alCrearEn === undefined ? "Espacio libre" : "Crear una actividad"} el ${NOMBRES_DE_DIA[indice] ?? ""} ${diaCorto(fecha)} a las ${formatearMinutos(hora * 60)}`}
+                disabled={alCrearEn === undefined}
+                onClick={() => alCrearEn?.(fecha, hora * 60)}
+                className="block w-full border-t border-linea enabled:hover:bg-naranja/10"
               />
             ))}
             {charlas

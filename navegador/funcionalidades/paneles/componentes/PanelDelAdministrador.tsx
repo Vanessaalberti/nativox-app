@@ -1,20 +1,29 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import type { EventoCompleto } from "@compartido/contratos";
-import { leerEvento, salir } from "@navegador/modulos/cliente-instancia";
+import { leerEvento } from "@navegador/modulos/cliente-instancia";
 import { MarcoDeEntrada } from "@navegador/interfaz/marco-de-entrada";
-import { Boton } from "@navegador/interfaz/sistema-diseno";
+import { EncabezadoDelPanel, PanelEnCarga } from "./EncabezadoDelPanel";
 
 type Carga =
   | { fase: "cargando" }
   | { fase: "error"; motivo: string }
   | { fase: "lista"; evento: EventoCompleto; email: string };
 
-export type PestanaDelPanel = "resumen" | "salas";
+type PestanaDelPanel = "resumen" | "salas" | "operadores" | "produccion" | "ajustes";
 
-const PESTANAS: { id: PestanaDelPanel; nombre: string; ruta: string }[] = [
+const PESTANAS: {
+  id: PestanaDelPanel;
+  nombre: string;
+  ruta: string;
+  // Solo con roles separados hay un equipo al que invitar.
+  soloConEquipo?: true;
+}[] = [
   { id: "resumen", nombre: "Resumen", ruta: "/panel" },
   { id: "salas", nombre: "Salas", ruta: "/panel/salas" },
+  { id: "operadores", nombre: "Operadores", ruta: "/panel/operadores", soloConEquipo: true },
+  { id: "produccion", nombre: "Producción", ruta: "/panel/produccion" },
+  { id: "ajustes", nombre: "Ajustes", ruta: "/panel/ajustes" },
 ];
 
 // El marco del panel del administrador: el nombre del evento, las pestañas y, adentro, lo que
@@ -26,7 +35,6 @@ export function PanelDelAdministrador({
   activa: PestanaDelPanel;
   children: (datos: { evento: EventoCompleto; email: string }) => ReactNode;
 }) {
-  const navegar = useNavigate();
   const [carga, setCarga] = useState<Carga>({ fase: "cargando" });
 
   useEffect(() => {
@@ -39,15 +47,7 @@ export function PanelDelAdministrador({
     });
   }, []);
 
-  if (carga.fase !== "lista") {
-    return (
-      <MarcoDeEntrada>
-        <p role={carga.fase === "error" ? "alert" : "status"} className="font-mono text-sm">
-          {carga.fase === "error" ? carga.motivo : "Abriendo tu panel…"}
-        </p>
-      </MarcoDeEntrada>
-    );
-  }
+  if (carga.fase !== "lista") return <PanelEnCarga carga={carga} />;
 
   const { evento, email } = carga;
   return (
@@ -56,30 +56,15 @@ export function PanelDelAdministrador({
       centrado={false}
       ancho="ancho"
     >
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <span className="font-mono text-[11px] tracking-widest text-naranja uppercase">
-            Panel de administrador
-          </span>
-          <h1 className="mt-2 font-display text-6xl leading-[0.95] font-extrabold tracking-tight uppercase">
-            {evento.nombre}
-          </h1>
-        </div>
-        <Boton
-          variante="secundario"
-          onClick={() => {
-            void salir().then(() => navegar("/", { replace: true }));
-          }}
-        >
-          Salir
-        </Boton>
-      </div>
+      <EncabezadoDelPanel etiqueta="Panel de administrador" titulo={evento.nombre} />
 
       <nav
         aria-label="Secciones del panel"
         className="mb-8 flex gap-6 border-b border-linea-fuerte"
       >
-        {PESTANAS.map((pestana) => (
+        {PESTANAS.filter(
+          (pestana) => !pestana.soloConEquipo || evento.tipo === "roles-separados",
+        ).map((pestana) => (
           <Link
             key={pestana.id}
             to={pestana.ruta}

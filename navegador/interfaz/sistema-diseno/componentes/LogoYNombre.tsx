@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
-import { Campo } from "@navegador/interfaz/sistema-diseno";
 import { achicarLogo } from "../logo";
+import { Campo } from "./Campo";
 
 // El nombre del evento y su logo (opcional): reemplazan el genérico en el panel y en la audiencia.
 export function LogoYNombre({

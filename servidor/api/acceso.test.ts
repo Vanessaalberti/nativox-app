@@ -236,7 +236,9 @@ describe("sesión y evento", () => {
     const invalidos = [
       { ...EVENTO, nombre: "   " },
       { ...EVENTO, salasSimultaneas: 0 },
-      { ...EVENTO, dias: 15 },
+      { ...EVENTO, dias: 366 },
+      // Con las dos fechas puestas, los días son los de las fechas (del 5 al 7 son 3).
+      { ...EVENTO, fechaInicio: "2026-10-05", fechaFin: "2026-10-07", dias: 1 },
       { ...EVENTO, fechaInicio: "2026-10-05", fechaFin: "2026-10-01" },
       { ...EVENTO, logo: "data:text/html;base64,PHNjcmlwdD4=" },
     ];
@@ -246,6 +248,20 @@ describe("sesión y evento", () => {
       expect(respuesta.status).toBe(400);
     }
     expect(await contexto.almacen.leerEvento()).toBeNull();
+  });
+
+  it("con las dos fechas, acepta los días que dicen las fechas", async () => {
+    const { cookie } = await abrirCuenta();
+    const respuesta = await crearEvento(
+      pedido(
+        "/api/evento",
+        { ...EVENTO, fechaInicio: "2026-10-05", fechaFin: "2026-10-07", dias: 3 },
+        cookie,
+      ),
+      contexto,
+    );
+
+    expect(respuesta.status).toBe(201);
   });
 
   it("el administrador lee su evento con su email; sin sesión, no", async () => {
@@ -283,9 +299,9 @@ describe("sesión y evento", () => {
 });
 
 describe("operador", () => {
-  it("todavía no hay invitaciones: cualquier código se rechaza", async () => {
+  it("un código que no existe se rechaza", async () => {
     const respuesta = await ingresarOperador(
-      pedido("/api/acceso/operador", { codigo: "NTVX-7K2P" }),
+      pedido("/api/acceso/operador", { codigo: "NTVX-7K2P-AAAA-BBBB" }),
       contexto,
     );
 

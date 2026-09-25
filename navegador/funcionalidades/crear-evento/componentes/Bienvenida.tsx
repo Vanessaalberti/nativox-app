@@ -19,7 +19,7 @@ export function Bienvenida() {
       <p className="mb-14 max-w-[560px] text-lg text-ink/80">
         Esta instancia de Nativox está lista para usarse. Elegí qué querés hacer.
       </p>
-      <div className="grid w-full max-w-[880px] gap-6 md:grid-cols-2 md:gap-8">
+      <div className="grid w-full max-w-[1400px] gap-6 md:grid-cols-2 md:gap-8">
         <Link
           to="/crear-evento"
           className="group flex flex-col items-start border-[3px] border-[#b8241f] bg-naranja p-8 text-left shadow-md transition-colors hover:bg-[#e67b00]"

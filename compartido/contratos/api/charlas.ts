@@ -36,7 +36,7 @@ export const esquemaDatosDeCharla = v.pipe(
   ),
 );
 
-const esquemaCharla = v.object({
+export const esquemaCharla = v.object({
   id: v.string(),
   salaId: v.string(),
   titulo: v.string(),

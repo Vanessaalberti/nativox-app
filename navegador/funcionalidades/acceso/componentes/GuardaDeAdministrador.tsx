@@ -17,6 +17,7 @@ export function GuardaDeAdministrador({
   return (
     <ConEstadoDeLaInstancia>
       {(estado) => {
+        if (estado.sesion?.rol === "operador") return <Navigate to="/operador" replace />;
         if (estado.sesion?.rol !== "administrador") return <Navigate to="/entrada/admin" replace />;
         if (evento === "con" && !estado.hayEvento) {
           return <Navigate to="/crear-evento/evento" replace />;

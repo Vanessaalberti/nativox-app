@@ -20,11 +20,21 @@ const esquemaFecha = v.pipe(v.string(), v.isoDate("La fecha no es válida."));
 export const LIMITES_DE_ESTIMACION = {
   salas: { minimo: 1, maximo: 60 },
   horas: { minimo: 1, maximo: 16 },
-  dias: { minimo: 1, maximo: 14 },
+  dias: { minimo: 1, maximo: 365 },
 } as const;
 
 const entero = (limites: { minimo: number; maximo: number }) =>
   v.pipe(v.number(), v.integer(), v.minValue(limites.minimo), v.maxValue(limites.maximo));
+
+// Los días que hay de una fecha a otra, contando las dos puntas (del 5 al 7 son 3).
+export function contarDias(inicio: string, fin: string): number {
+  const milisegundosPorDia = 24 * 60 * 60 * 1000;
+  return (
+    Math.round(
+      (Date.parse(`${fin}T00:00:00Z`) - Date.parse(`${inicio}T00:00:00Z`)) / milisegundosPorDia,
+    ) + 1
+  );
+}
 
 export const esquemaDatosEvento = v.pipe(
   v.object({
@@ -44,6 +54,18 @@ export const esquemaDatosEvento = v.pipe(
       "La fecha de fin no puede ser anterior a la de inicio.",
     ),
     ["fechaFin"],
+  ),
+  // Con las dos fechas puestas, la cantidad de días no se elige: es la que dicen las fechas.
+  v.forward(
+    v.check(
+      (evento) =>
+        !evento.fechaInicio ||
+        !evento.fechaFin ||
+        evento.fechaInicio > evento.fechaFin ||
+        evento.dias === contarDias(evento.fechaInicio, evento.fechaFin),
+      "Los días tienen que coincidir con las fechas del evento.",
+    ),
+    ["dias"],
   ),
 );
 

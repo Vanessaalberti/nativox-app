@@ -1,4 +1,13 @@
 import { createBrowserRouter } from "react-router";
+import {
+  AccionDeAviso,
+  Audiencia,
+  Monitoreo,
+  PantallaDeSala,
+  Subtitulos,
+  TransmisionDeSala,
+  TransmisionDeSalida,
+} from "@navegador/rutas/Audiencia";
 import { Calendario } from "@navegador/rutas/Calendario";
 import { ControlSala } from "@navegador/rutas/ControlSala";
 import {
@@ -8,7 +17,14 @@ import {
   PaginaSinAcceso,
 } from "@navegador/rutas/Entradas";
 import { Inicio } from "@navegador/rutas/Inicio";
-import { Panel, PanelSalas } from "@navegador/rutas/Panel";
+import {
+  Panel,
+  PanelAjustes,
+  PanelOperador,
+  PanelOperadores,
+  PanelProduccion,
+  PanelSalas,
+} from "@navegador/rutas/Panel";
 import { PasoCuenta, PasoEvento, PasoTipo } from "@navegador/rutas/PasoDelAsistente";
 
 export const enrutador = createBrowserRouter([
@@ -22,6 +38,17 @@ export const enrutador = createBrowserRouter([
   { path: "/sin-acceso", element: <PaginaSinAcceso /> },
   { path: "/panel", element: <Panel /> },
   { path: "/panel/salas", element: <PanelSalas /> },
+  { path: "/panel/operadores", element: <PanelOperadores /> },
+  { path: "/panel/produccion", element: <PanelProduccion /> },
+  { path: "/panel/ajustes", element: <PanelAjustes /> },
+  { path: "/operador", element: <PanelOperador /> },
+  { path: "/audiencia", element: <Audiencia /> },
+  { path: "/accion/:token", element: <AccionDeAviso /> },
+  { path: "/sala/:id/pantalla", element: <PantallaDeSala /> },
+  { path: "/sala/:id/transmision", element: <TransmisionDeSala /> },
+  { path: "/sala/:id/subtitulos", element: <Subtitulos /> },
+  { path: "/sala/:id/monitoreo", element: <Monitoreo /> },
+  { path: "/produccion/:salida", element: <TransmisionDeSalida /> },
   { path: "/sala/:id/calendario", element: <Calendario /> },
   { path: "/sala/:id/control", element: <ControlSala /> },
 ]);

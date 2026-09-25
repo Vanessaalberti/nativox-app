@@ -9,6 +9,7 @@ import {
   sumarDias,
 } from "./fechas";
 import { agregarTerminos, leerArchivoDeGlosario, sugerirTerminos } from "./glosario";
+import { exportar, idiomasDisponibles, segmentosEn } from "./transcripcion";
 
 describe("fechas", () => {
   it("el lunes de una semana, sea cual sea el día", () => {
@@ -74,5 +75,39 @@ describe("glosario de una charla", () => {
     expect(leerArchivoDeGlosario("terminos.txt", "Nerdearla ~ ner de arla\nAWS")).toBe(
       "Nerdearla ~ ner de arla\nAWS",
     );
+  });
+});
+
+describe("transcripción de una charla", () => {
+  const segmentos = [
+    {
+      id: "a",
+      original: "Hola a todos",
+      traducciones: { en: "Hello everyone" },
+      inicio: 0,
+      fin: 2,
+    },
+    { id: "b", original: "Gracias", traducciones: {}, inicio: 2, fin: 3 },
+  ];
+
+  it("ofrece los idiomas que llegaron traducidos", () => {
+    expect(idiomasDisponibles(segmentos)).toEqual(["en"]);
+  });
+
+  it("arma el texto en el idioma elegido y deja afuera lo que no tiene esa traducción", () => {
+    expect(segmentosEn(segmentos, "original").map((s) => s.texto)).toEqual([
+      "Hola a todos",
+      "Gracias",
+    ]);
+    expect(segmentosEn(segmentos, "en").map((s) => s.texto)).toEqual(["Hello everyone"]);
+  });
+
+  it("exporta a texto, SRT y VTT con corrimiento, sin marcas antes de 0", () => {
+    const original = segmentosEn(segmentos, "original");
+
+    expect(exportar(original, "txt", 0)).toBe("Hola a todos\nGracias\n");
+    expect(exportar(original, "srt", 1)).toContain("00:00:01,000 --> 00:00:03,000");
+    expect(exportar(original, "vtt", 0)).toMatch(/^WEBVTT/);
+    expect(exportar(original, "srt", -2.5)).not.toMatch(/-\d/);
   });
 });

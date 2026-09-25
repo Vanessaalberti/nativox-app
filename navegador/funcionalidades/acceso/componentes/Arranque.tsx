@@ -12,6 +12,9 @@ export function Arranque({ bienvenida }: { bienvenida: ReactNode }) {
       {(estado) => {
         const esAdministrador = estado.sesion?.rol === "administrador";
         if (!estado.hayAdministrador) return bienvenida;
+        if (estado.hayEvento && estado.sesion?.rol === "operador") {
+          return <Navigate to="/operador" replace />;
+        }
         if (!estado.hayEvento) {
           return (
             <Navigate to={esAdministrador ? "/crear-evento/evento" : "/entrada/admin"} replace />

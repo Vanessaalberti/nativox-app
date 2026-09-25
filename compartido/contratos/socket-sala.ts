@@ -3,7 +3,7 @@ import { esquemaIdioma } from "./idiomas";
 
 const segundos = v.pipe(v.number(), v.minValue(0));
 
-const esquemaTraducciones = v.partial(
+export const esquemaTraducciones = v.partial(
   v.strictObject({ es: v.string(), en: v.string(), pt: v.string() }),
 );
 
@@ -43,13 +43,31 @@ export const esquemaAgenda = v.object({
   idioma: esquemaIdioma,
 });
 
+// Lo que la sala le cuenta a quien la monitorea: quién está conectado y la última señal del equipo.
+export const esquemaEstadoSala = v.object({
+  tipo: v.literal("estado"),
+  // Computadoras publicando (0 o 1: un solo dueño por sala) y personas mirando.
+  publicando: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  espectadores: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  senal: v.nullable(esquemaSenal),
+  // Cuándo llegó esa señal (milisegundos desde 1970); null si todavía no llegó ninguna.
+  senalEn: v.nullable(v.number()),
+});
+
+// Cómo se conecta cada quien a la sala: quien publica (la computadora de la sala), quien mira y
+// quien monitorea. El servidor decide el rol según la sesión: el navegador no lo elige.
+export const ROLES_DE_SALA = ["publicador", "espectador", "monitor"] as const;
+
 export const esquemaMensajeSala = v.variant("tipo", [
   esquemaLinea,
   esquemaSenal,
   esquemaComando,
   esquemaAgenda,
+  esquemaEstadoSala,
 ]);
 
+export type RolDeSala = (typeof ROLES_DE_SALA)[number];
+export type EstadoSala = v.InferOutput<typeof esquemaEstadoSala>;
 export type Linea = v.InferOutput<typeof esquemaLinea>;
 export type Senal = v.InferOutput<typeof esquemaSenal>;
 export type Comando = v.InferOutput<typeof esquemaComando>;

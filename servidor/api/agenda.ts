@@ -2,7 +2,7 @@ import { esquemaDatosDeCharla, type Charla } from "@compartido/contratos";
 import { responderError } from "@servidor/plataforma/errores";
 import { crearId } from "@servidor/plataforma/ids";
 import { conCuerpo } from "@servidor/plataforma/pedido";
-import { salaInexistente } from "./salas";
+import { conSala, salaInexistente } from "./con-sala";
 import { comoAdministrador, type ContextoApi } from "./sesion";
 
 const charlaInexistente = () => responderError(404, "charla_inexistente", "Esa charla no existe.");
@@ -38,10 +38,9 @@ export function listarCharlas(
   contexto: ContextoApi,
   salaId = "",
 ): Promise<Response> {
-  return comoAdministrador(pedido, contexto, async () => {
-    if (!(await contexto.agenda.leerSala(salaId))) return salaInexistente();
-    return Response.json({ ok: true, charlas: await contexto.agenda.listarCharlas(salaId) });
-  });
+  return conSala(pedido, contexto, salaId, async (sala) =>
+    Response.json({ ok: true, charlas: await contexto.agenda.listarCharlas(sala.id) }),
+  );
 }
 
 export function crearCharla(

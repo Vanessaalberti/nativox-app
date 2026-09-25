@@ -1,12 +1,24 @@
 import { generarToken, hashearToken } from "@servidor/modulos/cripto-acceso";
 import type { AlmacenAcceso, Rol, SesionGuardada } from "@servidor/plataforma/almacen-acceso";
 import type { AlmacenAgenda } from "@servidor/plataforma/almacen-agenda";
+import type { AlmacenAjustes } from "@servidor/plataforma/almacen-ajustes";
+import type { AlmacenOperacion } from "@servidor/plataforma/almacen-operacion";
+import type { AlmacenOperadores } from "@servidor/plataforma/almacen-operadores";
+import type { AlmacenProduccion } from "@servidor/plataforma/almacen-produccion";
+import type { Avisos } from "@servidor/plataforma/avisos";
+import type { TiempoReal } from "@servidor/plataforma/tiempo-real";
 import { responderError } from "@servidor/plataforma/errores";
 
 // Lo que cada pedido necesita saber de su entorno: dónde guardar, qué hora es y quién pregunta.
 export interface ContextoApi {
   almacen: AlmacenAcceso;
   agenda: AlmacenAgenda;
+  operadores: AlmacenOperadores;
+  produccion: AlmacenProduccion;
+  operacion: AlmacenOperacion;
+  ajustes: AlmacenAjustes;
+  avisos: Avisos;
+  tiempoReal: TiempoReal;
   ahora: () => number;
   // Para frenar intentos en cadena por origen (CF-Connecting-IP en Cloudflare).
   ip: string;
@@ -93,4 +105,25 @@ export async function comoAdministrador(
   accion: () => Promise<Response>,
 ): Promise<Response> {
   return (await exigirAdministrador(pedido, contexto)) ?? accion();
+}
+
+// Corre la acción con la sesión de quien pregunta, sea administrador u operador.
+export async function comoPersona(
+  pedido: Request,
+  contexto: ContextoApi,
+  accion: (sesion: SesionGuardada) => Promise<Response>,
+): Promise<Response> {
+  const sesion = await sesionDe(pedido, contexto);
+  if (!sesion) return responderError(401, "sin_sesion", "Ingresá para continuar.");
+  return accion(sesion);
+}
+
+// El administrador ve todas las salas; un operador, solo las que le asignaron.
+export async function puedeVerSala(
+  contexto: ContextoApi,
+  sesion: SesionGuardada,
+  salaId: string,
+): Promise<boolean> {
+  if (sesion.rol === "administrador") return true;
+  return (await contexto.operadores.salasDe(sesion.cuentaId)).includes(salaId);
 }

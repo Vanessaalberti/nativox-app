@@ -37,6 +37,8 @@ export interface EventosSesion {
   alMedir: (medicion: Medicion) => void;
   alFallar: (motivo: string) => void;
   alTerminarCaptura: (motivo: string) => void;
+  // El volumen (0 a 1) de cada bloque de audio que entra; lo usa el monitoreo.
+  alNivel?: (nivel: number) => void;
 }
 
 export interface SesionArmada {
@@ -45,6 +47,13 @@ export interface SesionArmada {
 }
 
 const PASADA_PROVISORIA_MS = 1000;
+
+// El valor más alto del bloque, de 0 a 1: alcanza para una barra de nivel.
+function picoDe(bloque: Float32Array): number {
+  let pico = 0;
+  for (const muestra of bloque) pico = Math.max(pico, Math.abs(muestra));
+  return Math.min(1, pico);
+}
 
 export async function armarSesion(
   { modelos, traductor }: ModelosListos,
@@ -82,7 +91,10 @@ export async function armarSesion(
   });
 
   const opcionesCaptura = {
-    alRecibir: (bloque: Float32Array) => flujo.agregarAudio(bloque),
+    alRecibir: (bloque: Float32Array) => {
+      eventos.alNivel?.(picoDe(bloque));
+      flujo.agregarAudio(bloque);
+    },
     alTerminar: eventos.alTerminarCaptura,
   };
   const captura =

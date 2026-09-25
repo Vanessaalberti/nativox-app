@@ -45,3 +45,13 @@ export async function hashearToken(token: string): Promise<string> {
   const resumen = await crypto.subtle.digest("SHA-256", codificador.encode(token));
   return aHex(new Uint8Array(resumen));
 }
+
+// NTVX-XXXX-XXXX-XXXX (60 bits): el prefijo se ve bien en un chat; el resto es lo que protege.
+export function generarCodigoDeInvitacion(): string {
+  return `NTVX-${caracteresAlAzar(12).replace(/(.{4})(?=.)/g, "$1-")}`;
+}
+
+// El código se escribe o se pega a mano: se ignoran mayúsculas, guiones, espacios y el prefijo.
+export function hashearCodigoDeInvitacion(codigo: string): Promise<string> {
+  return hashearCodigo(normalizarCodigo(codigo).replace(/^NTVX/, ""));
+}

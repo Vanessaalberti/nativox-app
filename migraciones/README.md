@@ -7,8 +7,8 @@
 | `0001_evento_y_cuentas.sql` | evento, administrador, sesiones, intentos de ingreso, código de recuperación |
 | `0002_salas.sql` | salas con su idioma original y los idiomas destino. **Hecha** |
 | `0003_agenda_y_glosario.sql` | charlas (horario, idioma, resumen, oradores) y su glosario. **Hecha** (el glosario del evento y las correcciones, después) |
-| `0004_operadores.sql` | operadores (códigos de invitación hasheados) y sala_operador |
-| `0005_transcripciones.sql` | segmentos con marcas de tiempo reales y sus traducciones |
-| `0006_operacion.sql` | canal de avisos (webhook como secreto), links de acción de un solo uso, registro de acciones, equipos de reserva |
-| `0007_consumo.sql` | consumo estimado de IA y topes |
-| `0008_produccion.sql` | salidas de producción (nombre, estilo, sala al aire) y changelog |
+| `0004_operadores.sql` | operadores (códigos de invitación hasheados) y sala_operador. **Hecha** |
+| `0006_ajustes.sql` | ajustes del administrador y el webhook de avisos (secreto). **Hecha** |
+| `0007_operacion.sql` | segmentos transcriptos de cada charla, links de acción de un solo uso y registro de qué estuvo al aire. **Hecha** |
+| `0008_consumo.sql` | consumo estimado de IA y topes |
+| `0005_produccion.sql` | estilo de cada sala y salidas de producción (nombre, estilo, sala al aire). **Hecha** |

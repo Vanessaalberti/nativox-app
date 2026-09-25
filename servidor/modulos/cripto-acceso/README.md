@@ -8,6 +8,7 @@
 
 - `hashearContrasena` · `verificarContrasena`
 - `generarCodigoDeRecuperacion` · `normalizarCodigo` · `hashearCodigo`
+- `generarCodigoDeInvitacion` (NTVX-XXXX-XXXX-XXXX, 60 bits) · `hashearCodigoDeInvitacion` (ignora mayúsculas, guiones y el prefijo)
 - `generarToken` · `hashearToken`
 - `compararEnTiempoConstante`
 

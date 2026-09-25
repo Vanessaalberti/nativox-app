@@ -1,4 +1,4 @@
-import type { DatosEvento } from "@compartido/contratos";
+import type { ActualizarEvento, DatosEvento } from "@compartido/contratos";
 import type {
   Administrador,
   AlmacenAcceso,
@@ -120,6 +120,31 @@ export function crearAlmacenD1(db: D1Database): AlmacenAcceso {
             ahora,
           ),
       ),
+
+    async actualizarEvento(cambios: ActualizarEvento & { nubeComoRespaldo?: boolean }) {
+      const resultado = await db
+        .prepare(
+          "UPDATE evento SET nombre = ?, logo = ?, fecha_inicio = ?, fecha_fin = ?, nube_como_respaldo = COALESCE(?, nube_como_respaldo) WHERE id = 1",
+        )
+        .bind(
+          cambios.nombre,
+          cambios.logo,
+          cambios.fechaInicio,
+          cambios.fechaFin,
+          cambios.nubeComoRespaldo === undefined ? null : cambios.nubeComoRespaldo ? 1 : 0,
+        )
+        .run();
+      return resultado.meta.changes > 0;
+    },
+
+    async borrarTodo() {
+      await db.batch([
+        db.prepare("DELETE FROM sesion"),
+        db.prepare("DELETE FROM intento_ingreso"),
+        db.prepare("DELETE FROM evento"),
+        db.prepare("DELETE FROM administrador"),
+      ]);
+    },
 
     async guardarSesion(tokenHash, sesion, creadaEn, venceEn) {
       await db

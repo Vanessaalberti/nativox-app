@@ -1,15 +1,20 @@
 import { esquemaCrearSalas, esquemaDatosDeSala } from "@compartido/contratos";
-import { responderError } from "@servidor/plataforma/errores";
 import { crearId } from "@servidor/plataforma/ids";
 import { conCuerpo } from "@servidor/plataforma/pedido";
-import { comoAdministrador, type ContextoApi } from "./sesion";
+import { salaInexistente, conSala } from "./con-sala";
+import { comoAdministrador, comoPersona, type ContextoApi } from "./sesion";
 
-export const salaInexistente = () => responderError(404, "sala_inexistente", "Esa sala no existe.");
-
+// El administrador ve todas las salas; un operador, solo las que le asignaron.
 export function listarSalas(pedido: Request, contexto: ContextoApi): Promise<Response> {
-  return comoAdministrador(pedido, contexto, async () =>
-    Response.json({ ok: true, salas: await contexto.agenda.listarSalas() }),
-  );
+  return comoPersona(pedido, contexto, async (sesion) => {
+    const salas = await contexto.agenda.listarSalas();
+    const asignadas =
+      sesion.rol === "administrador" ? null : await contexto.operadores.salasDe(sesion.cuentaId);
+    return Response.json({
+      ok: true,
+      salas: asignadas === null ? salas : salas.filter((sala) => asignadas.includes(sala.id)),
+    });
+  });
 }
 
 // Crea una sala o varias de una (hasta 60): todas o ninguna.
@@ -26,10 +31,9 @@ export function crearSalas(pedido: Request, contexto: ContextoApi): Promise<Resp
 }
 
 export function leerSala(pedido: Request, contexto: ContextoApi, id = ""): Promise<Response> {
-  return comoAdministrador(pedido, contexto, async () => {
-    const sala = await contexto.agenda.leerSala(id);
-    return sala ? Response.json({ ok: true, sala }) : salaInexistente();
-  });
+  return conSala(pedido, contexto, id, (sala) =>
+    Promise.resolve(Response.json({ ok: true, sala })),
+  );
 }
 
 export function actualizarSala(pedido: Request, contexto: ContextoApi, id = ""): Promise<Response> {

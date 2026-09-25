@@ -1,6 +1,7 @@
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { IDIOMAS, esquemaIdioma, validar, type Idioma } from "@compartido/contratos";
 import { listarFuentes, type FuenteAudio } from "@navegador/modulos/captura-audio";
+import { Seleccion } from "@navegador/interfaz/sistema-diseno";
 import type { ConfiguracionSesion } from "../motor/armar-sesion";
 
 export const NOMBRES_DE_IDIOMA: Record<Idioma, string> = {
@@ -15,17 +16,19 @@ const campo =
 
 export interface PropiedadesControl {
   ocupada: boolean;
+  // Con qué idiomas y qué glosario arranca el formulario (los de la sala y la charla de ahora).
+  inicial?: { original: Idioma; destino: Idioma[]; glosario: string };
   alIniciar: (configuracion: ConfiguracionSesion) => void;
 }
 
-export function ControlSesion({ ocupada, alIniciar }: PropiedadesControl) {
+export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesControl) {
   const [fuentes, setFuentes] = useState<FuenteAudio[]>([]);
   const [tipoFuente, setTipoFuente] = useState<"entrada" | "archivo">("entrada");
   const [idDispositivo, setIdDispositivo] = useState<string>("");
   const [archivo, setArchivo] = useState<File | null>(null);
-  const [idiomaOriginal, setIdiomaOriginal] = useState<Idioma>("es");
-  const [idiomasDestino, setIdiomasDestino] = useState<Idioma[]>(["en", "pt"]);
-  const [glosario, setGlosario] = useState("");
+  const [idiomaOriginal, setIdiomaOriginal] = useState<Idioma>(inicial?.original ?? "es");
+  const [idiomasDestino, setIdiomasDestino] = useState<Idioma[]>(inicial?.destino ?? ["en", "pt"]);
+  const [glosario, setGlosario] = useState(inicial?.glosario ?? "");
   const [textoEnVivo, setTextoEnVivo] = useState(true);
 
   useEffect(() => {
@@ -110,21 +113,14 @@ export function ControlSesion({ ocupada, alIniciar }: PropiedadesControl) {
           />
         </label>
       )}
-      <label className="flex flex-col gap-1.5">
-        <span className={etiqueta}>Idioma original</span>
-        <select
-          value={idiomaOriginal}
-          onChange={(evento) => cambiarOriginal(evento.target.value)}
-          className={campo}
-          disabled={ocupada}
-        >
-          {IDIOMAS.map((idioma) => (
-            <option key={idioma} value={idioma}>
-              {NOMBRES_DE_IDIOMA[idioma]}
-            </option>
-          ))}
-        </select>
-      </label>
+      <fieldset className="flex flex-col gap-1.5" disabled={ocupada}>
+        <Seleccion
+          etiqueta="Idioma original"
+          valor={idiomaOriginal}
+          alCambiar={cambiarOriginal}
+          opciones={IDIOMAS.map((idioma) => ({ valor: idioma, texto: NOMBRES_DE_IDIOMA[idioma] }))}
+        />
+      </fieldset>
       <fieldset className="flex flex-col gap-1.5" disabled={ocupada}>
         <legend className={etiqueta}>Traducir a</legend>
         <div className="flex gap-4 pt-2">

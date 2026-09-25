@@ -1,10 +1,9 @@
 import { useState } from "react";
 import type { DatosDeSala, Sala } from "@compartido/contratos";
 import {
-  Aviso,
-  Boton,
   Campo,
   Modal,
+  PieDeFormulario,
   ZonaDeEliminar,
   useEnvio,
 } from "@navegador/interfaz/sistema-diseno";
@@ -28,11 +27,7 @@ export function ModalEditarSala({
     original: sala.idiomaOriginal,
     destino: sala.idiomasDestino,
   });
-  const { error, enviando, enviar } = useEnvio();
-
-  const ejecutar = async (accion: () => Promise<string | null>) => {
-    if ((await enviar(accion)) === null) alCerrar();
-  };
+  const { error, enviando, enviar } = useEnvio(alCerrar);
 
   return (
     <Modal etiqueta="Sala" titulo="Editar sala" alCerrar={alCerrar}>
@@ -40,7 +35,7 @@ export function ModalEditarSala({
         className="flex flex-col gap-5"
         onSubmit={(evento) => {
           evento.preventDefault();
-          void ejecutar(() =>
+          void enviar(() =>
             alGuardar({
               nombre,
               idiomaOriginal: idiomas.original,
@@ -51,19 +46,14 @@ export function ModalEditarSala({
       >
         <Campo etiqueta="Nombre" valor={nombre} alCambiar={setNombre} autoComplete="off" />
         <SelectorDeIdiomas valor={idiomas} alCambiar={setIdiomas} />
-        {error !== null && <Aviso tipo="error">{error}</Aviso>}
-        <div className="flex justify-end">
-          <Boton type="submit" disabled={enviando || nombre.trim() === ""}>
-            Guardar →
-          </Boton>
-        </div>
+        <PieDeFormulario error={error} deshabilitado={enviando || nombre.trim() === ""} />
       </form>
 
       <ZonaDeEliminar
         etiqueta="Eliminar sala"
         aviso={`Se borra la sala «${sala.nombre}»${sala.charlas > 0 ? ` y sus ${String(sala.charlas)} charlas` : ""}. No se puede deshacer.`}
         enviando={enviando}
-        alEliminar={() => void ejecutar(alEliminar)}
+        alEliminar={() => void enviar(alEliminar)}
       />
     </Modal>
   );

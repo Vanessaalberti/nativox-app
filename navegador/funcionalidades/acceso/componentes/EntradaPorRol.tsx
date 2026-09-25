@@ -15,6 +15,13 @@ const OPCIONES = [
     texto: "Tenés un código de invitación de tu organización. Entrá directo a tus salas asignadas.",
     ruta: "/entrada/operador",
   },
+  {
+    numero: "03",
+    titulo: "Audiencia",
+    texto:
+      "Mirá la transcripción y la traducción en vivo de las salas, en el idioma que prefieras. No hace falta cuenta.",
+    ruta: "/audiencia",
+  },
 ];
 
 // /entrada: en una instancia que ya tiene evento, cada persona elige cómo entra.
@@ -33,7 +40,7 @@ export function EntradaPorRol() {
       <p className="mb-12 max-w-[560px] text-lg text-ink/80">
         Esta es tu instancia de Nativox. Elegí tu rol para continuar.
       </p>
-      <div className="grid w-full max-w-[880px] gap-6 md:grid-cols-2 md:gap-8">
+      <div className="grid w-full max-w-[1400px] gap-6 md:grid-cols-3 md:gap-8">
         {OPCIONES.map((opcion) => (
           <Link
             key={opcion.ruta}

@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { TIPOS_DE_EVENTO, type TipoDeEvento } from "@compartido/contratos";
+import { contarDias, type TipoDeEvento } from "@compartido/contratos";
 import { crearEvento } from "@navegador/modulos/cliente-instancia";
 import { MarcoDeEntrada } from "@navegador/interfaz/marco-de-entrada";
-import { Aviso, Boton, Campo } from "@navegador/interfaz/sistema-diseno";
+import { Aviso, Boton, Campo, LogoYNombre } from "@navegador/interfaz/sistema-diseno";
 import type { Duracion } from "../estimador";
 import { leerTipo } from "../tipo";
 import { EstimadorDeCosto } from "./EstimadorDeCosto";
 import { EvaluarComputadora } from "./EvaluarComputadora";
-import { LogoYNombre } from "./LogoYNombre";
 
 const NOMBRES_DE_TIPO: Record<TipoDeEvento, string> = {
   "todo-en-uno": "Todo en uno",
@@ -26,7 +25,8 @@ const AYUDA_DEL_NOMBRE: Record<TipoDeEvento, string> = {
 export function DatosDelEvento() {
   const navegar = useNavigate();
   const [parametros] = useSearchParams();
-  const [tipo, setTipo] = useState(leerTipo(parametros.get("tipo")));
+  // Se eligió en el paso 1: acá no se vuelve a preguntar.
+  const tipo = leerTipo(parametros.get("tipo"));
   const [nombre, setNombre] = useState("");
   const [logo, setLogo] = useState<string | null>(null);
   const [fechaInicio, setFechaInicio] = useState("");
@@ -40,6 +40,11 @@ export function DatosDelEvento() {
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
 
+  const diasDeLasFechas =
+    fechaInicio !== "" && fechaFin !== "" && fechaInicio <= fechaFin
+      ? contarDias(fechaInicio, fechaFin)
+      : null;
+
   const guardar = async () => {
     setEnviando(true);
     setError(null);
@@ -50,6 +55,7 @@ export function DatosDelEvento() {
       fechaInicio: fechaInicio === "" ? null : fechaInicio,
       fechaFin: fechaFin === "" ? null : fechaFin,
       ...duracion,
+      dias: diasDeLasFechas ?? duracion.dias,
       nubeComoRespaldo: nube,
     });
     setEnviando(false);
@@ -82,26 +88,6 @@ export function DatosDelEvento() {
             void guardar();
           }}
         >
-          <fieldset className="flex flex-wrap gap-6 font-mono text-sm">
-            <legend className="mb-2 font-mono text-[11px] font-bold tracking-widest text-ink/70 uppercase">
-              ¿Quién opera?
-            </legend>
-            {TIPOS_DE_EVENTO.map((opcion) => (
-              <label key={opcion} className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="tipo"
-                  checked={tipo === opcion}
-                  onChange={() => setTipo(opcion)}
-                  className="accent-[#2f8a70]"
-                />
-                {opcion === "todo-en-uno"
-                  ? "Todo en uno (administro y opero yo)"
-                  : "Roles separados (mi equipo opera)"}
-              </label>
-            ))}
-          </fieldset>
-
           <LogoYNombre
             nombre={nombre}
             alCambiarNombre={setNombre}
@@ -138,6 +124,7 @@ export function DatosDelEvento() {
 
           <EstimadorDeCosto
             duracion={duracion}
+            diasDeLasFechas={diasDeLasFechas}
             alCambiar={setDuracion}
             nubeActivada={nube}
             alCambiarNube={setNube}

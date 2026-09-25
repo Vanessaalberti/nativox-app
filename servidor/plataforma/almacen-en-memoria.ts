@@ -24,6 +24,23 @@ export function crearAlmacenEnMemoria(): AlmacenAcceso {
       return Promise.resolve();
     },
     leerEvento: () => Promise.resolve(evento),
+    actualizarEvento: (cambios) => {
+      if (!evento) return Promise.resolve(false);
+      const { nubeComoRespaldo, ...resto } = cambios;
+      evento = {
+        ...evento,
+        ...resto,
+        nubeComoRespaldo: nubeComoRespaldo ?? evento.nubeComoRespaldo,
+      };
+      return Promise.resolve(true);
+    },
+    borrarTodo: () => {
+      administrador = null;
+      evento = null;
+      sesiones.clear();
+      intentos.length = 0;
+      return Promise.resolve();
+    },
     crearEvento: (datos) => {
       if (evento) return Promise.resolve(false);
       evento = {

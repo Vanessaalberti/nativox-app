@@ -73,7 +73,7 @@ export function ElegirTipo() {
         la instalación es la misma en los dos casos.
       </p>
 
-      <div className="mb-10 grid w-full max-w-[900px] gap-4 text-left md:grid-cols-2">
+      <div className="mb-10 grid w-full max-w-[1400px] gap-4 text-left md:grid-cols-2">
         {ROLES.map((rol) => (
           <div key={rol.nombre} className="border-[1.5px] border-ink/25 bg-canvas px-5 py-4">
             <span className="font-mono text-[11px] tracking-widest text-ink/50 uppercase">Rol</span>
@@ -83,7 +83,7 @@ export function ElegirTipo() {
         ))}
       </div>
 
-      <div className="mb-8 grid w-full max-w-[900px] gap-6 md:grid-cols-2 md:gap-8">
+      <div className="mb-8 grid w-full max-w-[1400px] gap-6 md:grid-cols-2 md:gap-8">
         {OPCIONES.map((opcion) => (
           <Link
             key={opcion.tipo}
@@ -115,7 +115,7 @@ export function ElegirTipo() {
         ))}
       </div>
 
-      <div className="max-w-[900px] text-left">
+      <div className="max-w-[1400px] text-left">
         <Aviso>
           En los dos casos: creás tu cuenta de administrador (email y contraseña), elegís cómo corre
           la IA y todo queda en tu propia instancia de Cloudflare. No hace falta ninguna API key:

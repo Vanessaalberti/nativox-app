@@ -6,6 +6,7 @@ import {
   crearSalas,
   listarSalas,
 } from "@navegador/modulos/cliente-instancia";
+import { useConRecarga } from "@navegador/interfaz/sistema-diseno";
 
 export type CargaDeSalas =
   { fase: "cargando" } | { fase: "error"; motivo: string } | { fase: "lista"; salas: Sala[] };
@@ -28,15 +29,7 @@ export function useSalas() {
     void recargar();
   }, [recargar]);
 
-  const conRecarga = useCallback(
-    async (accion: () => Promise<{ ok: true } | { ok: false; motivo: string }>) => {
-      const respuesta = await accion();
-      if (!respuesta.ok) return respuesta.motivo;
-      await recargar();
-      return null;
-    },
-    [recargar],
-  );
+  const conRecarga = useConRecarga(recargar);
 
   return {
     carga,

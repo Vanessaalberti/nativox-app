@@ -1,4 +1,6 @@
 import {
+  esquemaCambiarContrasena,
+  esquemaConContrasena,
   esquemaCrearCuenta,
   esquemaIngresar,
   esquemaIngresarOperador,
@@ -8,14 +10,16 @@ import {
   compararEnTiempoConstante,
   generarCodigoDeRecuperacion,
   hashearCodigo,
+  hashearCodigoDeInvitacion,
   hashearContrasena,
   verificarContrasena,
 } from "@servidor/modulos/cripto-acceso";
 import { responderError } from "@servidor/plataforma/errores";
-import { leerCuerpo } from "@servidor/plataforma/pedido";
+import { conCuerpo, leerCuerpo } from "@servidor/plataforma/pedido";
 import {
   abrirSesion,
   cerrarSesion,
+  comoAdministrador,
   cookieVencida,
   responderConCookie,
   type ContextoApi,
@@ -136,18 +140,84 @@ export async function recuperar(pedido: Request, contexto: ContextoApi): Promise
   return responderConCookie({ ok: true, codigoRecuperacion: codigoNuevo }, cookie);
 }
 
-// Los códigos de invitación de operador se crean desde el panel de administrador (migración 0002,
-// todavía no existe): hasta entonces no hay ninguno que pueda ser válido.
+// El operador entra con el código que le mandó el administrador. Sin email de por medio, lo que
+// frena las adivinanzas es el largo del código (60 bits) y el tope de intentos por origen.
 export async function ingresarOperador(pedido: Request, contexto: ContextoApi): Promise<Response> {
   const cuerpo = await leerCuerpo(pedido, esquemaIngresarOperador);
   if (!cuerpo.ok) return responderError(400, "pedido_invalido", cuerpo.motivo);
-  if (await estaBloqueado(contexto, "operador", "codigo")) return respuestaDeBloqueo();
+  if (await estaBloqueado(contexto, "operador", contexto.ip)) return respuestaDeBloqueo();
 
-  await registrarFallo(contexto, "operador", "codigo");
-  return responderError(401, "codigo_invalido", "El código no es válido o fue revocado.");
+  const persona = await contexto.operadores.buscarPorCodigo(
+    await hashearCodigoDeInvitacion(cuerpo.valor.codigo),
+  );
+  if (!persona) {
+    await registrarFallo(contexto, "operador", contexto.ip);
+    return responderError(401, "codigo_invalido", "El código no es válido o fue revocado.");
+  }
+
+  await contexto.operadores.registrarIngreso(persona.id, contexto.ahora());
+  return responderConCookie({ ok: true }, await abrirSesion(contexto, "operador", persona.id));
 }
 
 export async function salir(pedido: Request, contexto: ContextoApi): Promise<Response> {
   await cerrarSesion(pedido, contexto);
   return responderConCookie({ ok: true }, cookieVencida(contexto.segura));
+}
+
+// Verifica la contraseña del administrador con el mismo tope de intentos que el ingreso: sirve
+// para las acciones que cambian el acceso (contraseña nueva, código de recuperación nuevo).
+async function contrasenaDelAdministrador(
+  contexto: ContextoApi,
+  accion: string,
+  contrasena: string,
+): Promise<Response | null> {
+  const administrador = await contexto.almacen.leerAdministrador();
+  if (!administrador) return responderError(404, "sin_cuenta", "Todavía no hay una cuenta.");
+  if (await estaBloqueado(contexto, accion, administrador.email)) return respuestaDeBloqueo();
+
+  if (!(await verificarContrasena(contrasena, administrador.contrasenaHash))) {
+    await registrarFallo(contexto, accion, administrador.email);
+    return responderError(401, "contrasena_incorrecta", "La contraseña actual no es correcta.");
+  }
+  await contexto.almacen.borrarIntentos(`${accion}:email:${administrador.email}`);
+  return null;
+}
+
+// Cambia la contraseña: se cierran las demás sesiones abiertas y se sigue con una nueva.
+export function cambiarContrasena(pedido: Request, contexto: ContextoApi): Promise<Response> {
+  return comoAdministrador(pedido, contexto, () =>
+    conCuerpo(pedido, esquemaCambiarContrasena, async ({ actual, nueva }) => {
+      const rechazo = await contrasenaDelAdministrador(contexto, "contrasena", actual);
+      if (rechazo) return rechazo;
+
+      const administrador = await contexto.almacen.leerAdministrador();
+      await contexto.almacen.cambiarCredenciales({
+        contrasenaHash: await hashearContrasena(nueva),
+        codigoRecuperacionHash: administrador?.codigoRecuperacionHash ?? "",
+      });
+      await contexto.almacen.borrarSesionesDe("administrador", 1);
+      return responderConCookie({ ok: true }, await abrirSesion(contexto, "administrador", 1));
+    }),
+  );
+}
+
+// Genera un código de recuperación nuevo (el anterior deja de servir). Se muestra una sola vez.
+export function nuevoCodigoDeRecuperacion(
+  pedido: Request,
+  contexto: ContextoApi,
+): Promise<Response> {
+  return comoAdministrador(pedido, contexto, () =>
+    conCuerpo(pedido, esquemaConContrasena, async ({ contrasena }) => {
+      const rechazo = await contrasenaDelAdministrador(contexto, "codigo", contrasena);
+      if (rechazo) return rechazo;
+
+      const administrador = await contexto.almacen.leerAdministrador();
+      const codigo = generarCodigoDeRecuperacion();
+      await contexto.almacen.cambiarCredenciales({
+        contrasenaHash: administrador?.contrasenaHash ?? "",
+        codigoRecuperacionHash: await hashearCodigo(codigo),
+      });
+      return Response.json({ ok: true, codigoRecuperacion: codigo });
+    }),
+  );
 }

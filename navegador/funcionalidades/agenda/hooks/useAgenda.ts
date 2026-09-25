@@ -8,6 +8,7 @@ import {
   leerSala,
   listarCharlas,
 } from "@navegador/modulos/cliente-instancia";
+import { useConRecarga } from "@navegador/interfaz/sistema-diseno";
 
 export type CargaDeAgenda =
   | { fase: "cargando" }
@@ -49,14 +50,7 @@ export function useAgenda(salaId: string) {
     void cargar();
   }, [cargar]);
 
-  const conRecarga = async (
-    accion: () => Promise<{ ok: true } | { ok: false; motivo: string }>,
-  ) => {
-    const respuesta = await accion();
-    if (!respuesta.ok) return respuesta.motivo;
-    await cargar();
-    return null;
-  };
+  const conRecarga = useConRecarga(cargar);
 
   return {
     carga,

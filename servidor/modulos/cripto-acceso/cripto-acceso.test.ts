@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   compararEnTiempoConstante,
+  generarCodigoDeInvitacion,
   generarCodigoDeRecuperacion,
   generarToken,
   hashearCodigo,
+  hashearCodigoDeInvitacion,
   hashearContrasena,
   hashearToken,
   normalizarCodigo,
@@ -48,6 +50,15 @@ describe("códigos", () => {
   it("se compara sin importar mayúsculas, guiones ni espacios", async () => {
     expect(normalizarCodigo("abcd-efgh 2345")).toBe("ABCDEFGH2345");
     expect(await hashearCodigo("abcd-efgh-2345")).toBe(await hashearCodigo("ABCDEFGH2345"));
+  });
+
+  it("el de invitación es NTVX-XXXX-XXXX-XXXX y se compara sin el prefijo ni el formato", async () => {
+    const codigo = generarCodigoDeInvitacion();
+
+    expect(codigo).toMatch(/^NTVX-[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/);
+    expect(await hashearCodigoDeInvitacion(codigo.toLowerCase())).toBe(
+      await hashearCodigoDeInvitacion(codigo.replace("NTVX-", "").replaceAll("-", " ")),
+    );
   });
 
   it("los tokens son de 256 bits y su hash no es el token", async () => {

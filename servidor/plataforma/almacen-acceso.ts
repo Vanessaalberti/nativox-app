@@ -1,4 +1,4 @@
-import type { DatosEvento, TipoDeEvento } from "@compartido/contratos";
+import type { ActualizarEvento, DatosEvento, TipoDeEvento } from "@compartido/contratos";
 
 export type Rol = "administrador" | "operador";
 
@@ -33,6 +33,11 @@ export interface AlmacenAcceso {
   cambiarCredenciales: (credenciales: Omit<Administrador, "email">) => Promise<void>;
   leerEvento: () => Promise<EventoGuardado | null>;
   crearEvento: (evento: DatosEvento, ahora: number) => Promise<boolean>;
+  actualizarEvento: (
+    cambios: ActualizarEvento & { nubeComoRespaldo?: boolean },
+  ) => Promise<boolean>;
+  // Elimina el evento, la cuenta del administrador, las sesiones y los intentos de ingreso.
+  borrarTodo: () => Promise<void>;
   guardarSesion: (
     tokenHash: string,
     sesion: SesionGuardada,

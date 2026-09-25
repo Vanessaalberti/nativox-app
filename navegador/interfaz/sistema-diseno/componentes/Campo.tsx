@@ -12,6 +12,8 @@ export interface PropiedadesCampo {
   acento?: "naranja" | "verde";
   minimo?: number;
   maximo?: number;
+  // Se ve pero no se cambia (un valor que sale de otro campo).
+  soloLectura?: boolean;
 }
 
 const ENFOQUE = { naranja: "focus:border-naranja", verde: "focus:border-verde" } as const;
@@ -28,6 +30,7 @@ export function Campo({
   acento = "naranja",
   minimo,
   maximo,
+  soloLectura = false,
 }: PropiedadesCampo) {
   const id = useId();
   const [visible, setVisible] = useState(false);
@@ -51,7 +54,8 @@ export function Campo({
           autoComplete={autoComplete}
           min={minimo}
           max={maximo}
-          className={`w-full border-[1.5px] border-ink/25 bg-canvas px-4 py-3 font-mono text-sm text-ink outline-none transition-colors ${ENFOQUE[acento]} ${esContrasena ? "pr-24" : ""}`}
+          readOnly={soloLectura}
+          className={`w-full border-[1.5px] border-ink/25 bg-canvas px-4 py-3 font-mono text-sm text-ink outline-none transition-colors ${ENFOQUE[acento]} ${esContrasena ? "pr-24" : ""} ${soloLectura ? "bg-ink/5 text-ink/70" : ""}`}
         />
         {esContrasena && (
           <button

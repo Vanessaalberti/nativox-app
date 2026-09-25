@@ -164,6 +164,10 @@ export function crearAlmacenAgendaD1(db: D1Database): AlmacenAgenda {
       return huboCambios(resultado);
     },
 
+    async borrarTodo() {
+      await db.batch([db.prepare("DELETE FROM charla"), db.prepare("DELETE FROM sala")]);
+    },
+
     async borrarCharla(id) {
       return huboCambios(await db.prepare("DELETE FROM charla WHERE id = ?").bind(id).run());
     },

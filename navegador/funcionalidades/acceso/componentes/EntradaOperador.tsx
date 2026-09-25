@@ -52,7 +52,7 @@ export function EntradaOperador() {
           etiqueta="Código de invitación"
           valor={codigo}
           alCambiar={setCodigo}
-          placeholder="NTVX-7K2P"
+          placeholder="NTVX-XXXX-XXXX-XXXX"
           autoComplete="one-time-code"
         />
         {error !== null && <Aviso tipo="error">{error}</Aviso>}

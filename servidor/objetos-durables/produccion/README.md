@@ -4,4 +4,6 @@
 
 **Qué NO hace:** transcribir ni reenviar subtítulos (eso lo hace el Durable Object de cada sala).
 
+**Hoy:** sigue siendo un esqueleto. Las salidas viven en D1 (`salida`) y la página de cada salida pregunta cada 2 segundos qué sala está al aire; este objeto reemplazaría esa consulta por un aviso al instante.
+
 **Archivos previstos:** `produccion.ts` · `salidas.ts`.

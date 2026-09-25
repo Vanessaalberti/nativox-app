@@ -14,4 +14,6 @@ export interface AlmacenAgenda {
   crearCharla: (id: string, salaId: string, datos: DatosDeCharla, ahora: number) => Promise<void>;
   actualizarCharla: (id: string, datos: DatosDeCharla) => Promise<boolean>;
   borrarCharla: (id: string) => Promise<boolean>;
+  // Elimina todas las salas y sus charlas.
+  borrarTodo: () => Promise<void>;
 }

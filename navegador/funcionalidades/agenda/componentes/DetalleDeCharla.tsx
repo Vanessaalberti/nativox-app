@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Charla, DatosDeCharla } from "@compartido/contratos";
 import { Aviso, Boton } from "@navegador/interfaz/sistema-diseno";
 import { aDatos } from "../datos-de-charla";
+import { BloqueDeTranscripcion } from "./BloqueDeTranscripcion";
 import { formatearMinutos, nombreDelDia } from "../fechas";
 import { agregarTerminos, leerArchivoDeGlosario, sugerirTerminos } from "../glosario";
 
@@ -11,10 +12,12 @@ const subtitulo = "font-mono text-[10px] font-bold tracking-widest text-ink/60 u
 // archivo o se completa con los términos que sugiere el título y el resumen (nada entra sin aceptarlo).
 export function DetalleDeCharla({
   charla,
+  soloLectura,
   alEditar,
   alGuardarGlosario,
 }: {
   charla: Charla;
+  soloLectura: boolean;
   alEditar: () => void;
   // Devuelve el motivo si no se pudo guardar (null si salió bien).
   alGuardarGlosario: (datos: DatosDeCharla) => Promise<string | null>;
@@ -63,9 +66,11 @@ export function DetalleDeCharla({
             {formatearMinutos(charla.finMin)}
           </p>
         </div>
-        <Boton variante="secundario" onClick={alEditar}>
-          Editar
-        </Boton>
+        {!soloLectura && (
+          <Boton variante="secundario" onClick={alEditar}>
+            Editar
+          </Boton>
+        )}
       </div>
 
       {charla.oradores !== "" && (
@@ -79,6 +84,8 @@ export function DetalleDeCharla({
         {charla.resumen === "" ? "Sin descripción." : charla.resumen}
       </p>
 
+      <BloqueDeTranscripcion charlaId={charla.id} titulo={charla.titulo} />
+
       <section className="flex flex-col gap-3">
         <h3 className={subtitulo}>Glosario técnico</h3>
         <p className="font-mono text-[11px] text-ink/60">
@@ -90,33 +97,36 @@ export function DetalleDeCharla({
           value={glosario}
           onChange={(evento) => setGlosario(evento.target.value)}
           rows={6}
+          readOnly={soloLectura}
           aria-label="Glosario técnico de la actividad"
           className="w-full border-[1.5px] border-ink/25 bg-canvas px-3 py-2 font-mono text-sm outline-none focus:border-naranja"
         />
-        <div className="flex flex-wrap items-center gap-3">
-          <Boton disabled={guardando || !sinGuardar} onClick={() => void guardar(glosario)}>
-            Guardar glosario
-          </Boton>
-          <label className="cursor-pointer font-mono text-[11px] font-bold tracking-widest uppercase underline hover:text-naranja">
-            + Cargar archivo (.csv o .txt)
-            <input
-              type="file"
-              accept=".csv,.txt,text/csv,text/plain"
-              className="sr-only"
-              onChange={(evento) => {
-                void leerArchivo(evento.target.files?.[0]);
-                evento.target.value = "";
-              }}
-            />
-          </label>
-          <button
-            type="button"
-            onClick={() => setSugeridos(sugerirTerminos(charla.titulo, charla.resumen, glosario))}
-            className="font-mono text-[11px] font-bold tracking-widest uppercase underline hover:text-naranja"
-          >
-            ✦ Sugerir términos
-          </button>
-        </div>
+        {!soloLectura && (
+          <div className="flex flex-wrap items-center gap-3">
+            <Boton disabled={guardando || !sinGuardar} onClick={() => void guardar(glosario)}>
+              Guardar glosario
+            </Boton>
+            <label className="cursor-pointer font-mono text-[11px] font-bold tracking-widest uppercase underline hover:text-naranja">
+              + Cargar archivo (.csv o .txt)
+              <input
+                type="file"
+                accept=".csv,.txt,text/csv,text/plain"
+                className="sr-only"
+                onChange={(evento) => {
+                  void leerArchivo(evento.target.files?.[0]);
+                  evento.target.value = "";
+                }}
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setSugeridos(sugerirTerminos(charla.titulo, charla.resumen, glosario))}
+              className="font-mono text-[11px] font-bold tracking-widest uppercase underline hover:text-naranja"
+            >
+              ✦ Sugerir términos
+            </button>
+          </div>
+        )}
         {sinGuardar && (
           <p className="font-mono text-[11px] text-naranja">Hay cambios sin guardar.</p>
         )}

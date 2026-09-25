@@ -19,11 +19,14 @@ const CAMPOS: {
 // (en las computadoras de las salas) no cuesta nada, así que el número principal es $0.
 export function EstimadorDeCosto({
   duracion,
+  diasDeLasFechas,
   alCambiar,
   nubeActivada,
   alCambiarNube,
 }: {
   duracion: Duracion;
+  // Los días que salen de las fechas del evento (null si no se pusieron las dos): no se editan.
+  diasDeLasFechas: number | null;
   alCambiar: (duracion: Duracion) => void;
   nubeActivada: boolean;
   alCambiarNube: (activada: boolean) => void;
@@ -42,7 +45,10 @@ export function EstimadorDeCosto({
               key={clave}
               etiqueta={etiqueta}
               tipo="number"
-              valor={String(duracion[clave])}
+              valor={String(
+                clave === "dias" && diasDeLasFechas !== null ? diasDeLasFechas : duracion[clave],
+              )}
+              soloLectura={clave === "dias" && diasDeLasFechas !== null}
               minimo={limites.minimo}
               maximo={limites.maximo}
               acento="verde"
@@ -52,6 +58,11 @@ export function EstimadorDeCosto({
             />
           ))}
         </div>
+        {diasDeLasFechas !== null && (
+          <p className="font-mono text-[11px] text-ink/60">
+            Los días salen de las fechas del evento. Para cambiarlos, cambiá las fechas.
+          </p>
+        )}
       </fieldset>
 
       <section className="flex flex-col gap-3 border-[1.5px] border-verde bg-verde/10 p-4">
