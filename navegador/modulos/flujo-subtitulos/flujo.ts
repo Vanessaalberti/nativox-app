@@ -71,7 +71,11 @@ export function crearFlujoSubtitulos(o: OpcionesFlujo): FlujoSubtitulos {
 
   async function transcribirFinal(fragmento: FragmentoDeAudio) {
     const prompt = armarPromptWhisper(o.glosario, textoReciente(fragmento.numero));
-    const resultado = await o.transcribir(fragmento.audio, { prompt, idioma: o.idiomaOriginal });
+    const resultado = await o.transcribir(fragmento.audio, {
+      prompt,
+      idioma: o.idiomaOriginal,
+      segundosDeContexto: fragmento.segundosDeContexto,
+    });
     if (!resultado.ok) {
       o.alFallar(resultado.motivo);
       return null;

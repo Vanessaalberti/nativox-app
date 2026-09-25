@@ -8,6 +8,9 @@ export interface FuenteAudio {
 }
 
 export interface OpcionesCaptura {
+  // El micrófono de una notebook o un auricular necesita los filtros de voz del navegador
+  // (eco, ruido y volumen); la entrada de una consola (el caso de las salas) va sin ellos.
+  conFiltrosDeVoz?: boolean;
   alRecibir: (bloque: Float32Array) => void;
   // La pista se cortó sola: cable desconectado, permiso retirado o fin del archivo.
   alTerminar: (motivo: string) => void;

@@ -3,6 +3,9 @@ import type { Resultado } from "@compartido/contratos";
 export interface OpcionesTranscripcion {
   prompt: string;
   idioma: string;
+  // Cuánto del principio del audio es contexto del fragmento anterior (ya transcripto). Los
+  // motores que devuelven el horario de cada palabra lo usan para sacar ese tramo con precisión.
+  segundosDeContexto?: number;
 }
 
 export interface InfoMotor {

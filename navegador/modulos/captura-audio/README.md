@@ -2,7 +2,7 @@
 
 **Qué hace:** Abre una fuente de audio (entrada del equipo o micrófono, o un archivo) y entrega bloques PCM mono a 16 kHz de 100 ms. Avisa si la pista se corta. El archivo se entrega en tiempo real y sin sonar, como si alguien lo estuviera diciendo.
 
-**Qué NO hace:** Cortar ni transcribir. No reproduce el audio por los parlantes. Sin cancelación de eco, supresión de ruido ni control de volumen: son filtros para llamadas y le quitan a Whisper partes de la voz.
+**Qué NO hace:** Cortar ni transcribir. No reproduce el audio por los parlantes. Por defecto va sin cancelación de eco, supresión de ruido ni control de volumen (con la señal limpia de una consola, esos filtros le quitan a Whisper partes de la voz); con `conFiltrosDeVoz: true` se prenden, para el micrófono de una notebook o un auricular (lo usa la portada de la landing).
 
 ## API pública (solo desde `index.ts`)
 

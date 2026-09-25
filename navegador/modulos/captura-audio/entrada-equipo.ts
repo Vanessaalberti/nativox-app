@@ -13,14 +13,15 @@ export async function listarFuentes(): Promise<FuenteAudio[]> {
     }));
 }
 
-// Entrada del equipo (el cable de la consola) o micrófono. Sin cancelación de eco, supresión de
-// ruido ni control de volumen: esos filtros están pensados para llamadas y le quitan a Whisper
-// partes de la voz.
+// Entrada del equipo (el cable de la consola) o micrófono. Por defecto sin cancelación de eco,
+// supresión de ruido ni control de volumen: esos filtros están pensados para llamadas y con una
+// señal limpia de consola le quitan a Whisper partes de la voz. Con `conFiltrosDeVoz` (micrófono
+// de notebook o auricular) se prenden, porque ahí el ruido de la sala sí le hace más daño.
 export async function abrirEntrada(
   idDispositivo: string | null,
-  { alRecibir, alTerminar }: OpcionesCaptura,
+  { alRecibir, alTerminar, conFiltrosDeVoz = false }: OpcionesCaptura,
 ): Promise<Resultado<Captura>> {
-  const flujo = await pedirMicrofono(idDispositivo);
+  const flujo = await pedirMicrofono(idDispositivo, conFiltrosDeVoz);
   if (!flujo.ok) return flujo;
 
   const contexto = new AudioContext({ sampleRate: FRECUENCIA });
@@ -49,14 +50,18 @@ export async function abrirEntrada(
   return { ok: true, valor: { detener } };
 }
 
-async function pedirMicrofono(idDispositivo: string | null): Promise<Resultado<MediaStream>> {
+async function pedirMicrofono(
+  idDispositivo: string | null,
+  conFiltrosDeVoz: boolean,
+): Promise<Resultado<MediaStream>> {
   try {
     const flujo = await navigator.mediaDevices.getUserMedia({
       audio: {
         ...(idDispositivo ? { deviceId: { exact: idDispositivo } } : {}),
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false,
+        channelCount: 1,
+        echoCancellation: conFiltrosDeVoz,
+        noiseSuppression: conFiltrosDeVoz,
+        autoGainControl: conFiltrosDeVoz,
       },
     });
     return { ok: true, valor: flujo };

@@ -22,6 +22,16 @@ describe("limpiarAlucinaciones", () => {
     });
   });
 
+  it("si Whisper devuelve el prompt en lugar de transcribir, no se dijo nada", () => {
+    const prompt = "Nerdearla, Cloudflare, Workers AI, rollback, pull request y GitHub.";
+    expect(limpiarAlucinaciones("Workers AI, rollback, pull request", prompt)).toEqual({
+      texto: "",
+      alucino: true,
+    });
+    // Una palabra suelta del glosario sí puede ser lo que se dijo.
+    expect(limpiarAlucinaciones("rollback", prompt)).toEqual({ texto: "rollback", alucino: false });
+  });
+
   it("deja lo que se dice de verdad en una charla", () => {
     const texto =
       "Gracias a todos por venir. Nos vemos en el próximo Nerdearla. You subscribe to the topic.";

@@ -21,7 +21,7 @@ export interface PiezasDelFlujo {
   // Ya con el filtro de alucinaciones y su reintento.
   transcribir(
     audio: Float32Array,
-    opciones: { prompt: string; idioma: string },
+    opciones: { prompt: string; idioma: string; segundosDeContexto?: number },
   ): Promise<Resultado<{ texto: string; ms: number }>>;
   quitarRepetido(anterior: string, nuevo: string): string;
   crearAcuerdo(): {

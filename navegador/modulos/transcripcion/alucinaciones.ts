@@ -1,5 +1,5 @@
 import type { Resultado } from "@compartido/contratos";
-import { normalizar } from "./texto";
+import { normalizar, normalizarPalabra } from "./texto";
 import type { OpcionesTranscripcion, Transcriptor } from "./tipos";
 
 // Whisper aprendió con videos de YouTube y, en fragmentos difíciles (final de una toma, casi
@@ -19,7 +19,23 @@ const CIERRES_DE_YOUTUBE = [
   /legendas pela comunidade/,
 ];
 
-export function limpiarAlucinaciones(texto: string): { texto: string; alucino: boolean } {
+// Con ruido de fondo, Whisper a veces devuelve el prompt en lugar de transcribir: si lo que
+// dijo cabe entero dentro del prompt (y es más que una palabra suelta), no se dijo nada.
+const LARGO_MINIMO_ECO = 15;
+
+const sinSignos = (texto: string) => texto.split(/\s+/).map(normalizarPalabra).join("");
+
+export function limpiarAlucinaciones(
+  texto: string,
+  prompt = "",
+): { texto: string; alucino: boolean } {
+  if (
+    texto.length > LARGO_MINIMO_ECO &&
+    prompt !== "" &&
+    sinSignos(prompt).includes(sinSignos(texto))
+  ) {
+    return { texto: "", alucino: true };
+  }
   const oraciones = texto.split(/(?<=[.!?…])\s+/);
   const quedan = oraciones.filter(
     (oracion) => !CIERRES_DE_YOUTUBE.some((cierre) => cierre.test(normalizar(oracion))),
@@ -36,7 +52,7 @@ export async function transcribirSinAlucinaciones(
 ): Promise<Resultado<{ texto: string; ms: number; reintento: boolean }>> {
   const primera = await transcriptor.transcribir(audio, opciones);
   if (!primera.ok) return primera;
-  const limpia = limpiarAlucinaciones(primera.valor.texto);
+  const limpia = limpiarAlucinaciones(primera.valor.texto, opciones.prompt);
   if (!limpia.alucino) return { ok: true, valor: { ...primera.valor, reintento: false } };
 
   const segunda = await transcriptor.transcribir(audio, { ...opciones, prompt: "" });
