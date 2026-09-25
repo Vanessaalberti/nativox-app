@@ -4,7 +4,7 @@ Nativox se construye con ayuda de IA. Estas son las fallas más documentadas del
 
 | Mala costumbre | Qué se observó | Mitigación en Nativox | Quién la hace cumplir |
 | --- | --- | --- | --- |
-| **Duplicar código** en vez de reutilizar | GitClear (211 millones de líneas): los bloques duplicados de 5 líneas o más se multiplicaron ×8 en 2024; en 2026, +81% | Catálogo de módulos (`navegador/modulos/README.md`, `compartido/README.md`); regla "buscá antes de crear"; una sola API pública por módulo | `jscpd` en la integración continua |
+| **Duplicar código** en vez de reutilizar | GitClear (211 millones de líneas): los bloques duplicados de 5 líneas o más se multiplicaron ×8 en 2024; en 2026, +81% | Catálogo de módulos (`navegador/modulos/README.md`, `compartido/README.md`); regla "buscá antes de crear"; una sola API pública por módulo | `jscpd` en el CI |
 | **Dejar de refactorizar** y reescribir código a las dos semanas | Refactorización −40%; código reescrito en alza | Cambios chicos; funciones puras con pruebas que permiten refactorizar sin miedo | Pruebas |
 | **Dependencias inventadas** (*slopsquatting*) | USENIX Security 2025: 576.000 muestras; 51% de los paquetes alucinados eran inventados y 38% mezclas de nombres reales | Lista de dependencias aprobadas; toda dependencia nueva se aprueba y se verifica en npm; archivo de bloqueo; sin scripts `postinstall` | `herramientas.md`; revisión; `npm ci` |
 | **Aflojar una prueba para que pase** o pruebas que no prueban nada | Pruebas sin aserciones reales en buena parte del código generado | Nunca cambiar lo esperado sin explicarlo; pruebas con datos reales (`muestras/`); umbrales de WER y términos | Pruebas del glosario con el guion de `muestras/` |
@@ -15,7 +15,7 @@ Nativox se construye con ayuda de IA. Estas son las fallas más documentadas del
 | **Patrones inconsistentes** entre archivos | Cada archivo resuelve lo mismo de otra forma | Convenciones escritas; un README por módulo con la misma estructura; formato automático | `convenciones.md`; Prettier; ESLint |
 | **Archivos y funciones gigantes** | Todo en un archivo | Límites orientativos de tamaño | ESLint: `max-lines`, `max-lines-per-function`, `complexity` (aviso) |
 | **Comentarios de relleno** o desactualizados | Comentarios que repiten el código o quedan viejos | Comentarios solo del porqué; sin código comentado | Revisión; ESLint (`no-warning-comments` para TODO sin issue) |
-| **Código muerto** y restos | Exports sin uso, archivos huérfanos, `console.log` | Se elimina en el mismo commit | `knip`; ESLint `no-console` (salvo el registrador) |
+| **Dead code** y restos | Exports sin uso, archivos huérfanos, `console.log` | Se elimina en el mismo commit | `knip`; ESLint `no-console` (salvo el registrador) |
 | **Tipos débiles** | `any`, `as` para callar errores | TypeScript estricto; validación en los bordes con esquemas | `tsc --noEmit`; ESLint `no-explicit-any` |
 | **Secretos en el código** y datos sin validar | Keys pegadas en el código, datos de afuera usados sin validar | Secretos solo en el servidor; validación con `compartido/contratos` | `gitleaks`; revisión |
 | **Cambios fuera del pedido** | Refactors de paso, archivos que nadie pidió tocar | Un commit = un cambio; límites de import | `eslint-plugin-boundaries` |

@@ -28,7 +28,7 @@
 
 ## Pruebas
 
-Se prueba en el navegador (necesita WebGPU): ver "Cómo se probó" en el registro de cambios.
+Se prueba en el navegador (necesita WebGPU): ver "Cómo se probó" en el changelog.
 
 ## Referencia
 

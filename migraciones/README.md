@@ -10,4 +10,4 @@
 | `0004_transcripciones.sql` | segmentos con marcas de tiempo reales y sus traducciones |
 | `0005_operacion.sql` | canal de avisos (webhook como secreto), links de acción de un solo uso, registro de acciones, equipos de reserva |
 | `0006_consumo.sql` | consumo estimado de IA y topes |
-| `0007_produccion.sql` | salidas de producción (nombre, estilo, sala al aire) y registro de cambios |
+| `0007_produccion.sql` | salidas de producción (nombre, estilo, sala al aire) y changelog |

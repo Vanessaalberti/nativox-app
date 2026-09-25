@@ -15,7 +15,7 @@
     "enabled": true,
   },
   "upload_source_maps": true,
-  // Sin database_id: el despliegue crea la base en la cuenta de cada organizador.
+  // Sin database_id: el deploy crea la base en la cuenta de cada organizador.
   "d1_databases": [
     {
       "binding": "DB",

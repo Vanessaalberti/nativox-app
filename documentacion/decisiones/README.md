@@ -5,7 +5,7 @@ Una decisión por archivo: contexto, decisión, alternativas descartadas y conse
 | Número | Decisión |
 | --- | --- |
 | 0001 | Local primero: Whisper turbo + Bergamot en el navegador; la nube es opcional |
-| 0002 | Un solo Worker de Cloudflare (app + API + Durable Objects + D1) con despliegue de un clic |
+| 0002 | Un solo Worker de Cloudflare (app + API + Durable Objects + D1) con deploy de un clic |
 | 0003 | Sin API keys: Workers AI por binding |
 | 0004 | Avisos por webhook de Discord, sin bot |
 | 0005 | Módulos reutilizables dentro del repositorio, con límites de import, en vez de paquetes npm |

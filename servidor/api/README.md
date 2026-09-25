@@ -4,7 +4,7 @@ Cada archivo valida el pedido con `compartido/contratos`, autoriza (rol y sala),
 
 | Archivo previsto | Qué atiende |
 | --- | --- |
-| `salud.ts` | `/api/salud`: si el Worker responde (despliegue y monitoreo). **Ya existe** |
+| `salud.ts` | `/api/salud`: si el Worker responde (deploy y monitoreo). **Ya existe** |
 | `acceso.ts` | Crear cuenta, ingresar, recuperar con código, canjear invitaciones |
 | `evento.ts` | Datos del evento, eliminar evento |
 | `salas.ts` | Salas y sus idiomas |

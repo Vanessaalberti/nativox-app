@@ -2,7 +2,7 @@
 
 **Transcripción y traducción en vivo, de código abierto, para conferencias.** El audio del escenario se convierte en subtítulos en el idioma original y traducidos (español ↔ inglés ↔ portugués): en las pantallas del escenario, en el stream (vMix/OBS) y en los celulares.
 
-> En construcción durante la Vibeathon Nerdearla 2026. Las secciones marcadas *(a completar)* se completan al construir.
+> En construcción durante la Vibeathon Nerdearla 2026. Las secciones marcadas *(a completar)* se completan en el build.
 
 ## Por qué es distinto
 
@@ -10,9 +10,9 @@
 - **"Evaluar esta computadora":** un clic mide el equipo y elige el modelo, la velocidad y el traductor.
 - **Salas sin nadie al lado:** arrancan y paran con la agenda, se reparan solas y avisan por **Discord con un botón para reiniciar la sala desde el celular**. Nadie tiene que estar al lado de la computadora ni entrar por escritorio remoto.
 - **Glosario técnico en tres capas:** guía a Whisper, corrige la transcripción y se protege al traducir.
-- **Despliegue de un clic** en tu propia cuenta de Cloudflare.
+- **Deploy de un clic** en tu propia cuenta de Cloudflare.
 
-## Despliegue *(a completar)*
+## Deploy *(a completar)*
 
 Botón "Deploy to Cloudflare": crea el Worker, la base D1, los Durable Objects y la conexión con Workers AI. No pide secretos.
 
@@ -39,13 +39,13 @@ npm run dev
 | Comando | Qué hace |
 | --- | --- |
 | `npm run dev` | App + Worker en local, con recarga en caliente |
-| `npm run revisar` | Formato · lint (incluye límites de import) · tipos · pruebas · código muerto (`knip`) · duplicación (`jscpd`). Lo corre la integración continua |
+| `npm run revisar` | Formato · lint (incluye límites de import) · tipos · pruebas · dead code (`knip`) · duplicación (`jscpd`). Lo corre el CI |
 | `npm run probar` | Solo las pruebas (Vitest) |
-| `npm run construir` | Construcción de producción en `dist/` |
+| `npm run construir` | Build de producción en `dist/` |
 | `npm run formatear` | Aplica el formato de Prettier |
 | `npm run tipos` | Regenera `servidor/plataforma/env.d.ts` con `wrangler types` (después de tocar `wrangler.jsonc`) |
-| `npm run build` | Lo mismo que `construir`, con el nombre que Cloudflare detecta solo en el botón de despliegue (comando de compilación) |
-| `npm run deploy` | Aplica las migraciones de D1 y despliega (comando de despliegue del botón; necesita haber construido antes) |
+| `npm run build` | Lo mismo que `construir`, con el nombre que Cloudflare detecta solo en el botón de deploy (build command) |
+| `npm run deploy` | Aplica las migraciones de D1 y despliega (deploy command del botón; necesita haber hecho el build antes) |
 | `npm run publicar` | Para hacerlo a mano desde tu computadora: construye y después corre `deploy` |
 
 Reglas y convenciones: `documentacion/convenciones.md` y `documentacion/guardas-ia.md`.

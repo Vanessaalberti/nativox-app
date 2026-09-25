@@ -35,7 +35,7 @@ const aislamientoEnDesarrollo: Plugin = {
 };
 
 // Bergamot crea su worker y busca su WebAssembly con rutas relativas a su propio archivo, así
-// que no se empaqueta: se publica tal cual en /bergamot/ (en desarrollo y en la construcción).
+// que no se empaqueta: se publica tal cual en /bergamot/ (en desarrollo y en el build).
 const CARPETA_BERGAMOT = rutaAbsoluta("./node_modules/@browsermt/bergamot-translator/");
 const ARCHIVOS_BERGAMOT: Record<string, string> = {
   "translator.js": "text/javascript",
@@ -72,7 +72,7 @@ const publicarBergamot: Plugin = {
 
 // Transformers.js baja el WebAssembly de ONNX Runtime de jsDelivr (y lo guarda en la caché en
 // disco), así que la copia que Vite publica nunca se usa. Además pesa 26,9 MB y Cloudflare acepta
-// hasta 25 MiB por archivo estático: se saca de la construcción.
+// hasta 25 MiB por archivo estático: se saca del build.
 const sinWasmDeOnnx: Plugin = {
   name: "nativox:sin-wasm-de-onnx",
   generateBundle(_opciones, paquete) {

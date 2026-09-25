@@ -4,7 +4,7 @@ Como las carpetas están en español, la configuración apunta a ellas:
 
 | Archivo | Qué fija |
 | --- | --- |
-| `package.json` | Además de las dependencias, la configuración de Prettier (`prettier`), knip (`knip`: código muerto; `compartido/*/index.ts` cuentan como entrada) y jscpd (`jscpd`: duplicación de 5 líneas o más). Scripts: `dev`, `construir`, `revisar`, `probar`, `formatear`, `tipos`, `deploy` (migraciones D1 + `wrangler deploy`; el nombre `deploy` lo espera el botón de Cloudflare). Versiones fijadas |
+| `package.json` | Además de las dependencias, la configuración de Prettier (`prettier`), knip (`knip`: dead code; `compartido/*/index.ts` cuentan como entrada) y jscpd (`jscpd`: duplicación de 5 líneas o más). Scripts: `dev`, `construir`, `revisar`, `probar`, `formatear`, `tipos`, `deploy` (migraciones D1 + `wrangler deploy`; el nombre `deploy` lo espera el botón de Cloudflare). Versiones fijadas |
 | `tsconfig.json` + `configuracion/` | Opciones comunes en la raíz y un proyecto por zona en `configuracion/` (ver su README). `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`; alias `@navegador/*`, `@compartido/*`, `@servidor/*` |
 | `eslint.config.js` | `typescript-eslint` (con tipos), `eslint-plugin-boundaries` (reglas de `arquitectura.md`), `no-floating-promises`, `no-explicit-any`, `max-lines`, `complexity`, `no-console` |
 | `.gitleaks.toml` | Detección de secretos *(falta crearlo)* |
@@ -23,7 +23,7 @@ Como las carpetas están en español, la configuración apunta a ellas:
 | Transcripción local | `@huggingface/transformers` |
 | Traducción liviana | `@browsermt/bergamot-translator` |
 | Servidor | `wrangler`, `@cloudflare/vite-plugin` (tipos con `wrangler types`) |
-| Construcción | `vite`, `@vitejs/plugin-react` (los trae la plantilla oficial de Cloudflare) |
+| Build | `vite`, `@vitejs/plugin-react` (los trae la plantilla oficial de Cloudflare) |
 | Tipos | `@types/node`, `@types/react`, `@types/react-dom` |
 | Calidad | `typescript`, `eslint`, `typescript-eslint`, `eslint-plugin-boundaries`, `eslint-import-resolver-typescript` (para que los límites de import entiendan los alias `@navegador/*`…), `prettier`, `knip`, `jscpd`, `vitest`, `@playwright/test` |
 
