@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { crearAlmacenEnMemoria } from "@servidor/plataforma/almacen-en-memoria";
 import { crearCuenta, ingresar, ingresarOperador, recuperar, salir } from "./acceso";
+import {
+  abrirCuenta as abrirCuentaDePrueba,
+  CONTRASENA_DE_PRUEBA as CONTRASENA,
+  crearContextoDePrueba,
+  pedido,
+} from "./contexto-de-prueba";
 import { crearEvento, leerEvento, responderEstado } from "./evento";
-import type { ContextoApi } from "./sesion";
 
-const CONTRASENA = "una frase bien larga";
 const EVENTO = {
   tipo: "todo-en-uno",
   nombre: "DevConf Latam 2026",
@@ -14,40 +17,13 @@ const EVENTO = {
   nubeComoRespaldo: false,
 };
 
-let contexto: ContextoApi;
-let reloj: number;
+let contexto = crearContextoDePrueba();
 
 beforeEach(() => {
-  reloj = 1_000_000;
-  contexto = {
-    almacen: crearAlmacenEnMemoria(),
-    ahora: () => reloj,
-    ip: "1.2.3.4",
-    segura: true,
-  };
+  contexto = crearContextoDePrueba();
 });
 
-function pedido(ruta: string, cuerpo?: unknown, cookie?: string, metodo = "POST"): Request {
-  const encabezados = new Headers({ "Content-Type": "application/json" });
-  if (cookie) encabezados.set("Cookie", cookie);
-  const init: RequestInit = { method: metodo, headers: encabezados };
-  if (cuerpo !== undefined) init.body = JSON.stringify(cuerpo);
-  return new Request(`https://nativox.test${ruta}`, init);
-}
-
-// La cookie que devolvió el servidor, lista para mandarla en el pedido siguiente.
-function cookieDe(respuesta: Response): string {
-  return (respuesta.headers.get("Set-Cookie") ?? "").split(";")[0] ?? "";
-}
-
-async function abrirCuenta(): Promise<{ cookie: string; codigo: string }> {
-  const respuesta = await crearCuenta(
-    pedido("/api/acceso/cuenta", { email: "Vos@TuEvento.com", contrasena: CONTRASENA }),
-    contexto,
-  );
-  const cuerpo = (await respuesta.json()) as { codigoRecuperacion: string };
-  return { cookie: cookieDe(respuesta), codigo: cuerpo.codigoRecuperacion };
-}
+const abrirCuenta = () => abrirCuentaDePrueba(contexto);
 
 describe("crear cuenta", () => {
   it("crea al administrador, abre la sesión y entrega el código una sola vez", async () => {
@@ -152,7 +128,7 @@ describe("ingresar", () => {
 
     for (let i = 0; i < 8; i += 1) await intento("incorrecta");
     const bloqueado = await intento(CONTRASENA);
-    reloj += 16 * 60 * 1000;
+    contexto.reloj += 16 * 60 * 1000;
     const pasadoElTiempo = await intento(CONTRASENA);
 
     expect(bloqueado.status).toBe(429);
@@ -298,7 +274,7 @@ describe("sesión y evento", () => {
 
   it("una sesión vencida no sirve", async () => {
     const { cookie } = await abrirCuenta();
-    reloj += 31 * 24 * 60 * 60 * 1000;
+    contexto.reloj += 31 * 24 * 60 * 60 * 1000;
 
     const respuesta = await leerEvento(pedido("/api/evento", undefined, cookie, "GET"), contexto);
 

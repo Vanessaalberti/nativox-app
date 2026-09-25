@@ -1,4 +1,4 @@
-export { IDIOMAS, esquemaIdioma, type Idioma } from "./idiomas";
+export { IDIOMAS, NOMBRES_DE_IDIOMA, esquemaIdioma, type Idioma } from "./idiomas";
 export { validar, type Resultado } from "./validar";
 export {
   esquemaAgenda,
@@ -45,3 +45,23 @@ export {
   type EventoCompleto,
   type TipoDeEvento,
 } from "./api/evento";
+export {
+  esquemaCrearSalas,
+  esquemaDatosDeSala,
+  esquemaListaDeSalas,
+  esquemaSala,
+  esquemaUnaSala,
+  MAXIMO_DE_SALAS_POR_PEDIDO,
+  type CrearSalas,
+  type DatosDeSala,
+  type Sala,
+} from "./api/salas";
+export {
+  esquemaDatosDeCharla,
+  esquemaListaDeCharlas,
+  esquemaUnaCharla,
+  LARGO_MAXIMO_DEL_GLOSARIO,
+  MINUTOS_POR_DIA,
+  type Charla,
+  type DatosDeCharla,
+} from "./api/charlas";

@@ -9,7 +9,7 @@ const MENSAJE_SIN_CONEXION =
 export async function llamar<E extends v.GenericSchema<unknown, unknown>>(
   ruta: string,
   esquema: E,
-  { metodo = "GET", cuerpo }: { metodo?: "GET" | "POST"; cuerpo?: unknown } = {},
+  { metodo = "GET", cuerpo }: { metodo?: "GET" | "POST" | "PUT" | "DELETE"; cuerpo?: unknown } = {},
 ): Promise<Resultado<v.InferOutput<E>>> {
   const init: RequestInit = { method: metodo, credentials: "same-origin" };
   if (cuerpo !== undefined) {

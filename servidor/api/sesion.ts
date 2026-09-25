@@ -1,10 +1,12 @@
 import { generarToken, hashearToken } from "@servidor/modulos/cripto-acceso";
 import type { AlmacenAcceso, Rol, SesionGuardada } from "@servidor/plataforma/almacen-acceso";
+import type { AlmacenAgenda } from "@servidor/plataforma/almacen-agenda";
 import { responderError } from "@servidor/plataforma/errores";
 
 // Lo que cada pedido necesita saber de su entorno: dónde guardar, qué hora es y quién pregunta.
 export interface ContextoApi {
   almacen: AlmacenAcceso;
+  agenda: AlmacenAgenda;
   ahora: () => number;
   // Para frenar intentos en cadena por origen (CF-Connecting-IP en Cloudflare).
   ip: string;
@@ -82,4 +84,13 @@ export async function exigirAdministrador(
     return responderError(403, "sin_permiso", "Esta acción es solo para el administrador.");
   }
   return null;
+}
+
+// Corre la acción solo si quien pregunta es el administrador; si no, responde el error.
+export async function comoAdministrador(
+  pedido: Request,
+  contexto: ContextoApi,
+  accion: () => Promise<Response>,
+): Promise<Response> {
+  return (await exigirAdministrador(pedido, contexto)) ?? accion();
 }

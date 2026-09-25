@@ -1,23 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router";
 import type { EventoCompleto } from "@compartido/contratos";
 import { leerEvento, salir } from "@navegador/modulos/cliente-instancia";
 import { MarcoDeEntrada } from "@navegador/interfaz/marco-de-entrada";
-import { Boton, ListaDeDatos } from "@navegador/interfaz/sistema-diseno";
+import { Boton } from "@navegador/interfaz/sistema-diseno";
 
 type Carga =
   | { fase: "cargando" }
   | { fase: "error"; motivo: string }
   | { fase: "lista"; evento: EventoCompleto; email: string };
 
-const TIPOS = { "todo-en-uno": "Todo en uno", "roles-separados": "Roles separados" };
+export type PestanaDelPanel = "resumen" | "salas";
 
-const fecha = (valor: string | null) =>
-  valor === null ? "sin definir" : new Date(`${valor}T00:00:00`).toLocaleDateString("es");
+const PESTANAS: { id: PestanaDelPanel; nombre: string; ruta: string }[] = [
+  { id: "resumen", nombre: "Resumen", ruta: "/panel" },
+  { id: "salas", nombre: "Salas", ruta: "/panel/salas" },
+];
 
-// /panel: lo que ve el administrador al entrar. Por ahora muestra el evento que creó y abre la
-// sala de prueba; las salas, la agenda y los operadores llegan con sus pantallas.
-export function PanelDelAdministrador() {
+// El marco del panel del administrador: el nombre del evento, las pestañas y, adentro, lo que
+// pasa cada ruta. `children` recibe el evento y el email de la cuenta ya cargados.
+export function PanelDelAdministrador({
+  activa,
+  children,
+}: {
+  activa: PestanaDelPanel;
+  children: (datos: { evento: EventoCompleto; email: string }) => ReactNode;
+}) {
   const navegar = useNavigate();
   const [carga, setCarga] = useState<Carga>({ fase: "cargando" });
 
@@ -42,35 +50,21 @@ export function PanelDelAdministrador() {
   }
 
   const { evento, email } = carga;
-  const datos: [string, string][] = [
-    ["Tipo", TIPOS[evento.tipo]],
-    ["Administrador", email],
-    ["Fechas", `${fecha(evento.fechaInicio)} → ${fecha(evento.fechaFin)}`],
-    [
-      "Estimación",
-      `${String(evento.salasSimultaneas)} salas a la vez · ${String(evento.horasPorDia)} h por día · ${String(evento.dias)} ${evento.dias === 1 ? "día" : "días"}`,
-    ],
-    ["Transcripción en la nube", evento.nubeComoRespaldo ? "Como respaldo" : "No"],
-  ];
-
   return (
-    <MarcoDeEntrada evento={{ nombre: evento.nombre, logo: evento.logo }} centrado={false}>
-      <span className="font-mono text-[11px] tracking-widest text-naranja uppercase">
-        Panel de administrador
-      </span>
-      <h1 className="mt-3 mb-8 font-display text-6xl leading-[0.95] font-extrabold tracking-tight uppercase">
-        {evento.nombre}
-      </h1>
-
-      <ListaDeDatos filas={datos} />
-
-      <div className="flex flex-wrap gap-4">
-        <Link
-          to="/sala/prueba/control"
-          className="border-[3px] border-[#b8241f] bg-naranja px-6 py-3.5 font-mono text-sm font-bold tracking-widest uppercase hover:bg-[#e67b00]"
-        >
-          Abrir una sala de prueba →
-        </Link>
+    <MarcoDeEntrada
+      evento={{ nombre: evento.nombre, logo: evento.logo }}
+      centrado={false}
+      ancho="ancho"
+    >
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <span className="font-mono text-[11px] tracking-widest text-naranja uppercase">
+            Panel de administrador
+          </span>
+          <h1 className="mt-2 font-display text-6xl leading-[0.95] font-extrabold tracking-tight uppercase">
+            {evento.nombre}
+          </h1>
+        </div>
         <Boton
           variante="secundario"
           onClick={() => {
@@ -80,6 +74,24 @@ export function PanelDelAdministrador() {
           Salir
         </Boton>
       </div>
+
+      <nav
+        aria-label="Secciones del panel"
+        className="mb-8 flex gap-6 border-b border-linea-fuerte"
+      >
+        {PESTANAS.map((pestana) => (
+          <Link
+            key={pestana.id}
+            to={pestana.ruta}
+            aria-current={pestana.id === activa ? "page" : undefined}
+            className={`-mb-px border-b-[3px] pb-3 font-mono text-xs font-bold tracking-widest uppercase ${pestana.id === activa ? "border-naranja text-ink" : "border-transparent text-ink/50 hover:text-ink"}`}
+          >
+            {pestana.nombre}
+          </Link>
+        ))}
+      </nav>
+
+      {children({ evento, email })}
     </MarcoDeEntrada>
   );
 }

@@ -24,7 +24,7 @@
 ## Archivos
 
 - `idiomas.ts` · `validar.ts` · `socket-sala.ts` · `socket-produccion.ts` · `api/errores.ts` · `index.ts`
-- Previstos: un archivo por recurso en `api/` (`salas.ts`, `agenda.ts`, `ajustes.ts`, `avisos.ts`…).
+- `api/acceso.ts` · `api/evento.ts` · `api/salas.ts` · `api/charlas.ts`. Previstos: `ajustes.ts`, `avisos.ts`…
 
 ## Reglas
 

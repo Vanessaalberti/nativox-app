@@ -3,3 +3,7 @@ export { Boton, type PropiedadesBoton } from "./componentes/Boton";
 export { CajaCopiable } from "./componentes/CajaCopiable";
 export { Campo, type PropiedadesCampo } from "./componentes/Campo";
 export { ListaDeDatos } from "./componentes/ListaDeDatos";
+export { Modal } from "./componentes/Modal";
+export { Seleccion } from "./componentes/Seleccion";
+export { ZonaDeEliminar } from "./componentes/ZonaDeEliminar";
+export { useEnvio } from "./hooks/useEnvio";

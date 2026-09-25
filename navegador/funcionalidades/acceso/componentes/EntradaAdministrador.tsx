@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { ingresar, recuperar } from "@navegador/modulos/cliente-instancia";
 import { MarcoDeEntrada } from "@navegador/interfaz/marco-de-entrada";
-import { Aviso, Boton, CajaCopiable, Campo } from "@navegador/interfaz/sistema-diseno";
+import { Aviso, Boton, CajaCopiable, Campo, useEnvio } from "@navegador/interfaz/sistema-diseno";
 
 type Pantalla =
   { paso: "ingresar" } | { paso: "recuperar" } | { paso: "codigo-nuevo"; codigo: string };
@@ -33,20 +33,6 @@ export function EntradaAdministrador() {
 
 const TITULO =
   "mt-3 mb-4 font-display text-5xl leading-[0.95] font-extrabold tracking-tight uppercase";
-
-// Los formularios comparten esto: manda el pedido, muestra el error y bloquea el botón mientras espera.
-function useEnvio() {
-  const [error, setError] = useState<string | null>(null);
-  const [enviando, setEnviando] = useState(false);
-  const enviar = async (accion: () => Promise<string | null>) => {
-    setEnviando(true);
-    setError(null);
-    const motivo = await accion();
-    setEnviando(false);
-    setError(motivo);
-  };
-  return { error, enviando, enviar };
-}
 
 function FormularioDeIngreso({ alOlvidar }: { alOlvidar: () => void }) {
   const navegar = useNavigate();

@@ -7,9 +7,9 @@ Cada archivo valida el pedido con `compartido/contratos`, autoriza (rol y sala),
 | `salud.ts` | `/api/salud`: si el Worker responde (deploy y monitoreo). **Ya existe** |
 | `acceso.ts` | `POST /api/acceso/cuenta` (crea al administrador, una sola vez), `/ingresar`, `/recuperar` (con el código de un solo uso), `/operador` (invitaciones: todavía rechaza todo hasta la migración 0002) y `/salir`. **Ya existe** |
 | `evento.ts` | `GET /api/estado` (qué falta y quién pregunta, sin datos sensibles), `POST /api/evento` (una sola vez, solo el administrador) y `GET /api/evento`. **Ya existe** (falta eliminar el evento) |
-| `salas.ts` | Salas y sus idiomas |
+| `salas.ts` | `GET/POST /api/salas` (crear una o varias, todas o ninguna) y `GET/PUT/DELETE /api/salas/:id`. **Ya existe** |
 | `operadores.ts` | Operadores e invitaciones |
-| `agenda.ts` | Charlas, glosario por charla, arranque y parada por agenda |
+| `agenda.ts` | `GET/POST /api/salas/:id/charlas` y `PUT/DELETE /api/charlas/:id` (con el glosario de cada charla; sin dos charlas a la vez en una sala). **Ya existe** (falta arranque y parada por agenda) |
 | `transcripciones.ts` | Transcripción de cada charla y exportar |
 | `avisos.ts` | Guardar y probar el webhook, qué avisar |
 | `produccion.ts` | Salidas de producción: crear, estilo y qué sala está al aire (solo administrador) |
