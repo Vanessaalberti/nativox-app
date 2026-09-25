@@ -10,6 +10,7 @@
 - `conectarModelos(worker): Modelos` — el worker lo crea quien lo usa (`new Worker(new URL(".../segundo-plano/modelos.worker.ts", import.meta.url), { type: "module" })`).
   - `cargarWhisper(variante, alAvanzar(cargado, total))`
   - `transcribir(audio, { prompt, idioma })` → `{ texto, ms }`
+  - `cargarGemma(variante, alAvanzar)` y `traducirGemma({ texto, de, a })` → `{ texto, ms }`: TranslateGemma 4B (`onnx-community/translategemma-text-4b-it-ONNX`), en el mismo worker y la misma cola que Whisper (una sola placa). Con f16 baja ~2,1 GB (q4f16); sin f16, ~3,1 GB (q4). Se guarda en OPFS y se calienta al cargar (la primera traducción tarda ~9 s más).
 - `medirGuardados()` → bytes que este sitio tiene guardados en el navegador.
 - `borrarGuardados()` → borra todo lo que este sitio guardó (Cache API y OPFS: Whisper, ONNX Runtime, Bergamot) y dice cuánto liberó. Los modelos que ya están en memoria siguen hasta recargar.
 
@@ -24,7 +25,7 @@
 
 ## Archivos
 
-- `protocolo.ts` · `whisper.ts` · `cache-en-disco.ts` · `en-worker.ts` · `cliente.ts` · `variante.ts` · `guardados.ts` · `index.ts`
+- `protocolo.ts` · `whisper.ts` · `gemma.ts` · `cache-en-disco.ts` · `en-worker.ts` · `cliente.ts` · `variante.ts` · `guardados.ts` · `index.ts`
 
 ## Pruebas
 

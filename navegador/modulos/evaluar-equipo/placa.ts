@@ -7,6 +7,9 @@ export interface Equipo {
   // Chrome lo redondea y lo topea en 8 GB: sirve como pista, no como medida.
   memoriaGb: number | null;
   nucleos: number | null;
+  // El buffer más grande que el navegador deja pedirle a la placa (MB). Es un tope del navegador y
+  // no la memoria de video, pero da una idea de cuánto modelo entra: TranslateGemma pide ~2 GB.
+  bufferMaximoMb: number | null;
 }
 
 const SIN_WEBGPU: Equipo = {
@@ -15,6 +18,7 @@ const SIN_WEBGPU: Equipo = {
   placa: null,
   memoriaGb: null,
   nucleos: null,
+  bufferMaximoMb: null,
 };
 
 export async function detectarEquipo(): Promise<Equipo> {
@@ -33,6 +37,7 @@ export async function detectarEquipo(): Promise<Equipo> {
     webgpu: true,
     f16: adaptador.features.has("shader-f16"),
     placa: nombreDeLaPlaca(adaptador.info),
+    bufferMaximoMb: Math.round(adaptador.limits.maxBufferSize / 1024 ** 2),
     ...generales,
   };
 }

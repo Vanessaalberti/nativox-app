@@ -24,6 +24,7 @@ const aislamientoEnDesarrollo: Plugin = {
   configureServer(servidor) {
     servidor.middlewares.use((pedido, respuesta, seguir) => {
       const ruta = new URL(pedido.url ?? "/", "http://localhost").pathname;
+      respuesta.setHeader("Referrer-Policy", "no-referrer");
       const esPagina = pedido.headers["sec-fetch-dest"] === "document";
       if (!esPagina || paginasConModelos.test(ruta)) {
         respuesta.setHeader("Cross-Origin-Opener-Policy", "same-origin");

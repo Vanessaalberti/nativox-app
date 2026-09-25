@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { leerGlosario } from "@compartido/glosario";
-import { crearCola, traducirConContexto, ultimoTramoSinCerrar, type Traductor } from "./index";
+import {
+  crearCola,
+  crearTranslateGemma,
+  traducirConContexto,
+  ultimoTramoSinCerrar,
+  type Traductor,
+} from "./index";
 
 const glosario = leerGlosario("Workers AI\nCloudflare\nrama main => en: main branch");
 
@@ -172,5 +178,31 @@ describe("crearCola", () => {
 
     await expect(falla).rejects.toThrow("se cortó");
     await expect(sigue).resolves.toBe("sigue");
+  });
+});
+
+describe("crearTranslateGemma", () => {
+  it("declara la marca de código y traduce con el servicio que recibe", async () => {
+    const pedidos: unknown[] = [];
+    const traductor = crearTranslateGemma({
+      traducir: (pedido) => {
+        pedidos.push(pedido);
+        return Promise.resolve({ ok: true, valor: { texto: "Hello." } });
+      },
+    });
+
+    expect(traductor).toMatchObject({ marca: "codigo", nivel: "calidad" });
+    expect(await traductor.traducir("Hola.", "es", "en")).toEqual({ ok: true, valor: "Hello." });
+    expect(pedidos).toEqual([{ texto: "Hola.", de: "es", a: "en" }]);
+  });
+
+  it("devuelve el motivo si el modelo falla", async () => {
+    const traductor = crearTranslateGemma({
+      traducir: () => Promise.resolve({ ok: false, motivo: "sin memoria de video" }),
+    });
+    expect(await traductor.traducir("Hola.", "es", "pt")).toEqual({
+      ok: false,
+      motivo: "sin memoria de video",
+    });
   });
 });

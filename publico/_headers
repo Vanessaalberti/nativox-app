@@ -14,3 +14,10 @@
 /bergamot/*
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: credentialless
+
+# Sin Referer. Hugging Face (de donde se bajan los modelos) responde 404, sin encabezados CORS, a
+# los pedidos cuyo Referer es un sitio *.workers.dev (medido el 25/09: con pages.dev, un dominio
+# propio o sin Referer responde bien), y el navegador lo muestra como "Failed to fetch". Como las
+# instancias de cada organizador se despliegan en workers.dev, hay que evitarlo en todas.
+/*
+  Referrer-Policy: no-referrer

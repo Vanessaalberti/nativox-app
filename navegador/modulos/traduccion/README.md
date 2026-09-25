@@ -12,7 +12,7 @@
 - `ultimoTramoSinCerrar(anterior)` — vacío si la línea anterior terminó en `.`, `?`, `!` o `…`.
 - `crearCola()` — las tareas salen de a una y en el orden en que se pidieron; una que falla no traba las siguientes.
 
-Previsto (paso 11): `crearTranslateGemma(modelos)` (marca `codigo`).
+- `crearTranslateGemma(servicio) → Traductor` — TranslateGemma 4B (marca `codigo`, nivel `calidad`). Recibe por parámetro un `ServicioGemma` (`traducir({ texto, de, a })`), que da `modelos-compartidos`. Traduce mejor (normaliza números, modismos por el sentido) pero pesa ~2 a 3 GB y tarda ~2 a 3 s por idioma en una placa modesta: es una opción, no el camino por defecto.
 
 ## Por qué Bergamot usa `clave` y no `html`
 
@@ -25,7 +25,7 @@ Medido el 24/09 en el navegador: el modelo inglés→portugués de Bergamot trad
 
 ## Archivos
 
-- `tipos.ts` · `traductores/bergamot.ts` · `contexto.ts` · `con-contexto.ts` · `cola.ts` · `index.ts`
+- `tipos.ts` · `traductores/bergamot.ts` · `traductores/translategemma.ts` · `contexto.ts` · `con-contexto.ts` · `cola.ts` · `index.ts`
 - Bergamot se publica tal cual en `/bergamot/` (ver `vite.config.ts`): crea su propio worker con rutas relativas a su archivo.
 
 ## Pruebas

@@ -11,22 +11,32 @@ export interface OpcionesTranscribir {
   idioma: string;
 }
 
+export interface PedidoDeTraduccion {
+  texto: string;
+  de: string;
+  a: string;
+}
+
 export type Pedido =
   | { tipo: "cargar-whisper"; id: number; variante: VarianteWhisper }
+  // TranslateGemma comparte la variante con Whisper: sin f16 va comprimido.
+  | { tipo: "cargar-gemma"; id: number; variante: VarianteWhisper }
+  | ({ tipo: "traducir-gemma"; id: number } & PedidoDeTraduccion)
   | ({ tipo: "transcribir"; id: number; audio: Float32Array } & OpcionesTranscribir);
 
 export type Respuesta =
   | { tipo: "progreso"; id: number; cargado: number; total: number }
   | { tipo: "cargado"; id: number }
   | { tipo: "transcripto"; id: number; texto: string; ms: number }
+  | { tipo: "traducido"; id: number; texto: string; ms: number }
   | { tipo: "error"; id: number; motivo: string };
 
 export function esPedido(dato: unknown): dato is Pedido {
-  return tieneTipo(dato, ["cargar-whisper", "transcribir"]);
+  return tieneTipo(dato, ["cargar-whisper", "cargar-gemma", "transcribir", "traducir-gemma"]);
 }
 
 export function esRespuesta(dato: unknown): dato is Respuesta {
-  return tieneTipo(dato, ["progreso", "cargado", "transcripto", "error"]);
+  return tieneTipo(dato, ["progreso", "cargado", "transcripto", "traducido", "error"]);
 }
 
 function tieneTipo(dato: unknown, tipos: readonly string[]): boolean {
