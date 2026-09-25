@@ -152,7 +152,19 @@ function buscarParecida({ texto, palabras }: Contexto, desde: number, entrada: E
 
   const limite = letras.length >= 8 ? 2 : 1;
   const distancia = distanciaEdicion(Array.from(candidata), Array.from(termino));
-  return distancia <= limite ? desde + buscadas.length : null;
+  if (distancia > limite || !cadaPalabraSeParece(tramo, buscadas)) return null;
+  return desde + buscadas.length;
+}
+
+// Además del total, cada palabra por separado: una letra de diferencia cada 3 ("pul" por "pull"),
+// así una palabra corta no cambia entera ("Workers Day" no es "Workers AI": la AI puede venir en
+// el fragmento siguiente, y de eso se ocupa la corrección del límite entre líneas).
+function cadaPalabraSeParece(tramo: readonly Palabra[], buscadas: readonly string[]): boolean {
+  return buscadas.every((buscada, i) => {
+    const candidata = tramo[i]?.normal ?? "";
+    const permitida = Math.floor(buscada.length / 3);
+    return distanciaEdicion(Array.from(candidata), Array.from(buscada)) <= permitida;
+  });
 }
 
 const BUSCADORES: Record<TipoCoincidencia, Buscador> = {

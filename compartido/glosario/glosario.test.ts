@@ -86,6 +86,10 @@ describe("corregirTranscripcion", () => {
     );
   });
 
+  it("una palabra corta del término no cambia entera por parecido", () => {
+    expect(corregirTranscripcion("como Workers Day", glosario).texto).toBe("como Workers Day");
+  });
+
   it("no cruza comas ni puntos para armar un término", () => {
     expect(corregirTranscripcion("Workers. AI", glosario).texto).toBe("Workers. AI");
   });
@@ -110,7 +114,7 @@ describe("proteger y restaurar", () => {
     return { protegido, ...restaurar(traducirRespetandoMarcas(protegido.texto), protegido) };
   };
 
-  it.each<Marca>(["html", "codigo"])(
+  it.each<Marca>(["clave", "html", "codigo"])(
     "devuelve los 56 términos del guion (es → en y pt) con marca %s",
     (marca) => {
       let protegidos = 0;
@@ -147,6 +151,18 @@ describe("proteger y restaurar", () => {
       texto: "Gemini and Whisper",
       terminosPerdidos: [],
     });
+  });
+
+  it("con claves, cambia cada término por un código de letras distinto", () => {
+    const protegido = proteger("la API key de Gemini y la de Whisper", entradas, "pt", "clave");
+    expect(protegido.texto).toBe("la NTXA de NTXB y la de NTXC");
+  });
+
+  it("con claves, repone en cualquier orden y no duplica si el traductor repite un código", () => {
+    const protegido = proteger("corran los tests del pipeline", entradas, "en", "clave");
+
+    expect(restaurar("run the NTXB NTXA.", protegido).texto).toBe("run the pipeline tests.");
+    expect(restaurar("run the NTXB NTXB NTXA .", protegido).texto).toBe("run the pipeline tests.");
   });
 
   it("avisa qué términos se perdieron", () => {

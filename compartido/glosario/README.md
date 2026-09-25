@@ -1,6 +1,6 @@
 # glosario ♻
 
-**Qué hace:** Lee el glosario (`término`, `término ~ variantes`, `término => en: X | pt: Y`), arma el prompt para Whisper (hasta 224 tokens, por prioridad), corrige la transcripción (variantes, parecido de 1–2 letras en términos largos, siglas exactas, siglas con barra, términos de varias palabras con palabras cortas en el medio) y protege los términos al traducir (marca `html` o `codigo`) y los restaura.
+**Qué hace:** Lee el glosario (`término`, `término ~ variantes`, `término => en: X | pt: Y`), arma el prompt para Whisper (hasta 224 tokens, por prioridad), corrige la transcripción (variantes, parecido de 1–2 letras en términos largos, siglas exactas, siglas con barra, términos de varias palabras con palabras cortas en el medio) y protege los términos al traducir (marca `clave`, `html` o `codigo`) y los restaura.
 
 **Qué NO hace:** Transcribir ni traducir. No decide qué términos sugerir (eso lo hace `servidor/api/ia` con Gemma).
 
@@ -9,7 +9,7 @@
 - `leerGlosario(texto): EntradaGlosario[]`
 - `armarPromptWhisper(entradas, textoAnterior): string`
 - `corregirTranscripcion(texto, entradas): { texto, correcciones }`
-- `proteger(texto, entradas, idiomaDestino, marca): TextoProtegido` — `marca`: `"html"` (Bergamot) o `"codigo"` (modelos de lenguaje). Usa la traducción fija del idioma destino si la hay.
+- `proteger(texto, entradas, idiomaDestino, marca): TextoProtegido` — `marca`: `"clave"` (códigos opacos `NTXA`, `NTXB`…; la usa Bergamot), `"html"` (`<span data-g>`) o `"codigo"` (acentos graves; modelos de lenguaje). Usa la traducción fija del idioma destino si la hay. Por qué Bergamot usa `clave`: `navegador/modulos/traduccion/README.md`.
 - `restaurar(traducido, protegido): { texto, terminosPerdidos }` — perdido = el término no quedó en el texto final, con o sin marca.
 
 ## Dependencias
@@ -35,7 +35,7 @@ Ninguna forma cruza comas ni puntos. Si dos coincidencias se pisan, gana la más
 
 ## Pruebas
 
-Casos reales del laboratorio: "Workers Day de AI" → "Workers AI", "CI y CD" → "CI/CD", "pul request" → "pull request", sin comerse palabras vecinas ("rollback a"). Protección: los 56 términos del guion (28 en inglés y 28 en portugués) vuelven con las dos marcas. El guion bien escrito no se "corrige".
+Casos reales del laboratorio: "Workers Day de AI" → "Workers AI", "CI y CD" → "CI/CD", "pul request" → "pull request", sin comerse palabras vecinas ("rollback a"), y una palabra corta del término no cambia entera por parecido ("Workers Day" no se vuelve "Workers AI": eso lo resuelve la corrección del límite entre líneas). Protección: los 56 términos del guion (28 en inglés y 28 en portugués) vuelven con las tres marcas. El guion bien escrito no se "corrige".
 
 ## Referencia
 
