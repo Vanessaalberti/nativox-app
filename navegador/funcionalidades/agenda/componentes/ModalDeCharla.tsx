@@ -1,40 +1,25 @@
 import { useState } from "react";
-import {
-  IDIOMAS,
-  NOMBRES_DE_IDIOMA,
-  esquemaIdioma,
-  validar,
-  type DatosDeCharla,
-  type Idioma,
-} from "@compartido/contratos";
-import {
-  Aviso,
-  Boton,
-  Campo,
-  Modal,
-  Seleccion,
-  ZonaDeEliminar,
-  useEnvio,
-} from "@navegador/interfaz/sistema-diseno";
+import type { DatosDeCharla } from "@compartido/contratos";
+import { Campo, Modal, PieDeModal, Seleccion, useEnvio } from "@navegador/interfaz/sistema-diseno";
 import { formatearMinutos } from "../fechas";
 
 // Cada 15 minutos del día: 00:00 a 23:45 para empezar y 00:15 a 24:00 para terminar.
 const MOMENTOS = Array.from({ length: 96 }, (_, indice) => indice * 15);
 const comoOpcion = (minutos: number) => ({ valor: minutos, texto: formatearMinutos(minutos) });
 
-// Crear o editar una charla. El glosario no se edita acá: tiene su lugar en el detalle.
+// Crear o editar una actividad del calendario: título, día, desde/hasta y descripción. El idioma,
+// los oradores y el glosario no se piden acá: el idioma es el de la sala y el glosario tiene su
+// lugar en el detalle. Lo que la charla ya tenga se conserva al editar.
 export function ModalDeCharla({
   inicial,
-  idiomaDeLaSala,
+  editando,
   alGuardar,
-  alEliminar,
   alCerrar,
 }: {
   inicial: DatosDeCharla;
-  idiomaDeLaSala: Idioma;
-  // Devuelven el motivo si no se pudo (null si salió bien). `alEliminar` solo al editar.
+  editando: boolean;
+  // Devuelve el motivo si no se pudo (null si salió bien).
   alGuardar: (datos: DatosDeCharla) => Promise<string | null>;
-  alEliminar?: () => Promise<string | null>;
   alCerrar: () => void;
 }) {
   const [datos, setDatos] = useState(inicial);
@@ -48,50 +33,31 @@ export function ModalDeCharla({
       finMin: datos.finMin > inicioMin ? datos.finMin : Math.min(1440, inicioMin + 60),
     });
 
-  const cambiarIdioma = (texto: string) => {
-    const idioma = validar(esquemaIdioma, texto);
-    cambiar({ idioma: idioma.ok ? idioma.valor : null });
-  };
-
   const finesPosibles = [...MOMENTOS.filter((minutos) => minutos > datos.inicioMin), 1440];
 
   return (
     <Modal
-      etiqueta="Agenda"
-      titulo={alEliminar ? "Editar actividad" : "Nueva actividad"}
+      etiqueta={editando ? "Editar actividad" : "Nueva actividad"}
+      ancho={480}
+      titulo={
+        editando ? (
+          "Editar actividad"
+        ) : (
+          <>
+            Agregar al
+            <br />
+            calendario
+          </>
+        )
+      }
       alCerrar={alCerrar}
     >
-      <form
-        className="flex flex-col gap-5"
-        onSubmit={(evento) => {
-          evento.preventDefault();
-          void enviar(() => alGuardar(datos));
-        }}
-      >
+      <div className="flex flex-col gap-5">
         <Campo
           etiqueta="Título"
           valor={datos.titulo}
           alCambiar={(titulo) => cambiar({ titulo })}
-          autoComplete="off"
-        />
-        <label className="flex flex-col gap-1.5">
-          <span className="font-mono text-[11px] font-bold tracking-widest text-ink/70 uppercase">
-            Resumen (opcional)
-          </span>
-          <textarea
-            value={datos.resumen}
-            onChange={(evento) => cambiar({ resumen: evento.target.value })}
-            rows={3}
-            className="w-full border-[1.5px] border-ink/25 bg-canvas px-3 py-3 font-mono text-sm outline-none focus:border-naranja"
-          />
-          <span className="font-mono text-[11px] text-ink/60">
-            Con un resumen, «Sugerir términos» encuentra mejores términos para el glosario.
-          </span>
-        </label>
-        <Campo
-          etiqueta="Oradores (opcional)"
-          valor={datos.oradores}
-          alCambiar={(oradores) => cambiar({ oradores })}
+          placeholder="Charla principal"
           autoComplete="off"
         />
         <Campo
@@ -102,47 +68,42 @@ export function ModalDeCharla({
         />
         <div className="grid grid-cols-2 gap-4">
           <Seleccion
-            etiqueta="Empieza"
+            etiqueta="Desde"
             valor={datos.inicioMin}
             alCambiar={(texto) => cambiarInicio(Number(texto))}
             opciones={MOMENTOS.map(comoOpcion)}
           />
           <Seleccion
-            etiqueta="Termina"
+            etiqueta="Hasta"
             valor={datos.finMin}
             alCambiar={(texto) => cambiar({ finMin: Number(texto) })}
             opciones={finesPosibles.map(comoOpcion)}
           />
         </div>
-        <Seleccion
-          etiqueta="Idioma de la charla"
-          valor={datos.idioma ?? ""}
-          alCambiar={cambiarIdioma}
-          opciones={[
-            { valor: "", texto: `El de la sala (${NOMBRES_DE_IDIOMA[idiomaDeLaSala]})` },
-            ...IDIOMAS.map((idioma) => ({ valor: idioma, texto: NOMBRES_DE_IDIOMA[idioma] })),
-          ]}
-        />
+        <label className="flex flex-col gap-2">
+          <span className="font-mono text-[11px] font-bold tracking-widest text-ink/70 uppercase">
+            Descripción
+          </span>
+          <textarea
+            value={datos.resumen}
+            onChange={(evento) => cambiar({ resumen: evento.target.value })}
+            rows={3}
+            placeholder="Opcional"
+            className="w-full resize-none border-[1.5px] border-[#443d30] bg-canvas px-4 py-3 text-sm text-ink transition-colors outline-none placeholder:text-ink/30 focus:border-naranja"
+          />
+        </label>
 
-        {error !== null && <Aviso tipo="error">{error}</Aviso>}
-        <div className="flex justify-end">
-          <Boton
-            type="submit"
+        <PieDeModal error={error} alCancelar={alCerrar}>
+          <button
+            type="button"
             disabled={enviando || datos.titulo.trim() === "" || datos.fecha === ""}
+            onClick={() => void enviar(() => alGuardar(datos))}
+            className="inline-flex items-center gap-2 border-[3px] border-[#b8241f] bg-naranja px-6 py-3 font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:bg-[#e67b00] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Guardar →
-          </Boton>
-        </div>
-      </form>
-
-      {alEliminar && (
-        <ZonaDeEliminar
-          etiqueta="Eliminar actividad"
-          aviso={`Se borra «${datos.titulo}». No se puede deshacer.`}
-          enviando={enviando}
-          alEliminar={() => void enviar(alEliminar)}
-        />
-      )}
+          </button>
+        </PieDeModal>
+      </div>
     </Modal>
   );
 }

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router";
+import { MarcaDeNativox, SelloOpenSource } from "./piezas";
 
 // "angosto" es para los formularios cortos (ingresar, crear la cuenta); el resto ocupa todo el ancho,
 // como la portada y "Probar".
@@ -25,16 +25,7 @@ export function MarcoDeEntrada({
   return (
     <div className="grilla-fondo relative flex min-h-screen flex-col bg-canvas text-ink">
       <header className="relative z-20 flex h-[60px] items-center justify-between px-8">
-        <Link to="/" className="flex items-center gap-2.5" aria-label="Nativox">
-          <span className="grid size-5 grid-cols-2 gap-[2px]" aria-hidden>
-            {[0, 1, 2, 3].map((cuadro) => (
-              <span key={cuadro} className="size-[9px] bg-naranja" />
-            ))}
-          </span>
-          <span className="font-display text-2xl leading-none font-bold tracking-wider">
-            NATIVOX
-          </span>
-        </Link>
+        <MarcaDeNativox />
         {evento && (
           <span className="flex items-center gap-2 font-mono text-[11px] tracking-widest uppercase">
             {evento.logo && <img src={evento.logo} alt="" className="size-6 object-contain" />}
@@ -50,16 +41,7 @@ export function MarcoDeEntrada({
       </main>
 
       <footer className="relative z-20 flex h-14 items-center px-8 font-mono">
-        <span className="flex items-center gap-3">
-          <span className="flex flex-col gap-[2px]" aria-hidden>
-            <span className="size-3.5 bg-naranja" />
-            <span className="size-3.5 bg-verde" />
-          </span>
-          <span className="text-[9px] leading-tight tracking-wider text-ink/70 uppercase">
-            <span className="block">Open source</span>
-            <span className="block">Tu propia instancia</span>
-          </span>
-        </span>
+        <SelloOpenSource />
       </footer>
     </div>
   );

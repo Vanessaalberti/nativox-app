@@ -1,3 +1,4 @@
+import { useParams } from "react-router";
 import { GuardaDeAdministrador, GuardaDeOperador } from "@navegador/funcionalidades/acceso";
 import { PanelDeAjustes } from "@navegador/funcionalidades/ajustes";
 import { PanelDeOperadores } from "@navegador/funcionalidades/operadores";
@@ -5,36 +6,37 @@ import {
   PanelDelAdministrador,
   PanelDelOperador,
   ResumenDelEvento,
+  pestanaDeLaRuta,
 } from "@navegador/funcionalidades/paneles";
 import { PanelDeProduccion } from "@navegador/funcionalidades/produccion";
 import { PanelDeSalas } from "@navegador/funcionalidades/salas";
 
-// /panel, /panel/salas y /panel/operadores — solo el administrador, y solo cuando el evento ya
-// existe.
+// /panel (y /panel/salas, /panel/staff…) — solo el administrador, y solo cuando el evento ya
+// existe. Es una sola página: las pestañas cambian lo que se ve sin cambiar de ruta, y el segmento
+// de la URL solo decide con cuál se abre.
 export function Panel() {
-  return (
-    <GuardaDeAdministrador evento="con">
-      <PanelDelAdministrador activa="resumen">
-        {(datos) => <ResumenDelEvento {...datos} />}
-      </PanelDelAdministrador>
-    </GuardaDeAdministrador>
-  );
-}
+  const { pestana } = useParams();
 
-export function PanelSalas() {
   return (
     <GuardaDeAdministrador evento="con">
-      <PanelDelAdministrador activa="salas">{() => <PanelDeSalas />}</PanelDelAdministrador>
-    </GuardaDeAdministrador>
-  );
-}
-
-export function PanelOperadores() {
-  return (
-    <GuardaDeAdministrador evento="con">
-      <PanelDelAdministrador activa="operadores">
-        {() => <PanelDeOperadores />}
-      </PanelDelAdministrador>
+      <PanelDelAdministrador
+        inicial={pestanaDeLaRuta(pestana)}
+        paneles={{
+          dashboard: ({ evento, visible, irA }) => (
+            <ResumenDelEvento evento={evento} visible={visible} alAbrirSalas={() => irA("salas")} />
+          ),
+          salas: ({ evento, visible }) => (
+            <PanelDeSalas conEquipo={evento.tipo === "roles-separados"} visible={visible} />
+          ),
+          staff: ({ visible, irA }) => (
+            <PanelDeOperadores visible={visible} alAbrirSalas={() => irA("salas")} />
+          ),
+          produccion: ({ visible }) => <PanelDeProduccion visible={visible} />,
+          ajustes: ({ evento, email, visible }) => (
+            <PanelDeAjustes evento={evento} email={email} visible={visible} />
+          ),
+        }}
+      />
     </GuardaDeAdministrador>
   );
 }
@@ -45,25 +47,5 @@ export function PanelOperador() {
     <GuardaDeOperador>
       <PanelDelOperador />
     </GuardaDeOperador>
-  );
-}
-
-export function PanelProduccion() {
-  return (
-    <GuardaDeAdministrador evento="con">
-      <PanelDelAdministrador activa="produccion">
-        {() => <PanelDeProduccion />}
-      </PanelDelAdministrador>
-    </GuardaDeAdministrador>
-  );
-}
-
-export function PanelAjustes() {
-  return (
-    <GuardaDeAdministrador evento="con">
-      <PanelDelAdministrador activa="ajustes">
-        {(datos) => <PanelDeAjustes {...datos} />}
-      </PanelDelAdministrador>
-    </GuardaDeAdministrador>
   );
 }

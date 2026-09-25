@@ -30,6 +30,7 @@ export function SeccionConsumo({
   return (
     <>
       <Seccion
+        etiqueta="Consumo"
         titulo="Consumo de IA"
         texto="Solo aplica si activás la transcripción en la nube (opcional, apagada por defecto): lo que corre en las computadoras de cada sala no consume nada ni tiene límite. La factura exacta está en tu panel de Cloudflare."
       >
@@ -94,15 +95,11 @@ export function SeccionConsumo({
         {error !== null && <Aviso tipo="error">{error}</Aviso>}
       </Seccion>
 
-      <Seccion titulo="Subtítulos">
-        <h3 className="font-mono text-[11px] font-bold tracking-widest text-ink/70 uppercase">
-          Calidad de la traducción
-        </h3>
-        <p className="max-w-[760px] text-sm text-ink/70">
-          No suma demora: la traducción aparece igual de rápido. Lo que puede pasar es que una línea
-          se corrija en pantalla cuando llega la siguiente (por ejemplo, un término que el corte
-          partió en dos).
-        </p>
+      <Seccion
+        etiqueta="Subtítulos"
+        titulo="Calidad de la traducción"
+        texto="No suma demora: la traducción aparece igual de rápido. Lo que puede pasar es que una línea se corrija en pantalla cuando llega la siguiente (por ejemplo, un término que el corte partió en dos)."
+      >
         <Interruptor
           etiqueta="Corregir la línea anterior cuando llega la siguiente, con más contexto."
           valor={ajustes.subtitulos.corregirLineaAnterior}

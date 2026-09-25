@@ -11,14 +11,14 @@ export function SelectorDeSalas({
   alCambiar: (elegidas: string[]) => void;
 }) {
   if (salas.length === 0) {
-    return <p className="font-mono text-xs text-ink/50">Todavía no hay salas creadas.</p>;
+    return <p className="text-xs whitespace-nowrap text-ink/40">Todavía no hay salas creadas.</p>;
   }
   return (
     <div className="flex flex-col gap-1.5">
       {salas.map((sala) => (
         <label
           key={sala.id}
-          className="flex items-center gap-2 font-mono text-xs whitespace-nowrap"
+          className="flex cursor-pointer items-center gap-2 text-xs whitespace-nowrap text-ink/80"
         >
           <input
             type="checkbox"
@@ -30,7 +30,7 @@ export function SelectorDeSalas({
                   : elegidas.filter((id) => id !== sala.id),
               )
             }
-            className="accent-naranja"
+            className="size-3.5 accent-verde"
           />
           {sala.nombre}
         </label>

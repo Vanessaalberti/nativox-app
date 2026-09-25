@@ -1,10 +1,12 @@
 import type { Charla } from "@compartido/contratos";
 import { diaCorto, formatearMinutos, NOMBRES_DE_DIA } from "../fechas";
 
-const ALTO_DE_HORA_PX = 48;
+const ALTO_DE_HORA_PX = 44;
 
-// La semana en una grilla: una columna por día y una fila por hora. Un clic en un espacio vacío
-// crea una charla ahí; un clic en una charla la selecciona.
+const cuadro = "border-r border-b border-ink/30 bg-canvas";
+
+// La semana en una grilla, como en el maquetado: una columna por día y una fila por hora. Un clic
+// en un espacio vacío crea una charla ahí; un clic en una charla la selecciona.
 export function GrillaSemanal({
   semana,
   charlas,
@@ -27,16 +29,16 @@ export function GrillaSemanal({
   const horas = Array.from({ length: horaFin - horaInicio }, (_, indice) => horaInicio + indice);
 
   return (
-    <div className="overflow-x-auto border-[1.5px] border-ink/25 bg-canvas">
-      <div className="grid min-w-[760px] grid-cols-[56px_repeat(7,minmax(0,1fr))]">
-        <div className="border-b border-linea-fuerte" />
+    <div className="overflow-x-auto lg:overflow-visible">
+      <div className="grid min-w-[720px] grid-cols-[64px_repeat(7,minmax(0,1fr))] border-t border-l border-ink/30">
+        <div className={`h-8 ${cuadro}`} />
         {semana.map((fecha, indice) => (
           <div
             key={fecha}
-            className="border-b border-l border-linea-fuerte py-2 text-center font-mono text-[10px] font-bold tracking-widest uppercase"
+            className={`flex h-8 items-center justify-center gap-1.5 font-mono text-[10px] font-bold tracking-widest uppercase ${cuadro}`}
           >
-            {(NOMBRES_DE_DIA[indice] ?? "").slice(0, 3)}{" "}
-            <span className="text-ink/50">{diaCorto(fecha)}</span>
+            {(NOMBRES_DE_DIA[indice] ?? "").slice(0, 3)}
+            <span className="font-normal text-ink/50">{diaCorto(fecha)}</span>
           </div>
         ))}
 
@@ -45,7 +47,7 @@ export function GrillaSemanal({
             <div
               key={hora}
               style={{ height: ALTO_DE_HORA_PX }}
-              className="pt-1 pr-2 text-right font-mono text-[10px] font-bold text-ink/70"
+              className={`flex items-start justify-end pt-1 pr-2 font-mono text-[10px] font-bold text-ink/70 ${cuadro}`}
             >
               {formatearMinutos(hora * 60)}
             </div>
@@ -53,7 +55,7 @@ export function GrillaSemanal({
         </div>
 
         {semana.map((fecha, indice) => (
-          <div key={fecha} className="relative border-l border-linea-fuerte">
+          <div key={fecha} className="relative">
             {horas.map((hora) => (
               <button
                 key={hora}
@@ -62,7 +64,7 @@ export function GrillaSemanal({
                 aria-label={`${alCrearEn === undefined ? "Espacio libre" : "Crear una actividad"} el ${NOMBRES_DE_DIA[indice] ?? ""} ${diaCorto(fecha)} a las ${formatearMinutos(hora * 60)}`}
                 disabled={alCrearEn === undefined}
                 onClick={() => alCrearEn?.(fecha, hora * 60)}
-                className="block w-full border-t border-linea enabled:hover:bg-naranja/10"
+                className={`block w-full enabled:cursor-pointer enabled:hover:bg-naranja/10 ${cuadro}`}
               />
             ))}
             {charlas

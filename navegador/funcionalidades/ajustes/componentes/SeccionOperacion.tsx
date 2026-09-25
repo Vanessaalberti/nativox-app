@@ -51,6 +51,7 @@ export function SeccionOperacion({
 
   return (
     <Seccion
+      etiqueta="Operación"
       titulo="Salas sin nadie al lado"
       texto="Cada sala arranca con la agenda, se repara sola y, si algo no se puede arreglar, te avisa por Discord. Nadie tiene que estar al lado de la computadora ni entrar por escritorio remoto."
     >

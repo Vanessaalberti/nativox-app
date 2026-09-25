@@ -14,10 +14,7 @@ export function SeccionGeneral({ evento }: { evento: EventoCompleto }) {
   const { error, enviando, enviar } = useEnvio(() => window.location.reload());
 
   return (
-    <Seccion
-      titulo="General"
-      texto="Datos del evento, credenciales, tu acceso y qué hacer cuando termina."
-    >
+    <Seccion etiqueta="General" titulo="Logo y nombre">
       <form
         className="flex max-w-[760px] flex-col gap-6"
         onSubmit={(evento) => {

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { NOMBRES_DE_IDIOMA, type Idioma, type Transcripcion } from "@compartido/contratos";
-import { Boton, Campo } from "@navegador/interfaz/sistema-diseno";
 import { leerTranscripcion } from "@navegador/modulos/cliente-instancia";
 import { exportar, idiomasDisponibles, segmentosEn, type Formato } from "../transcripcion";
 
@@ -10,7 +9,7 @@ const EXTENSION: Record<Formato, { extension: string; tipo: string }> = {
   vtt: { extension: "vtt", tipo: "text/vtt;charset=utf-8" },
 };
 
-const subtitulo = "font-mono text-[10px] font-bold tracking-widest text-ink/60 uppercase";
+const subtitulo = "font-mono text-[11px] tracking-widest text-ink/50 uppercase";
 
 // Lo que se transcribió de la charla (lo guarda la sala frase por frase), para copiar o descargar
 // como texto, SRT o VTT, con un corrimiento de tiempo para que coincida con el video.
@@ -65,44 +64,57 @@ export function BloqueDeTranscripcion({ charlaId, titulo }: { charlaId: string; 
     URL.revokeObjectURL(url);
   };
 
+  const enlace = "font-mono text-xs font-bold tracking-widest uppercase";
+
   return (
-    <div className="flex flex-col gap-3">
-      <h3 className={subtitulo}>Transcripción</h3>
-      <label className="flex flex-col gap-1.5">
-        <span className={subtitulo}>Idioma</span>
-        <select
-          value={idioma}
-          onChange={(evento) => setIdioma(evento.target.value as "original" | Idioma)}
-          className="border-[1.5px] border-ink/25 bg-canvas px-3 py-2 font-mono text-sm"
-        >
-          <option value="original">Original</option>
-          {idiomasDisponibles(segmentos).map((disponible) => (
-            <option key={disponible} value={disponible}>
-              {NOMBRES_DE_IDIOMA[disponible]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <pre className="max-h-[180px] overflow-y-auto border-[1.5px] border-ink/20 bg-canvas p-3 font-mono text-xs whitespace-pre-wrap">
+    <div className="mb-6">
+      <span className={subtitulo}>Transcripción</span>
+      <select
+        value={idioma}
+        aria-label="Idioma de la transcripción"
+        onChange={(evento) => setIdioma(evento.target.value as "original" | Idioma)}
+        className="mt-2 block w-full border-[1.5px] border-[#443d30] bg-canvas px-3 py-2 font-mono text-xs"
+      >
+        <option value="original">Original</option>
+        {idiomasDisponibles(segmentos).map((disponible) => (
+          <option key={disponible} value={disponible}>
+            {NOMBRES_DE_IDIOMA[disponible]}
+          </option>
+        ))}
+      </select>
+      <div className="mt-2 mb-3 max-h-[120px] overflow-y-auto border-[1.5px] border-[#443d30]/25 p-3 text-xs leading-relaxed whitespace-pre-wrap text-ink/70">
         {texto}
-      </pre>
-      <Campo
-        etiqueta="Correr el tiempo (segundos)"
-        tipo="number"
-        valor={corrimiento}
-        alCambiar={setCorrimiento}
-        ayuda="Para que coincida con el video; negativo adelanta. Vale para SRT y VTT."
-      />
-      <div className="flex flex-wrap gap-3">
-        <Boton variante="secundario" onClick={() => void copiar()}>
+      </div>
+      <div className="flex flex-wrap items-center gap-4">
+        <button
+          type="button"
+          onClick={() => void copiar()}
+          className={`${enlace} text-ink/60 transition-colors hover:text-ink`}
+        >
           {copiado ? "✓ Copiado" : "Copiar"}
-        </Boton>
+        </button>
         {(["txt", "srt", "vtt"] as const).map((formato) => (
-          <Boton key={formato} variante="secundario" onClick={() => descargar(formato)}>
+          <button
+            key={formato}
+            type="button"
+            onClick={() => descargar(formato)}
+            className={`${enlace} text-naranja hover:underline`}
+          >
             Descargar (.{formato})
-          </Boton>
+          </button>
         ))}
       </div>
+      <label className="mt-3 flex flex-wrap items-center gap-2 text-xs text-ink/60">
+        Correr el tiempo
+        <input
+          type="number"
+          step="0.5"
+          value={corrimiento}
+          onChange={(evento) => setCorrimiento(evento.target.value)}
+          className="w-20 border-[1.5px] border-[#443d30] bg-canvas px-2 py-1 font-mono text-xs text-ink outline-none focus:border-naranja"
+        />
+        s <span className="text-ink/40">(para que coincida con el video; negativo adelanta)</span>
+      </label>
     </div>
   );
 }

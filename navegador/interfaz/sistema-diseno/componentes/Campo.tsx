@@ -55,7 +55,7 @@ export function Campo({
           min={minimo}
           max={maximo}
           readOnly={soloLectura}
-          className={`w-full border-[1.5px] border-ink/25 bg-canvas px-4 py-3 font-mono text-sm text-ink outline-none transition-colors ${ENFOQUE[acento]} ${esContrasena ? "pr-24" : ""} ${soloLectura ? "bg-ink/5 text-ink/70" : ""}`}
+          className={`w-full border-[1.5px] border-[#443d30] bg-canvas px-4 py-3 font-mono text-sm text-ink outline-none transition-colors ${ENFOQUE[acento]} ${esContrasena ? "pr-24" : ""} ${soloLectura ? "bg-ink/5 text-ink/70" : ""}`}
         />
         {esContrasena && (
           <button

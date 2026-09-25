@@ -29,6 +29,7 @@ export function SeccionCuenta({ email }: { email: string }) {
 
   return (
     <Seccion
+      etiqueta="Cuenta"
       titulo="Tu acceso"
       texto="La cuenta con la que entrás como administrador. Tu instancia no envía correos: si olvidás la contraseña, se recupera con el código de recuperación."
     >

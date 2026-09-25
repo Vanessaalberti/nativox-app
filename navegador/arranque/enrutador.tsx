@@ -17,14 +17,7 @@ import {
   PaginaSinAcceso,
 } from "@navegador/rutas/Entradas";
 import { Inicio } from "@navegador/rutas/Inicio";
-import {
-  Panel,
-  PanelAjustes,
-  PanelOperador,
-  PanelOperadores,
-  PanelProduccion,
-  PanelSalas,
-} from "@navegador/rutas/Panel";
+import { Panel, PanelOperador } from "@navegador/rutas/Panel";
 import { PasoCuenta, PasoEvento, PasoTipo } from "@navegador/rutas/PasoDelAsistente";
 
 export const enrutador = createBrowserRouter([
@@ -37,10 +30,7 @@ export const enrutador = createBrowserRouter([
   { path: "/entrada/operador", element: <EntradaOperadorCodigo /> },
   { path: "/sin-acceso", element: <PaginaSinAcceso /> },
   { path: "/panel", element: <Panel /> },
-  { path: "/panel/salas", element: <PanelSalas /> },
-  { path: "/panel/operadores", element: <PanelOperadores /> },
-  { path: "/panel/produccion", element: <PanelProduccion /> },
-  { path: "/panel/ajustes", element: <PanelAjustes /> },
+  { path: "/panel/:pestana", element: <Panel /> },
   { path: "/operador", element: <PanelOperador /> },
   { path: "/audiencia", element: <Audiencia /> },
   { path: "/accion/:token", element: <AccionDeAviso /> },

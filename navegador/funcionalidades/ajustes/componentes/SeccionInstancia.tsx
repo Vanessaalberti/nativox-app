@@ -12,43 +12,50 @@ export function SeccionInstancia({ evento }: { evento: EventoCompleto }) {
   return (
     <>
       <Seccion
+        etiqueta="Infraestructura"
         titulo="Tu instancia"
-        texto="Corre en tu propia cuenta de Cloudflare. Guarda salas, staff, glosario y los ajustes."
+        texto="Corre en tu propia cuenta de Cloudflare. Guarda salas, staff, glosario, transcripciones y el historial de correcciones."
       >
-        <p className="font-mono text-sm font-bold">{direccion}</p>
-        <ul className="flex flex-col gap-1 font-mono text-xs text-ink/75">
-          <li>✓ Base de datos</li>
-          <li>✓ Tiempo real</li>
-        </ul>
-        <div>
+        <div className="border-[1.5px] border-[#443d30] bg-canvas p-4">
+          <p className="font-mono text-sm break-all">{direccion}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {["✓ Base de datos", "✓ Tiempo real"].map((estado) => (
+              <span
+                key={estado}
+                className="bg-verde/20 px-2.5 py-1 font-mono text-[10px] font-bold tracking-widest text-verde uppercase"
+              >
+                {estado}
+              </span>
+            ))}
+          </div>
           <a
             href="https://dash.cloudflare.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-[11px] font-bold tracking-widest uppercase underline hover:text-naranja"
+            className="mt-4 inline-flex items-center gap-2 font-mono text-xs font-bold tracking-widest text-ink/50 uppercase transition-colors hover:text-ink"
           >
             Abrir panel de Cloudflare ↗
           </a>
         </div>
       </Seccion>
 
-      <section className="flex flex-col gap-4 border-[1.5px] border-[#b8241f] bg-[#b8241f]/5 p-6">
-        <h2 className="font-display text-4xl leading-none text-[#b8241f] uppercase">
-          Zona de peligro
-        </h2>
-        <h3 className="font-mono text-[11px] font-bold tracking-widest uppercase">
-          Eliminar tu evento
-        </h3>
-        <p className="max-w-[760px] text-sm text-ink/80">
+      <Seccion etiqueta="Zona de peligro" titulo="Eliminar evento" tipo="peligro">
+        <p className="mb-2 max-w-[560px] text-sm leading-relaxed text-ink/70">
           Pensado para cuando termina el evento y ya no querés seguir con esta instancia activa.
-          Borra todos los datos: salas, agenda, glosarios, equipo, salidas de producción, ajustes y
-          tu cuenta. Después te guiamos para borrar la instancia de tu cuenta de Cloudflare (lleva 2
-          minutos). No se puede deshacer.
+          Borra todos los datos, las keys y los códigos de acceso de tu staff. Después te guiamos
+          para borrar la instancia de tu cuenta de Cloudflare (lleva 2 minutos). No se puede
+          deshacer.
         </p>
         <div>
-          <Boton onClick={() => setEliminando(true)}>Eliminar evento →</Boton>
+          <button
+            type="button"
+            onClick={() => setEliminando(true)}
+            className="inline-flex items-center gap-2 border-[3px] border-[#b8241f] bg-[#b8241f] px-6 py-3 font-mono text-xs font-bold tracking-widest text-canvas uppercase transition-colors hover:bg-[#9c1e1a]"
+          >
+            Eliminar evento →
+          </button>
         </div>
-      </section>
+      </Seccion>
 
       {eliminando && <ModalEliminar nombre={evento.nombre} alCerrar={() => setEliminando(false)} />}
     </>

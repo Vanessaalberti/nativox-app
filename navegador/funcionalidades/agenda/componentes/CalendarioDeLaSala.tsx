@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import type { Charla, DatosDeCharla } from "@compartido/contratos";
-import { MarcoDeEntrada } from "@navegador/interfaz/marco-de-entrada";
+import { MarcoDeEntrada, MarcoDelPanel } from "@navegador/interfaz/marco-de-entrada";
 import { Boton } from "@navegador/interfaz/sistema-diseno";
 import { aDatos } from "../datos-de-charla";
 import { diaCorto, hoy, lunesDe, semanaDesde, sumarDias } from "../fechas";
@@ -83,66 +83,78 @@ export function CalendarioDeLaSala({
   const charlaElegida = charlas.find((charla) => charla.id === elegida) ?? null;
 
   return (
-    <MarcoDeEntrada ancho="ancho" centrado={false}>
-      <Link
-        to={soloLectura ? "/operador" : "/panel/salas"}
-        className="mb-6 font-mono text-[11px] tracking-widest text-ink/50 uppercase hover:text-ink"
-      >
-        {soloLectura ? "← Volver a mis salas" : "← Volver a Salas"}
-      </Link>
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <span className="font-mono text-[11px] tracking-widest text-naranja uppercase">
-            Calendario semanal
-          </span>
-          <h1 className="mt-2 font-display text-6xl leading-[0.95] font-extrabold tracking-tight uppercase">
-            {sala.nombre}
-          </h1>
-        </div>
-        {!soloLectura && (
-          <Boton
-            onClick={() =>
-              setEditando({ modo: "nueva", datos: datosNuevos(semana[0] ?? hoy(), 9 * 60) })
-            }
-          >
-            + Agregar al calendario
-          </Boton>
-        )}
-      </div>
-      <p className="mb-4 max-w-[760px] font-mono text-xs text-ink/60">
-        {soloLectura
-          ? "Hacé clic en una actividad para ver el detalle."
-          : "Hacé clic en un espacio vacío para crear una actividad, o usá el botón para cargarla desde el formulario. Hacé clic en una actividad para ver el detalle."}
-      </p>
-
-      <div className="mb-4 flex items-center gap-4 font-mono text-xs">
-        <button
-          type="button"
-          onClick={() => setSemanaElegida(sumarDias(lunes, -7))}
-          className="font-bold underline"
+    <MarcoDelPanel
+      libre
+      rotulo={["CALENDARIO", "DE SALA"]}
+      junto={
+        <Link
+          to={soloLectura ? "/operador" : "/panel/salas"}
+          className="inline-flex items-center gap-1 font-mono text-[11px] tracking-widest text-ink/50 uppercase transition-colors hover:text-ink"
         >
-          ← Semana anterior
-        </button>
-        <span>
-          {diaCorto(semana[0] ?? lunes)} – {diaCorto(semana[6] ?? lunes)}
+          <span>←</span> {soloLectura ? "Volver a mis salas" : "Volver a Salas"}
+        </Link>
+      }
+      acciones={
+        <span className="bg-verde px-2.5 py-1 font-mono text-[10px] font-bold tracking-widest uppercase">
+          {soloLectura ? "Operador" : "Admin"}
         </span>
-        <button
-          type="button"
-          onClick={() => setSemanaElegida(sumarDias(lunes, 7))}
-          className="font-bold underline"
-        >
-          Semana siguiente →
-        </button>
-        <button
-          type="button"
-          onClick={() => setSemanaElegida(lunesDe(hoy()))}
-          className="underline"
-        >
-          Hoy
-        </button>
-      </div>
+      }
+    >
+      <div className="flex-1 px-8 py-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:overflow-y-auto">
+        <div className="flex shrink-0 flex-wrap items-start justify-between gap-4">
+          <div>
+            <span className="font-mono text-[11px] tracking-widest text-naranja uppercase">
+              Calendario semanal
+            </span>
+            <h1 className="mt-2 mb-1 font-display text-4xl leading-[0.95] font-extrabold tracking-tight uppercase md:text-5xl">
+              {sala.nombre}
+            </h1>
+          </div>
+          {!soloLectura && (
+            <button
+              type="button"
+              onClick={() =>
+                setEditando({ modo: "nueva", datos: datosNuevos(semana[0] ?? hoy(), 9 * 60) })
+              }
+              className="inline-flex shrink-0 items-center gap-2 border-[3px] border-[#b8241f] bg-naranja px-5 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:bg-[#e67b00]"
+            >
+              + Agregar al calendario
+            </button>
+          )}
+        </div>
+        <p className="mb-4 shrink-0 text-sm text-ink/60">
+          {soloLectura
+            ? "Hacé clic en una actividad para ver el detalle."
+            : "Hacé clic en un espacio vacío para crear una actividad, o usá el botón para cargarla directo desde el formulario. Hacé clic en una actividad para ver el detalle."}
+        </p>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="mb-3 flex shrink-0 flex-wrap items-center gap-4 font-mono text-[11px] tracking-widest text-ink/60 uppercase">
+          <button
+            type="button"
+            onClick={() => setSemanaElegida(sumarDias(lunes, -7))}
+            className="font-bold hover:text-ink"
+          >
+            ← Semana anterior
+          </button>
+          <span className="text-ink">
+            {diaCorto(semana[0] ?? lunes)} – {diaCorto(semana[6] ?? lunes)}
+          </span>
+          <button
+            type="button"
+            onClick={() => setSemanaElegida(sumarDias(lunes, 7))}
+            className="font-bold hover:text-ink"
+          >
+            Semana siguiente →
+          </button>
+          <button
+            type="button"
+            onClick={() => setSemanaElegida(lunesDe(hoy()))}
+            className="hover:text-ink"
+          >
+            Hoy
+          </button>
+        </div>
+
         <GrillaSemanal
           semana={semana}
           charlas={charlas}
@@ -157,6 +169,9 @@ export function CalendarioDeLaSala({
           }
           alElegir={setElegida}
         />
+      </div>
+
+      <aside className="w-full shrink-0 border-t border-[#443d30]/20 bg-canvas px-6 py-8 lg:w-[420px] lg:overflow-y-auto lg:border-t-0 lg:border-l">
         {charlaElegida ? (
           <DetalleDeCharla
             key={charlaElegida.id}
@@ -164,40 +179,38 @@ export function CalendarioDeLaSala({
             soloLectura={soloLectura}
             alEditar={() => setEditando({ modo: "editar", charla: charlaElegida })}
             alGuardarGlosario={(datos) => editar(charlaElegida.id, datos)}
+            alEliminar={async () => {
+              const motivo = await eliminar(charlaElegida.id);
+              if (motivo === null) setElegida(null);
+              return motivo;
+            }}
           />
         ) : (
-          <aside className="border-[1.5px] border-ink/25 bg-canvas p-5">
-            <span className="font-mono text-[10px] font-bold tracking-widest text-ink/60 uppercase">
+          <div>
+            <span className="font-mono text-[11px] tracking-widest text-ink/50 uppercase">
               Detalle
             </span>
-            <h2 className="mt-1 font-display text-3xl leading-none uppercase">Nada seleccionado</h2>
-            <p className="mt-2 text-sm text-ink/70">
-              Seleccioná una actividad del calendario para ver acá su información. Un espacio vacío
-              crea una actividad nueva.
+            <h2 className="mt-2 mb-4 font-display text-2xl leading-none uppercase">
+              Nada seleccionado
+            </h2>
+            <p className="text-sm leading-relaxed text-ink/60">
+              Seleccioná una actividad del calendario para ver acá su información.
+              {!soloLectura && " Un espacio vacío crea una actividad nueva."}
             </p>
-          </aside>
+          </div>
         )}
-      </div>
+      </aside>
 
       {editando && (
         <ModalDeCharla
           inicial={editando.modo === "nueva" ? editando.datos : aDatos(editando.charla)}
-          idiomaDeLaSala={sala.idiomaOriginal}
+          editando={editando.modo === "editar"}
           alGuardar={(datos) =>
             editando.modo === "nueva" ? crear(datos) : editar(editando.charla.id, datos)
           }
-          {...(editando.modo === "editar"
-            ? {
-                alEliminar: async () => {
-                  const motivo = await eliminar(editando.charla.id);
-                  if (motivo === null) setElegida(null);
-                  return motivo;
-                },
-              }
-            : {})}
           alCerrar={() => setEditando(null)}
         />
       )}
-    </MarcoDeEntrada>
+    </MarcoDelPanel>
   );
 }

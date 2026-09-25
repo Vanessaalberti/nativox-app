@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { MAXIMO_DE_SALAS_POR_PEDIDO } from "@compartido/contratos";
+import { MAXIMO_DE_SALAS_POR_PEDIDO, type Idioma } from "@compartido/contratos";
 import { Aviso, Boton, Campo, Modal } from "@navegador/interfaz/sistema-diseno";
-import { SelectorDeIdiomas, type IdiomasDeSala } from "./SelectorDeIdiomas";
 
 type Paso = "eleccion" | "una" | "cantidad" | "tabla";
 
 const SALAS_POR_PAGINA = 10;
-const IDIOMAS_INICIALES: IdiomasDeSala = { original: "es", destino: ["en"] };
+// Al crear una sala no se pregunta el idioma: arranca en español con inglés y portugués, y se
+// cambia después desde "Editar" (o en cada charla).
+const IDIOMA_ORIGINAL: Idioma = "es";
+const IDIOMAS_DESTINO: Idioma[] = ["en", "pt"];
 
 const OPCIONES = [
   { paso: "una", titulo: "1 sala", texto: "Para un solo escenario o sesión." },
@@ -18,7 +20,7 @@ const OPCIONES = [
 ] as const;
 
 // "Añadir sala": una sola, o varias de una (se elige la cantidad y se les pone nombre en una
-// tabla). Los idiomas que se elijan valen para todas las que se creen y se cambian después.
+// tabla).
 export function ModalAnadirSala({
   cantidadActual,
   alCrear,
@@ -29,14 +31,13 @@ export function ModalAnadirSala({
   alCrear: (
     salas: {
       nombre: string;
-      idiomaOriginal: IdiomasDeSala["original"];
-      idiomasDestino: IdiomasDeSala["destino"];
+      idiomaOriginal: Idioma;
+      idiomasDestino: Idioma[];
     }[],
   ) => Promise<string | null>;
   alCerrar: () => void;
 }) {
   const [paso, setPaso] = useState<Paso>("eleccion");
-  const [idiomas, setIdiomas] = useState(IDIOMAS_INICIALES);
   const [nombres, setNombres] = useState<string[]>([]);
   const [cantidad, setCantidad] = useState("2");
   const [pagina, setPagina] = useState(0);
@@ -52,8 +53,8 @@ export function ModalAnadirSala({
     const motivo = await alCrear(
       lista.map((nombre, indice) => ({
         nombre: nombre.trim() || nombreInicial(indice),
-        idiomaOriginal: idiomas.original,
-        idiomasDestino: idiomas.destino,
+        idiomaOriginal: IDIOMA_ORIGINAL,
+        idiomasDestino: IDIOMAS_DESTINO,
       })),
     );
     setEnviando(false);
@@ -132,7 +133,6 @@ export function ModalAnadirSala({
             alCambiar={(nombre) => setNombres([nombre])}
             autoComplete="off"
           />
-          <SelectorDeIdiomas valor={idiomas} alCambiar={setIdiomas} />
           {error !== null && <Aviso tipo="error">{error}</Aviso>}
           <div className="flex justify-between gap-3">
             <Boton variante="secundario" onClick={() => setPaso("eleccion")}>
@@ -161,7 +161,6 @@ export function ModalAnadirSala({
             minimo={2}
             maximo={MAXIMO_DE_SALAS_POR_PEDIDO}
           />
-          <SelectorDeIdiomas valor={idiomas} alCambiar={setIdiomas} />
           <div className="flex justify-between gap-3">
             <Boton variante="secundario" onClick={() => setPaso("eleccion")}>
               ← Atrás

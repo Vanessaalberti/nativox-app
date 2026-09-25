@@ -15,3 +15,6 @@ export { EnlaceDeAccion } from "./componentes/EnlaceDeAccion";
 export { LogoYNombre } from "./componentes/LogoYNombre";
 export { Interruptor } from "./componentes/Interruptor";
 export { useConRecarga } from "./hooks/useConRecarga";
+export { useAlMostrarse } from "./hooks/useAlMostrarse";
+export { useFilasQueEntran } from "./hooks/useFilasQueEntran";
+export { PieDeModal } from "./componentes/PieDeModal";

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   diaCorto,
   formatearMinutos,
+  haTerminado,
   hoy,
   lunesDe,
   nombreDelDia,
@@ -36,6 +37,15 @@ describe("fechas", () => {
 
   it("hoy es la fecha local, no la de UTC", () => {
     expect(hoy(new Date(2026, 9, 5, 23, 30))).toBe("2026-10-05");
+  });
+
+  it("una charla terminó cuando pasó su hora de fin, en hora local", () => {
+    const ahora = new Date(2026, 9, 5, 12, 0);
+
+    expect(haTerminado("2026-10-05", 11 * 60, ahora)).toBe(true);
+    expect(haTerminado("2026-10-05", 13 * 60, ahora)).toBe(false);
+    expect(haTerminado("2026-10-04", 1440, ahora)).toBe(true);
+    expect(haTerminado("2026-10-06", 60, ahora)).toBe(false);
   });
 
   it("formatea días y horas", () => {

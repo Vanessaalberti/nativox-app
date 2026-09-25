@@ -13,12 +13,12 @@ export function Seleccion({
   opciones: readonly { valor: string | number; texto: string }[];
 }) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className="flex flex-col gap-2">
       <span className={ETIQUETA}>{etiqueta}</span>
       <select
         value={valor}
         onChange={(evento) => alCambiar(evento.target.value)}
-        className="w-full border-[1.5px] border-ink/25 bg-canvas px-3 py-3 font-mono text-sm outline-none focus:border-naranja"
+        className="w-full border-[1.5px] border-[#443d30] bg-canvas px-4 py-3 font-mono text-sm outline-none focus:border-naranja"
       >
         {opciones.map((opcion) => (
           <option key={opcion.valor} value={opcion.valor}>

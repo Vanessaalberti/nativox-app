@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Sala, SalidaDeProduccion } from "@compartido/contratos";
 import {
   Aviso,
@@ -6,18 +6,21 @@ import {
   CajaCopiable,
   CargaConReintento,
   EstadoVacio,
+  useAlMostrarse,
   useEnvio,
 } from "@navegador/interfaz/sistema-diseno";
 import { EditorDeEstilo, VistaPreviaDeEstilo } from "@navegador/interfaz/subtitulos";
+import { describirIdiomas } from "../idiomas";
 import { useProduccion } from "../hooks/useProduccion";
 import { RegistroDeAire } from "./RegistroDeAire";
 
 // La pestaña "Producción": salidas con un link fijo cada una para vMix/OBS. Desde acá se elige qué
 // sala sale en cada una (con un clic o con las teclas 1–9) sin tocar el programa de transmisión.
-export function PanelDeProduccion() {
+export function PanelDeProduccion({ visible }: { visible: boolean }) {
   const produccion = useProduccion();
   const [elegida, setElegida] = useState<number | null>(null);
   const [creando, setCreando] = useState(false);
+  useAlMostrarse(visible, () => void produccion.recargar());
   const { carga } = produccion;
 
   if (carga.fase !== "lista") {
@@ -34,28 +37,35 @@ export function PanelDeProduccion() {
   const actual = salidas.find((salida) => salida.numero === elegida) ?? salidas[0] ?? null;
 
   return (
-    <div className="flex flex-col gap-8">
-      <p className="max-w-[860px] text-base text-ink/80">
-        Elegí desde acá qué sala sale en el stream. Pegás un solo link por salida en OBS o vMix y
-        cambiás de sala con un clic, sin tocar el programa de transmisión. Es opcional: también
-        podés seguir usando el link de cada sala.
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <p className="mb-6 max-w-[760px] shrink-0 text-sm text-ink/60">
+        Elegí desde acá qué sala sale en el stream. Pegás <b>un solo link por salida</b> en OBS o
+        vMix y cambiás de sala con un clic, sin tocar el programa de transmisión. Es opcional:
+        también podés seguir usando el link de cada sala.
       </p>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="mb-6 flex shrink-0 flex-wrap items-center gap-2">
+        <span className="mr-1 font-mono text-[10px] tracking-widest text-ink/40 uppercase">
+          Salidas
+        </span>
         {salidas.map((salida) => (
           <button
             key={salida.numero}
             type="button"
             aria-pressed={salida.numero === actual?.numero}
             onClick={() => setElegida(salida.numero)}
-            className={`px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase ${salida.numero === actual?.numero ? "border-[3px] border-[#b8241f] bg-naranja" : "border-[1.5px] border-ink/30 hover:border-ink"}`}
+            className={`border-[1.5px] px-3 py-2 font-mono text-[11px] font-bold tracking-widest uppercase ${salida.numero === actual?.numero ? "border-ink bg-ink text-canvas" : "border-[#443d30] text-ink/60 hover:border-ink"}`}
           >
-            {salida.nombre}
+            Salida {salida.numero} · {salida.nombre}
           </button>
         ))}
-        <Boton variante="secundario" onClick={() => setCreando(true)}>
+        <button
+          type="button"
+          onClick={() => setCreando(true)}
+          className="border-[1.5px] border-dashed border-[#443d30]/60 px-3 py-2 font-mono text-[11px] font-bold tracking-widest text-ink/50 uppercase transition-colors hover:border-ink hover:text-ink"
+        >
           + Nueva salida
-        </Boton>
+        </button>
       </div>
 
       {creando && (
@@ -70,18 +80,19 @@ export function PanelDeProduccion() {
         />
       )}
 
-      <RegistroDeAire
-        version={salidas
-          .map((salida) => `${String(salida.numero)}:${salida.salaAlAire ?? "-"}`)
-          .join(",")}
-        nombresDeSalidas={new Map(salidas.map((salida) => [salida.numero, salida.nombre]))}
-      />
-
       {actual ? (
         <Salida
           key={actual.numero}
           salida={actual}
           salas={salas}
+          registro={
+            <RegistroDeAire
+              version={salidas
+                .map((salida) => `${String(salida.numero)}:${salida.salaAlAire ?? "-"}`)
+                .join(",")}
+              nombresDeSalidas={new Map(salidas.map((salida) => [salida.numero, salida.nombre]))}
+            />
+          }
           alActualizar={(datos) => produccion.actualizar(actual.numero, datos)}
           alEliminar={async () => {
             const motivo = await produccion.eliminar(actual.numero);
@@ -151,11 +162,13 @@ function NuevaSalida({
 function Salida({
   salida,
   salas,
+  registro,
   alActualizar,
   alEliminar,
 }: {
   salida: SalidaDeProduccion;
   salas: readonly Sala[];
+  registro: ReactNode;
   alActualizar: (datos: {
     nombre: string;
     salaAlAire: string | null;
@@ -190,58 +203,81 @@ function Salida({
   }, [salas, salida]);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-      <div className="flex flex-col gap-8">
-        <section>
-          <h2 className="mb-3 font-mono text-[11px] font-bold tracking-widest text-ink/70 uppercase">
+    <div className="grid grid-cols-1 gap-6 pb-10 xl:grid-cols-[1fr_520px]">
+      <div>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <span className="font-mono text-[11px] tracking-widest text-ink/50 uppercase">
             Salas · tocá una para ponerla al aire (o teclas 1–9)
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              aria-pressed={salida.salaAlAire === null}
-              onClick={() => void ponerAlAire(null)}
-              className={`px-4 py-3 font-mono text-xs font-bold tracking-widest uppercase ${salida.salaAlAire === null ? "border-[3px] border-[#b8241f] bg-naranja" : "border-[1.5px] border-ink/30 hover:border-ink"}`}
-            >
-              0 · Sin subtítulos
-            </button>
-            {salas.map((sala, indice) => (
+          </span>
+          <button
+            type="button"
+            aria-pressed={salida.salaAlAire === null}
+            onClick={() => void ponerAlAire(null)}
+            className="font-mono text-[11px] font-bold tracking-widest text-ink/50 uppercase hover:text-[#b8241f]"
+          >
+            Sin subtítulos
+          </button>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {salas.map((sala, indice) => {
+            const alAireAhora = salida.salaAlAire === sala.id;
+            return (
               <button
                 key={sala.id}
                 type="button"
-                aria-pressed={salida.salaAlAire === sala.id}
+                aria-pressed={alAireAhora}
                 onClick={() => void ponerAlAire(sala.id)}
-                className={`px-4 py-3 font-mono text-xs font-bold tracking-widest uppercase ${salida.salaAlAire === sala.id ? "border-[3px] border-[#b8241f] bg-naranja" : "border-[1.5px] border-ink/30 hover:border-ink"}`}
+                className={`border-[1.5px] p-4 text-left transition-colors ${alAireAhora ? "border-[#b8241f] bg-[#b8241f]/[0.06]" : "border-[#443d30] bg-canvas hover:border-ink"}`}
               >
-                {indice < 9 ? `${String(indice + 1)} · ` : ""}
-                {sala.nombre}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs font-bold">
+                    {indice < 9 ? `${String(indice + 1)} · ` : ""}
+                    {sala.nombre}
+                  </span>
+                  {alAireAhora && (
+                    <span className="bg-[#b8241f] px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest text-canvas uppercase">
+                      Al aire
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 text-xs leading-snug text-ink/60">
+                  {describirIdiomas(sala.idiomaOriginal, sala.idiomasDestino)}
+                </p>
               </button>
-            ))}
-          </div>
-          {salas.length === 0 && (
-            <p className="mt-3 font-mono text-xs text-ink/60">
-              Todavía no hay salas: creá una en la pestaña Salas.
-            </p>
-          )}
-          {error !== null && <Aviso tipo="error">{error}</Aviso>}
-        </section>
-
-        <section>
-          <h2 className="mb-2 font-mono text-[11px] font-bold tracking-widest text-ink/70 uppercase">
-            Link de esta salida (se pega una sola vez)
-          </h2>
-          <CajaCopiable valor={enlace} />
-          <p className="mt-3 font-mono text-[11px] leading-relaxed text-ink/60">
-            vMix: Add Input → Web Browser → pegá el link → 1920 × 1080 → como Overlay. OBS: Fuentes
-            → + → Navegador → pegá el link → 1920 × 1080. El fondo es transparente; los cambios de
-            sala y de estilo se ven solos, sin tocar nada ahí.
+            );
+          })}
+        </div>
+        {salas.length === 0 && (
+          <p className="mt-3 text-xs text-ink/50">
+            Todavía no hay salas: creá las tuyas en la pestaña Salas.
           </p>
-        </section>
+        )}
+        {error !== null && (
+          <div className="mt-3">
+            <Aviso tipo="error">{error}</Aviso>
+          </div>
+        )}
+      </div>
 
-        <section className="flex flex-col gap-4">
-          <h2 className="font-mono text-[11px] font-bold tracking-widest text-ink/70 uppercase">
+      <div className="flex flex-col gap-4">
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <span className="font-mono text-[11px] tracking-widest text-ink/50 uppercase">
+              Al aire en Salida {salida.numero}
+            </span>
+            <span
+              className={`px-2.5 py-1 font-mono text-[10px] font-bold tracking-widest uppercase ${alAire ? "bg-[#b8241f] text-canvas" : "bg-ink/10 text-ink/50"}`}
+            >
+              {alAire ? alAire.nombre : "Sin subtítulos"}
+            </span>
+          </div>
+          <VistaPreviaDeEstilo estilo={estilo} idiomaOriginal={alAire?.idiomaOriginal ?? "es"} />
+        </div>
+
+        <div className="flex flex-col gap-3 border-[1.5px] border-[#443d30] bg-canvas p-4">
+          <span className="font-mono text-[10px] tracking-widest text-ink/40 uppercase">
             Estilo de esta salida
-          </h2>
+          </span>
           <EditorDeEstilo
             estilo={estilo}
             idiomas={
@@ -269,7 +305,23 @@ function Salida({
             </Boton>
             {guardado && <span className="font-mono text-xs text-ink/70">Guardado.</span>}
           </div>
-        </section>
+        </div>
+
+        <div className="border-[1.5px] border-[#443d30] bg-canvas p-4">
+          <span className="font-mono text-[10px] tracking-widest text-ink/40 uppercase">
+            Link de esta salida (se pega una sola vez)
+          </span>
+          <div className="mt-2">
+            <CajaCopiable valor={enlace} />
+          </div>
+          <p className="mt-2 text-xs leading-snug text-ink/60">
+            <b>vMix:</b> Add Input → Web Browser → pegá el link → 1920 × 1080 → como Overlay.{" "}
+            <b>OBS:</b> Fuentes → + → Navegador → pegá el link → 1920 × 1080. El fondo es
+            transparente; los cambios de sala y de estilo se ven solos, sin tocar nada ahí.
+          </p>
+        </div>
+
+        {registro}
 
         <button
           type="button"
@@ -285,16 +337,6 @@ function Salida({
           Eliminar esta salida
         </button>
       </div>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-[11px] font-bold tracking-widest text-ink/70 uppercase">
-          Vista previa del programa · al aire en {alAire ? alAire.nombre : "ninguna sala"}
-        </h2>
-        <VistaPreviaDeEstilo estilo={estilo} idiomaOriginal={alAire?.idiomaOriginal ?? "es"} />
-        <p className="font-mono text-[11px] text-ink/60">
-          La vista previa usa frases de muestra: el estilo es el que ves acá.
-        </p>
-      </section>
     </div>
   );
 }

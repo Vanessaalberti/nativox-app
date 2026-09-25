@@ -44,3 +44,9 @@ export function nombreDelDia(iso: string): string {
 export function formatearMinutos(minutos: number): string {
   return `${String(Math.floor(minutos / 60)).padStart(2, "0")}:${String(minutos % 60).padStart(2, "0")}`;
 }
+
+// Si la charla ya terminó, según el reloj de quien mira (la agenda es en hora local, sin zona).
+export function haTerminado(fecha: string, finMin: number, ahora = new Date()): boolean {
+  const [anio = 0, mes = 1, dia = 1] = fecha.split("-").map(Number);
+  return new Date(anio, mes - 1, dia, 0, finMin).getTime() <= ahora.getTime();
+}
