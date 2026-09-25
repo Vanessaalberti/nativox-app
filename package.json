@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "construir": "tsc -b && vite build",
+    "build": "npm run construir",
     "probar": "vitest run",
     "revisar": "npm run revisar:formato && npm run revisar:lint && npm run revisar:tipos && npm run probar && npm run revisar:muerto && npm run revisar:duplicado",
     "revisar:formato": "prettier --check .",
@@ -16,7 +17,8 @@
     "revisar:duplicado": "jscpd",
     "formatear": "prettier --write .",
     "tipos": "wrangler types servidor/plataforma/env.d.ts",
-    "deploy": "npm run construir && wrangler d1 migrations apply DB --remote && wrangler deploy"
+    "deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy",
+    "publicar": "npm run construir && npm run deploy"
   },
   "dependencies": {
     "@browsermt/bergamot-translator": "0.4.9",

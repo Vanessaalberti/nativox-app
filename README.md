@@ -44,7 +44,9 @@ npm run dev
 | `npm run construir` | Construcción de producción en `dist/` |
 | `npm run formatear` | Aplica el formato de Prettier |
 | `npm run tipos` | Regenera `servidor/plataforma/env.d.ts` con `wrangler types` (después de tocar `wrangler.jsonc`) |
-| `npm run deploy` | Construye, aplica las migraciones de D1 y despliega en tu cuenta de Cloudflare |
+| `npm run build` | Lo mismo que `construir`, con el nombre que Cloudflare detecta solo en el botón de despliegue (comando de compilación) |
+| `npm run deploy` | Aplica las migraciones de D1 y despliega (comando de despliegue del botón; necesita haber construido antes) |
+| `npm run publicar` | Para hacerlo a mano desde tu computadora: construye y después corre `deploy` |
 
 Reglas y convenciones: `documentacion/convenciones.md` y `documentacion/guardas-ia.md`.
 
