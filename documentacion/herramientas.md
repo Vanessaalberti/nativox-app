@@ -17,7 +17,7 @@ Como las carpetas están en español, la configuración apunta a ellas:
 | Para | Paquete |
 | --- | --- |
 | Interfaz | `react`, `react-dom`, `react-router` |
-| Estilos | `tailwindcss` |
+| Estilos | `tailwindcss`, `@tailwindcss/vite` (su plugin oficial para Vite) |
 | Datos del servidor | `@tanstack/react-query` |
 | Validación | `valibot` (liviano, sirve en el navegador y en el servidor) |
 | Transcripción local | `@huggingface/transformers` |

@@ -1,5 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { RouterProvider } from "react-router/dom";
+import "@navegador/interfaz/sistema-diseno/estilos.css";
+import { enrutador } from "./enrutador";
 
 const raiz = document.getElementById("raiz");
 if (!raiz) {
@@ -8,9 +11,6 @@ if (!raiz) {
 
 createRoot(raiz).render(
   <StrictMode>
-    <main>
-      <h1>Nativox</h1>
-      <p>Transcripción y traducción en vivo para conferencias.</p>
-    </main>
+    <RouterProvider router={enrutador} />
   </StrictMode>,
 );

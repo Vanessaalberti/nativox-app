@@ -1,27 +1,32 @@
 # flujo-subtitulos ♻
 
-**Qué hace:** Orquesta una sesión: fragmento → transcripción → corrección con el glosario → corrección del límite con la línea anterior → traducción a **los idiomas de la sala** → líneas en orden. Garantiza **una línea = un segmento** (una corrección actualiza esa línea, nunca agrega otra) y que cada línea se muestra cuando la anterior ya se mostró.
+**Qué hace:** Orquesta una sesión: bloque de audio → cortador → transcripción → borrado de lo repetido → corrección con el glosario → corrección del límite con la línea anterior → traducción a **los idiomas de la sala** → líneas. Garantiza **una línea = un segmento** (provisoria → confirmada → traducida, siempre con el mismo `id`; una corrección actualiza esa línea, nunca agrega otra). Mientras se habla, hace pasadas provisorias (texto en vivo) cuando la placa está libre. Ajusta el mínimo del cortador a lo que tarda cada pasada (promedio de las últimas 5 × 1,2 + 0,3 s, entre 1,5 y 4 s). Mide cada línea.
 
-**Qué NO hace:** Capturar audio ni conectarse a la red: recibe el transcriptor, los traductores y el cortador por parámetro y emite eventos.
+**Qué NO hace:** Capturar audio ni conectarse a la red: recibe el cortador, el transcriptor y el traductor por parámetro (`PiezasDelFlujo`) y avisa por callbacks.
 
 ## API pública (solo desde `index.ts`)
 
-- `crearFlujoSubtitulos({ cortador, transcriptor, traductores, glosario, idiomas })`
-- eventos: `linea:nueva`, `linea:actualizada`, `linea:traducida`, `estadisticas`
+- `crearFlujoSubtitulos(opciones) → { agregarAudio(bloque), terminar() }`
+  - Piezas: `cortador`, `transcribir` (ya sin alucinaciones), `quitarRepetido`, `crearAcuerdo`, `traducir` (ya con glosario, contexto y cola).
+  - Opciones: `idSesion`, `idiomaOriginal`, `idiomasDestino`, `glosario`, `pasadaProvisoriaCadaMs` (0 = solo frases enteras), `ahoraMs`.
+  - Avisos: `alCambiarLinea(linea)` (la línea completa, con `compartido/contratos`), `alMedir({ numero, transcripcionMs, traduccionMs, retrasoConfirmacionSegundos, retrasoTraduccionSegundos })`, `alFallar(motivo)`.
+- `corregirLimite(anterior, nuevo, glosario)` — "…como Workers Day" | "de AI de Cloudflare" → "…como Workers AI" | "de Cloudflare".
+
+Orden: en local cada fragmento se procesa después del anterior (una sola placa). Primero se traduce la línea nueva y después la corrección de la anterior. El reordenamiento de respuestas desordenadas de la nube llega con el motor de Workers AI (paso 11).
 
 ## Dependencias
 
-- **Puede importar:** `compartido/glosario`, `compartido/contratos` (forma de una línea). Recibe los demás módulos por parámetro.
-- **Lo usan:** `sesion-en-vivo`, `pantalla-escenario` (lee las líneas), landing ("Probar").
+- **Puede importar:** `compartido/glosario`, `compartido/contratos`. Recibe los demás módulos por parámetro.
+- **Lo usan:** `sesion-en-vivo`; landing ("Probar").
 
-## Archivos previstos
+## Archivos
 
-- `flujo.ts` · `orden.ts` · `correccion-de-limite.ts` · `lineas.ts` · `index.ts`
+- `tipos.ts` · `flujo.ts` · `correccion-de-limite.ts` · `minimo-adaptativo.ts` · `index.ts`
 
 ## Pruebas
 
-Respuestas desordenadas de la nube salen en orden; "Workers Day" | "de AI" se une en la línea anterior y se vuelve a traducir; nunca dos líneas para el mismo segmento.
+Varios idiomas en la misma línea; orden; "Workers Day" | "de AI" se une en la línea anterior y se vuelve a traducir después de la nueva; nunca dos líneas para el mismo segmento; glosario antes de traducir; línea vacía sin traducir; falla de transcripción que no corta la sesión; mediciones.
 
 ## Referencia
 
-Documento de decisiones → "Traducción en vivo" (orden, una línea = un segmento, corrección de la línea anterior).
+Documento de decisiones → "Traducción en vivo" (orden, una línea = un segmento, corrección de la línea anterior) y "Cómo se corta y se manda el audio" (mínimo adaptativo).

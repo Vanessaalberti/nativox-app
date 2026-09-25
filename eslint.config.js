@@ -96,6 +96,16 @@ export default defineConfig(
       "max-lines-per-function": ["warn", { max: 50, skipBlankLines: true, skipComments: true }],
       "max-params": ["warn", 4],
       complexity: ["warn", 10],
+      // `onClick={() => setAbierto(true)}` es la forma habitual en React: no confunde a nadie.
+      "@typescript-eslint/no-confusing-void-expression": ["error", { ignoreArrowShorthand: true }],
+    },
+  },
+
+  {
+    // Un componente con su JSX ocupa más líneas que una función: el aviso salta más tarde.
+    files: ["**/*.tsx"],
+    rules: {
+      "max-lines-per-function": ["warn", { max: 120, skipBlankLines: true, skipComments: true }],
     },
   },
 
@@ -121,6 +131,7 @@ export default defineConfig(
 
   {
     files: ["**/*.test.{ts,tsx}"],
-    rules: { "max-lines-per-function": "off" },
+    // Los comparadores de Vitest (`expect.any`, `expect.objectContaining`) están tipados como any.
+    rules: { "max-lines-per-function": "off", "@typescript-eslint/no-unsafe-assignment": "off" },
   },
 );

@@ -1,7 +1,7 @@
 # sistema-diseno ♻
 
-Tokens (color, tipografía, espaciado), preset de Tailwind y componentes base. Fuente: documento de decisiones → "Sistema de diseño — Rumbo Vox".
+Tokens del sistema de diseño "Rumbo Vox" en `estilos.css` (Tailwind 4 con `@theme`): colores (`canvas`, `ink`, `naranja`, `verde`, `menu`, `escenario`, `linea`), tipografías (`font-display` Bebas Neue, `font-sans` Space Grotesk, `font-mono` Space Mono, cargadas desde Google Fonts en `index.html`), radio mínimo, la animación `titilar` y la utilidad `grilla-fondo`. Fuente: documento de decisiones → "Sistema de diseño — Rumbo Vox".
 
-**Archivos previstos:** `tokens/` · `preset-tailwind.ts` · `componentes/` (un archivo por componente, con sus estados) · `index.ts`.
+**Previstos:** `componentes/` (Boton, Etiqueta, EstadoPill, Modal, Campo…, un archivo por componente) · `index.ts`.
 
-**Reglas:** sin gradientes, radio mínimo, bordes cálidos; contraste accesible; cada componente con foco visible.
+**Reglas:** sin gradientes, radio mínimo, bordes cálidos; el naranja siempre marca algo activo; contraste accesible; foco visible en todo.

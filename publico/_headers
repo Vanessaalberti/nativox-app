@@ -1,6 +1,16 @@
 # Aislamiento entre orígenes (habilita SharedArrayBuffer, que ONNX Runtime usa para correr Whisper
-# con varios hilos) solo donde corren los modelos. No se aplica a las páginas para vMix/OBS, la
-# audiencia ni el componente embebible, para no bloquear recursos de otros orígenes.
+# con varios hilos) solo en las páginas que corren modelos. No se aplica a las páginas para
+# vMix/OBS, la audiencia ni el componente embebible, para no bloquear recursos de otros orígenes.
 /sala/:id/control
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+# Los scripts y workers también: un worker sin estos encabezados no arranca desde una página
+# aislada. En un script no cambian nada para las demás páginas.
+/assets/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+/bergamot/*
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: credentialless

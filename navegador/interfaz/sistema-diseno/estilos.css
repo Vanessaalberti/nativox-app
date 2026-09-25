@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Tokens del sistema de diseño Rumbo Vox (documento de decisiones → "Sistema de diseño"). Cada
+   color tiene un rol fijo: el naranja siempre marca algo activo o interactivo. Sin gradientes. */
+@theme {
+  --color-canvas: #f7f4ed;
+  --color-ink: #12241d;
+  --color-naranja: #f5860d;
+  --color-verde: #48c0a0;
+  --color-menu: #172c25;
+  --color-escenario: #0f0f0f;
+  --color-linea: rgb(18 36 29 / 0.08);
+  --color-linea-fuerte: rgb(18 36 29 / 0.16);
+
+  --font-display: "Bebas Neue", sans-serif;
+  --font-sans: "Space Grotesk", sans-serif;
+  --font-mono: "Space Mono", monospace;
+
+  --radius-sm: 2px;
+
+  --animate-titilar: titilar 1.4s ease-in-out infinite;
+  @keyframes titilar {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.25;
+    }
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-naranja);
+    outline-offset: 2px;
+  }
+}
+
+/* Grilla de construcción de fondo: 140 × 140 px, casi invisible. */
+@utility grilla-fondo {
+  background-size: 140px 140px;
+  background-image:
+    linear-gradient(to right, var(--color-linea) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-linea) 1px, transparent 1px);
+}
