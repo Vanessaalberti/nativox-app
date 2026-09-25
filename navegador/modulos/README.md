@@ -11,7 +11,8 @@
 | `traduccion` | Traductores con una misma interfaz, contexto, control de confianza y colas |
 | `flujo-subtitulos` | Orquesta todo: orden, una línea por segmento, correcciones y traducción en vivo |
 | `modelos-compartidos` | Carga los modelos una vez y los comparte entre salas (SharedWorker) |
-| `evaluar-equipo` | "Evaluar esta computadora": detecta la placa, mide una pasada y recomienda versión de Whisper, nivel de velocidad y si conviene la nube |
+| `evaluar-equipo` | "Evaluar esta computadora": detecta la placa, mide su potencia y recomienda versión de Whisper, nivel de velocidad y si conviene la nube |
+| `cliente-instancia` | Las llamadas del navegador a `/api` de la propia instancia: estado, cuenta, ingreso, recuperación y evento |
 | `autorreparacion` | Detecta fallas y repara en tres pasos |
 | `cliente-sala` | Cliente WebSocket de la sala: publicar y recibir subtítulos, señales y comandos |
 

@@ -17,6 +17,7 @@ Si la pasada estimada pasa de 6 s, ni cortando por frases llega en vivo: recomie
 
 ## API pública (solo desde `index.ts`)
 
+- `evaluarEquipo(alAvanzar): Promise<Resultado<Evaluacion>>` — todo junto: detecta, mide, estima y recomienda; avisa en qué etapa va. Es lo que usan la landing y el asistente de crear evento.
 - `detectarEquipo(): Promise<Equipo>` — `{ webgpu, f16, placa, memoriaGb, nucleos, bufferMaximoMb }`. Sin WebGPU no falla: lo dice.
 - `medirRendimiento(): Promise<Resultado<{ gflops }>>` — el benchmark. Corta a los 8 s si la placa no contesta (nunca deja la pestaña esperando).
 - `estimarPasada(gflops): number` — milisegundos estimados de una pasada de Whisper.
@@ -26,7 +27,7 @@ Si la pasada estimada pasa de 6 s, ni cortando por frases llega en vivo: recomie
 ## Dependencias
 
 - **Puede importar:** `compartido/contratos`.
-- **Lo usan:** landing ("Probar"); después `crear-evento` y `sesion-en-vivo`.
+- **Lo usan:** landing ("Probar"), `crear-evento` (paso 3) y, después, `sesion-en-vivo`.
 
 ## Archivos
 

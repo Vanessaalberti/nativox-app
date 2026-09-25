@@ -1,0 +1,1 @@
+export { MarcoDeEntrada } from "./MarcoDeEntrada";

@@ -1,3 +1,4 @@
+export { evaluarEquipo, type AvanceEvaluacion, type Evaluacion } from "./evaluar";
 export { detectarEquipo, type Equipo } from "./placa";
 export { medirRendimiento } from "./rendimiento";
 export {
