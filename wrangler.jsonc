@@ -15,6 +15,9 @@
     "enabled": true,
   },
   "upload_source_maps": true,
+  // La dirección pública (<nombre>.<subdominio>.workers.dev) queda activada en cada deploy. Si se la
+  // apaga desde el panel pero acá no, el próximo deploy la vuelve a encender.
+  "workers_dev": true,
   // Sin database_id: el deploy crea la base en la cuenta de cada organizador.
   "d1_databases": [
     {
