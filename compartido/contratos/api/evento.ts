@@ -78,7 +78,9 @@ export const esquemaEstadoDeLaInstancia = v.object({
   hayEvento: v.boolean(),
   // Quién es la persona que pregunta (null si no hay sesión válida).
   sesion: v.nullable(v.object({ rol: v.picklist(["administrador", "operador"]) })),
-  evento: v.nullable(v.object({ nombre: v.string(), logo: v.nullable(v.string()) })),
+  evento: v.nullable(
+    v.object({ nombre: v.string(), logo: v.nullable(v.string()), tipo: esquemaTipoDeEvento }),
+  ),
 });
 
 export type EstadoDeLaInstancia = v.InferOutput<typeof esquemaEstadoDeLaInstancia>;

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { Audiencia, Sala } from "@compartido/contratos";
-import { responderAudiencia } from "./audiencia";
+import {
+  renovarEnlaceDeAudiencia,
+  responderAudiencia,
+  responderEnlaceDeAudiencia,
+} from "./audiencia";
 import { pedido, usarCuentaConSalas } from "./contexto-de-prueba";
 import { crearCharla } from "./agenda";
 import { abrirSala } from "./tiempo-real";
@@ -127,8 +131,13 @@ describe("audiencia", () => {
     );
     entorno.contexto.tiempoReal.enVivo.add(auditorio());
 
+    const enlace = await responderEnlaceDeAudiencia(
+      pedido("/api/audiencia/enlace", undefined, entorno.cookie, "GET"),
+      entorno.contexto,
+    );
+    const { token } = (await enlace.json()) as { token: string };
     const respuesta = await responderAudiencia(
-      pedido("/api/audiencia", undefined, undefined, "GET"),
+      pedido(`/api/audiencia?t=${token}`, undefined, undefined, "GET"),
       entorno.contexto,
     );
     const cuerpo = (await respuesta.json()) as Audiencia;
@@ -139,5 +148,37 @@ describe("audiencia", () => {
     ]);
     expect(cuerpo.salas[0]?.charlas[0]).toMatchObject({ titulo: "Keynote", inicioMin: 600 });
     expect(JSON.stringify(cuerpo)).not.toContain("secreto interno");
+  });
+
+  it("sin el link no se ve nada, y uno nuevo deja sin efecto el anterior", async () => {
+    const pedirEnlace = async (metodo: "GET" | "POST") => {
+      const funcion = metodo === "GET" ? responderEnlaceDeAudiencia : renovarEnlaceDeAudiencia;
+      const respuesta = await funcion(
+        pedido("/api/audiencia/enlace", undefined, entorno.cookie, metodo),
+        entorno.contexto,
+      );
+      return ((await respuesta.json()) as { token: string }).token;
+    };
+    const ver = (consulta: string) =>
+      responderAudiencia(
+        pedido(`/api/audiencia${consulta}`, undefined, undefined, "GET"),
+        entorno.contexto,
+      );
+    const viejo = await pedirEnlace("GET");
+    const nuevo = await pedirEnlace("POST");
+
+    const estados = [
+      (await ver("")).status,
+      (await ver("?t=inventado")).status,
+      (await ver(`?t=${viejo}`)).status,
+      (await ver(`?t=${nuevo}`)).status,
+    ];
+    const sinSesion = await responderEnlaceDeAudiencia(
+      pedido("/api/audiencia/enlace", undefined, undefined, "GET"),
+      entorno.contexto,
+    );
+
+    expect([...estados, sinSesion.status]).toEqual([404, 404, 404, 200, 401]);
+    expect(nuevo).not.toBe(viejo);
   });
 });

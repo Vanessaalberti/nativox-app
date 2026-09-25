@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import type { EventoCompleto } from "@compartido/contratos";
-import { leerEvento, salir } from "@navegador/modulos/cliente-instancia";
+import { leerEnlaceDeAudiencia, leerEvento, salir } from "@navegador/modulos/cliente-instancia";
 import { MarcoDelPanel } from "@navegador/interfaz/marco-de-entrada";
-import { PanelEnCarga } from "./EncabezadoDelPanel";
+import { PanelEnCarga } from "./PanelEnCarga";
 
 type Carga =
   | { fase: "cargando" }
@@ -47,6 +47,7 @@ export function PanelDelAdministrador({
 }) {
   const navegar = useNavigate();
   const [carga, setCarga] = useState<Carga>({ fase: "cargando" });
+  const [enlaceDeAudiencia, setEnlaceDeAudiencia] = useState<string | null>(null);
   const [activa, setActiva] = useState(inicial);
   const [abiertas, setAbiertas] = useState<PestanaDelPanel[]>([inicial]);
 
@@ -60,11 +61,18 @@ export function PanelDelAdministrador({
     });
   }, []);
 
+  const conEvento = carga.fase === "lista";
+  const solo = conEvento && carga.evento.tipo === "todo-en-uno";
+  useEffect(() => {
+    if (!solo) return;
+    void leerEnlaceDeAudiencia().then((respuesta) => {
+      if (respuesta.ok) setEnlaceDeAudiencia(`/a/${respuesta.valor}`);
+    });
+  }, [solo]);
+
   if (carga.fase !== "lista") return <PanelEnCarga carga={carga} />;
 
   const { evento, email } = carga;
-  // Con un solo rol, la misma persona administra y opera: no hay staff ni "administrador".
-  const solo = evento.tipo === "todo-en-uno";
   const cambiar = (pestana: PestanaDelPanel) => {
     setActiva(pestana);
     setAbiertas((anteriores) =>
@@ -78,7 +86,7 @@ export function PanelDelAdministrador({
       acciones={
         solo ? (
           <a
-            href="/audiencia"
+            href={enlaceDeAudiencia ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-[11px] tracking-widest text-ink/50 uppercase transition-colors hover:text-ink"

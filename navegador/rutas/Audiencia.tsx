@@ -8,8 +8,11 @@ import {
   PaginaTransparente,
 } from "@navegador/funcionalidades/subtitulos-stream";
 
-// /audiencia y /sala/:id/pantalla — públicas: cualquiera mira, sin cuenta.
-export const Audiencia = () => <ListaDeSalasPublicas />;
+// /a/:token y /sala/:id/pantalla — sin cuenta: el link lo genera el administrador y lo comparte.
+export function Audiencia() {
+  const { token = "" } = useParams();
+  return <ListaDeSalasPublicas token={token} />;
+}
 
 export function PantallaDeSala() {
   const { id = "" } = useParams();

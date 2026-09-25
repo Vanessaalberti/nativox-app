@@ -34,7 +34,7 @@ export async function responderEstado(pedido: Request, contexto: ContextoApi): P
     hayAdministrador: administrador !== null,
     hayEvento: evento !== null,
     sesion: sesion ? { rol: sesion.rol } : null,
-    evento: evento ? { nombre: evento.nombre, logo: evento.logo } : null,
+    evento: evento ? { nombre: evento.nombre, logo: evento.logo, tipo: evento.tipo } : null,
   };
   return Response.json(estado);
 }

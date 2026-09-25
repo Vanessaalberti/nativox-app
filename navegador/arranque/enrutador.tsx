@@ -32,7 +32,7 @@ export const enrutador = createBrowserRouter([
   { path: "/panel", element: <Panel /> },
   { path: "/panel/:pestana", element: <Panel /> },
   { path: "/operador", element: <PanelOperador /> },
-  { path: "/audiencia", element: <Audiencia /> },
+  { path: "/a/:token", element: <Audiencia /> },
   { path: "/accion/:token", element: <AccionDeAviso /> },
   { path: "/sala/:id/pantalla", element: <PantallaDeSala /> },
   { path: "/sala/:id/transmision", element: <TransmisionDeSala /> },

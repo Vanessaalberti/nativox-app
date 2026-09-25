@@ -30,7 +30,11 @@ import {
   nuevoCodigo,
 } from "@servidor/api/operadores";
 import { confirmarAccion, verAccion } from "@servidor/api/acciones";
-import { responderAudiencia } from "@servidor/api/audiencia";
+import {
+  renovarEnlaceDeAudiencia,
+  responderAudiencia,
+  responderEnlaceDeAudiencia,
+} from "@servidor/api/audiencia";
 import {
   actualizarSalida,
   borrarSalida,
@@ -77,6 +81,10 @@ const TOKEN = "([0-9a-f]{64})";
 const RUTAS: Ruta[] = [
   { patron: /^\/api\/estado$/, metodos: { GET: responderEstado } },
   { patron: /^\/api\/audiencia$/, metodos: { GET: responderAudiencia } },
+  {
+    patron: /^\/api\/audiencia\/enlace$/,
+    metodos: { GET: responderEnlaceDeAudiencia, POST: renovarEnlaceDeAudiencia },
+  },
   { patron: /^\/api\/acceso\/cuenta$/, metodos: { POST: crearCuenta } },
   { patron: /^\/api\/acceso\/ingresar$/, metodos: { POST: ingresar } },
   { patron: /^\/api\/acceso\/recuperar$/, metodos: { POST: recuperar } },

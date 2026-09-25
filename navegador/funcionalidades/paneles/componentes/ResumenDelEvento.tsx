@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { EventoCompleto, Operador, Sala, SalaPublica } from "@compartido/contratos";
 import { leerAudiencia, listarOperadores, listarSalas } from "@navegador/modulos/cliente-instancia";
 import { Link } from "react-router";
+import { EnlaceDeAudiencia } from "./EnlaceDeAudiencia";
 import { useAlMostrarse } from "@navegador/interfaz/sistema-diseno";
 
 const CADA_CUANTO_SE_ACTUALIZA_MS = 10_000;
@@ -86,6 +87,8 @@ export function ResumenDelEvento({
         <Tarjeta nombre="Salas en vivo" valor={datos?.enVivo.size ?? 0} acento="text-verde" />
         {conEquipo && <Tarjeta nombre="Sin asignar" valor={sinAsignar} acento="text-naranja" />}
       </div>
+
+      <EnlaceDeAudiencia />
 
       {datos !== null && salas.length === 0 && (
         <div className="flex min-h-[240px] flex-1 flex-col items-center justify-center border-[1.5px] border-dashed border-[#443d30]/60 px-8 py-16 text-center">

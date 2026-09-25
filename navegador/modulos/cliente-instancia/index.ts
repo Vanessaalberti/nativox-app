@@ -43,6 +43,7 @@ export {
   crearSalida,
   guardarEstiloDeSala,
   leerAudiencia,
+  leerEnlaceDeAudiencia,
   leerTransmisionDeSala,
   leerTransmisionDeSalida,
   listarSalidas,

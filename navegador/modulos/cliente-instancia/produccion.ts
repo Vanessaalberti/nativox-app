@@ -1,5 +1,6 @@
 import {
   esquemaAudiencia,
+  esquemaEnlaceDeAudiencia,
   esquemaListaDeSalidas,
   esquemaRespuestaSimple,
   esquemaTransmision,
@@ -13,9 +14,19 @@ import {
 } from "@compartido/contratos";
 import { llamar } from "./llamar";
 
-// Lo público: no necesita sesión (lo cargan la audiencia y las páginas de vMix/OBS).
-export function leerAudiencia(): Promise<Resultado<Audiencia>> {
-  return llamar("/api/audiencia", esquemaAudiencia);
+// Lo que ve la audiencia: no necesita sesión, pero sí el link que genera el administrador (el
+// administrador con su sesión lo ve sin link).
+export function leerAudiencia(token: string | null = null): Promise<Resultado<Audiencia>> {
+  const consulta = token === null ? "" : `?t=${encodeURIComponent(token)}`;
+  return llamar(`/api/audiencia${consulta}`, esquemaAudiencia);
+}
+
+// El link para la audiencia: el vigente, o uno nuevo (el anterior deja de servir). Devuelven el token.
+export async function leerEnlaceDeAudiencia(renovar = false): Promise<Resultado<string>> {
+  const respuesta = await llamar("/api/audiencia/enlace", esquemaEnlaceDeAudiencia, {
+    metodo: renovar ? "POST" : "GET",
+  });
+  return respuesta.ok ? { ok: true, valor: respuesta.valor.token } : respuesta;
 }
 
 export function leerTransmisionDeSala(salaId: string): Promise<Resultado<Transmision>> {

@@ -24,6 +24,8 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
   const [lineas, setLineas] = useState<Linea[]>([]);
   const [mediciones, setMediciones] = useState<Medicion[]>([]);
   const [avisos, setAvisos] = useState<string[]>([]);
+  // El video de la fuente cuando es un link: se muestra en la pantalla de control.
+  const [video, setVideo] = useState<HTMLVideoElement | null>(null);
   const [variante, setVariante] = useState<VarianteWhisper | null>(null);
   const [idiomas, setIdiomas] = useState<{ original: Idioma; destino: readonly Idioma[] }>({
     original: "es",
@@ -57,6 +59,7 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
     if (!actual) return;
     sesion.current = null;
     actual.captura.detener();
+    setVideo(null);
     setEstado({ fase: "terminando" });
     await actual.flujo.terminar();
     setEstado({ fase: "inactiva" });
@@ -106,6 +109,7 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
         return;
       }
       sesion.current = armada.valor;
+      setVideo(armada.valor.captura.video ?? null);
       setEstado({ fase: "en-vivo" });
       // Si estaba reparando y volvió, se puede volver a reparar la próxima vez.
       if (esReintento) reintentos.current = 0;
@@ -149,6 +153,7 @@ export function useSesionEnVivo({ autorreparar = false }: { autorreparar?: boole
     mediciones,
     avisos,
     variante,
+    video,
     idiomas,
     nivelDeAudio,
     iniciar: (configuracion: ConfiguracionSesion) => iniciar(configuracion),

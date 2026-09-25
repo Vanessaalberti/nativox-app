@@ -63,6 +63,50 @@ export function PanelDeSalas({ conEquipo, visible }: { conEquipo: boolean; visib
         <ul className="grid flex-1 grid-cols-1 content-start gap-5 overflow-y-auto sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {salas.map((sala) => {
             const asignados = operadoresPorSala[sala.id] ?? 0;
+            // Con un solo rol quien administra también opera: la tarjeta trae lo que en el otro
+            // caso ve el operador (entrar en vivo, calendario, monitoreo).
+            if (!conEquipo) {
+              return (
+                <li
+                  key={sala.id}
+                  className="relative flex flex-col border-[1.5px] border-[#443d30] bg-canvas p-5"
+                >
+                  <span className="font-mono text-[10px] tracking-widest text-ink/40 uppercase">
+                    Sala
+                  </span>
+                  <h3 className="mt-1 mb-4 font-display text-2xl leading-none uppercase">
+                    {sala.nombre}
+                  </h3>
+                  <Link
+                    to={`/sala/${sala.id}/control`}
+                    className="mb-4 font-mono text-xs font-bold tracking-widest text-verde uppercase hover:underline"
+                  >
+                    Entrar en vivo →
+                  </Link>
+                  <div className="mt-auto flex items-center gap-4 border-t border-[#443d30]/15 pt-4">
+                    {[
+                      ["Calendario", `/sala/${sala.id}/calendario`],
+                      ["Monitoreo", `/sala/${sala.id}/monitoreo`],
+                    ].map(([nombre, ruta]) => (
+                      <Link
+                        key={nombre}
+                        to={ruta ?? ""}
+                        className="font-mono text-[10px] font-bold tracking-widest text-ink/50 uppercase transition-colors hover:text-ink"
+                      >
+                        {nombre}
+                      </Link>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setEditada(sala)}
+                      className="ml-auto font-mono text-[10px] font-bold tracking-widest text-ink/40 uppercase hover:text-ink"
+                    >
+                      Editar
+                    </button>
+                  </div>
+                </li>
+              );
+            }
             return (
               <li key={sala.id} className="relative">
                 <Link
@@ -76,11 +120,9 @@ export function PanelDeSalas({ conEquipo, visible }: { conEquipo: boolean; visib
                     {sala.nombre}
                   </h3>
                   <p className="text-xs text-ink/60">
-                    {conEquipo
-                      ? asignados === 0
-                        ? "Sin asignar"
-                        : `${plural(asignados, "operador", "operadores")} ${asignados === 1 ? "asignado" : "asignados"}`
-                      : plural(sala.charlas, "charla", "charlas")}
+                    {asignados === 0
+                      ? "Sin asignar"
+                      : `${plural(asignados, "operador", "operadores")} ${asignados === 1 ? "asignado" : "asignados"}`}
                   </p>
                 </Link>
                 <button

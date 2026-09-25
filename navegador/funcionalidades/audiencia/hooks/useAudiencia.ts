@@ -11,17 +11,17 @@ const CADA_CUANTO_SE_ACTUALIZA_MS = 15_000;
 
 // El evento, sus salas y sus charlas: lo que ve cualquiera. Se vuelve a pedir cada 15 segundos
 // para que el estado "en vivo" de las salas siga al día.
-export function useAudiencia() {
+export function useAudiencia(token: string | null) {
   const [carga, setCarga] = useState<CargaDeAudiencia>({ fase: "cargando" });
 
   const cargar = useCallback(async () => {
-    const respuesta = await leerAudiencia();
+    const respuesta = await leerAudiencia(token);
     setCarga((anterior) => {
       if (respuesta.ok) return { fase: "lista", audiencia: respuesta.valor };
       // Si ya se veía algo, un pedido que falla no lo borra.
       return anterior.fase === "lista" ? anterior : { fase: "error", motivo: respuesta.motivo };
     });
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     void cargar();

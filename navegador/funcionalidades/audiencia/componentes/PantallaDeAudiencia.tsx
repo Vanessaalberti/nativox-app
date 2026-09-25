@@ -24,8 +24,11 @@ const TEXTO_DE_CONEXION: Record<EstadoDeConexion, string> = {
 // subtítulos a medida que llegan, con el historial reciente para quien entra tarde. No corre ningún
 // modelo ni pide cuenta ni micrófono: cambiar de idioma es instantáneo.
 export function PantallaDeAudiencia({ salaId }: { salaId: string }) {
-  const { carga, recargar } = useAudiencia();
   const [parametros] = useSearchParams();
+  // El link de la audiencia viaja en la dirección: es lo que abre la lista y a donde se vuelve.
+  const token = parametros.get("t");
+  const volverA = token === null ? "/" : `/a/${token}`;
+  const { carga, recargar } = useAudiencia(token);
   const [idioma, setIdioma] = useState<Idioma | null>(null);
 
   if (carga.fase !== "lista") {
@@ -49,7 +52,7 @@ export function PantallaDeAudiencia({ salaId }: { salaId: string }) {
           Esa sala no existe.
         </p>
         <Link
-          to="/audiencia"
+          to={volverA}
           className="font-mono text-xs font-bold tracking-widest uppercase underline"
         >
           ← Volver a las salas
@@ -66,7 +69,7 @@ export function PantallaDeAudiencia({ salaId }: { salaId: string }) {
   return (
     <MarcoDeEntrada evento={audiencia.evento} ancho="ancho" centrado={false}>
       <Link
-        to="/audiencia"
+        to={volverA}
         className="mb-6 font-mono text-[11px] tracking-widest text-ink/50 uppercase hover:text-ink"
       >
         ← Volver a salas

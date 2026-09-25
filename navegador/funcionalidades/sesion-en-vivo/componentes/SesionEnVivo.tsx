@@ -6,6 +6,7 @@ import { BorrarModelos } from "./BorrarModelos";
 import { ControlSesion } from "./ControlSesion";
 import { Mediciones } from "./Mediciones";
 import { Transcripcion } from "./Transcripcion";
+import { VideoDeLaFuente } from "./VideoDeLaFuente";
 
 const TEXTO_DE_CONEXION: Record<EstadoDeConexion, string> = {
   conectando: "Conectando con la sala…",
@@ -120,6 +121,7 @@ export function SesionEnVivo({
         </section>
 
         <section className="flex flex-col gap-6">
+          {sesion.video && <VideoDeLaFuente video={sesion.video} />}
           <div className="border-[1.5px] border-ink/15 bg-canvas p-5">
             <h2 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-ink/55">
               Transcripción

@@ -23,10 +23,10 @@ function Estado({ estado }: { estado: EstadoDeSala }) {
   );
 }
 
-// /audiencia — "Elegí tu sala": cualquiera puede entrar, sin cuenta, y ver la agenda de cada sala
-// para sumarse a una charla con transcripción o traducción en vivo.
-export function ListaDeSalasPublicas() {
-  const { carga, recargar } = useAudiencia();
+// /a/:token — "Elegí tu sala": quien tiene el link del administrador entra sin cuenta y ve la
+// agenda de cada sala para sumarse a una charla con transcripción o traducción en vivo.
+export function ListaDeSalasPublicas({ token }: { token: string }) {
+  const { carga, recargar } = useAudiencia(token);
   const [abierta, setAbierta] = useState<string | null>(null);
 
   if (carga.fase !== "lista") {
@@ -93,7 +93,9 @@ export function ListaDeSalasPublicas() {
         </ul>
       )}
 
-      {sala && <ModalDeSala sala={sala} ahora={ahora} alCerrar={() => setAbierta(null)} />}
+      {sala && (
+        <ModalDeSala sala={sala} ahora={ahora} token={token} alCerrar={() => setAbierta(null)} />
+      )}
     </MarcoDeEntrada>
   );
 }
@@ -101,10 +103,12 @@ export function ListaDeSalasPublicas() {
 function ModalDeSala({
   sala,
   ahora,
+  token,
   alCerrar,
 }: {
   sala: SalaPublica;
   ahora: Date;
+  token: string;
   alCerrar: () => void;
 }) {
   const { charlas } = charlasParaMostrar(sala.charlas, ahora);
@@ -126,7 +130,7 @@ function ModalDeSala({
         </div>
         {sala.enVivo && (
           <Link
-            to={`/sala/${sala.id}/pantalla`}
+            to={`/sala/${sala.id}/pantalla?t=${token}`}
             className="border-[3px] border-[#b8241f] bg-naranja px-5 py-3 text-center font-mono text-xs font-bold tracking-widest uppercase hover:bg-[#e67b00]"
           >
             Ver la transcripción en vivo →
@@ -152,7 +156,7 @@ function ModalDeSala({
                   <p className="font-display text-xl leading-none uppercase">{charla.titulo}</p>
                 </div>
                 <Link
-                  to={`/sala/${sala.id}/pantalla?charla=${charla.id}`}
+                  to={`/sala/${sala.id}/pantalla?charla=${charla.id}&t=${token}`}
                   className="shrink-0 font-mono text-xs font-bold tracking-widest text-naranja uppercase hover:underline"
                 >
                   Acceder →

@@ -14,6 +14,15 @@ const etiqueta = "font-mono text-[10px] font-bold uppercase tracking-widest text
 const campo =
   "w-full rounded-sm border-[1.5px] border-ink/25 bg-canvas px-3 py-2 font-mono text-sm";
 
+type TipoDeFuente = "entrada" | "pestana" | "enlace" | "archivo";
+
+const OPCIONES_DE_FUENTE: { valor: TipoDeFuente; texto: string }[] = [
+  { valor: "entrada", texto: "Entrada de audio de este equipo (cable de la consola o micrófono)" },
+  { valor: "pestana", texto: "Pestaña o ventana (el audio de otro programa o sitio)" },
+  { valor: "enlace", texto: "Link de un video o audio" },
+  { valor: "archivo", texto: "Archivo de audio (prueba)" },
+];
+
 export interface PropiedadesControl {
   ocupada: boolean;
   // Con qué idiomas y qué glosario arranca el formulario (los de la sala y la charla de ahora).
@@ -23,7 +32,8 @@ export interface PropiedadesControl {
 
 export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesControl) {
   const [fuentes, setFuentes] = useState<FuenteAudio[]>([]);
-  const [tipoFuente, setTipoFuente] = useState<"entrada" | "archivo">("entrada");
+  const [tipoFuente, setTipoFuente] = useState<TipoDeFuente>("entrada");
+  const [direccion, setDireccion] = useState("");
   const [idDispositivo, setIdDispositivo] = useState<string>("");
   const [archivo, setArchivo] = useState<File | null>(null);
   const [idiomaOriginal, setIdiomaOriginal] = useState<Idioma>(inicial?.original ?? "es");
@@ -48,14 +58,21 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
     );
   };
 
+  const faltaLaFuente =
+    (tipoFuente === "archivo" && !archivo) || (tipoFuente === "enlace" && direccion.trim() === "");
+
+  const fuenteElegida = (): ConfiguracionSesion["fuente"] => {
+    if (tipoFuente === "archivo" && archivo) return { tipo: "archivo", archivo };
+    if (tipoFuente === "enlace") return { tipo: "enlace", direccion: direccion.trim() };
+    if (tipoFuente === "pestana") return { tipo: "pestana" };
+    return { tipo: "entrada", idDispositivo: idDispositivo || null };
+  };
+
   const enviar = (evento: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     evento.preventDefault();
-    if (tipoFuente === "archivo" && !archivo) return;
+    if (faltaLaFuente) return;
     alIniciar({
-      fuente:
-        tipoFuente === "archivo" && archivo
-          ? { tipo: "archivo", archivo }
-          : { tipo: "entrada", idDispositivo: idDispositivo || null },
+      fuente: fuenteElegida(),
       idiomaOriginal,
       idiomasDestino,
       glosario,
@@ -73,15 +90,19 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
         <select
           value={tipoFuente}
           onChange={(evento) =>
-            setTipoFuente(evento.target.value === "archivo" ? "archivo" : "entrada")
+            setTipoFuente(
+              OPCIONES_DE_FUENTE.find((opcion) => opcion.valor === evento.target.value)?.valor ??
+                "entrada",
+            )
           }
           className={campo}
           disabled={ocupada}
         >
-          <option value="entrada">
-            Entrada de audio de este equipo (cable de la consola o micrófono)
-          </option>
-          <option value="archivo">Archivo de audio (prueba)</option>
+          {OPCIONES_DE_FUENTE.map((opcion) => (
+            <option key={opcion.valor} value={opcion.valor}>
+              {opcion.texto}
+            </option>
+          ))}
         </select>
       </label>
       {tipoFuente === "entrada" ? (
@@ -100,6 +121,23 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
               </option>
             ))}
           </select>
+        </label>
+      ) : tipoFuente === "pestana" ? (
+        <p className="self-end font-mono text-[11px] text-ink/60">
+          Al iniciar, el navegador te pide elegir la pestaña o ventana: tildá «Compartir audio».
+          Sirve para un video de YouTube, una transmisión o una llamada abiertos en este equipo.
+        </p>
+      ) : tipoFuente === "enlace" ? (
+        <label className="flex flex-col gap-1.5">
+          <span className={etiqueta}>Link del video o audio (directo: .mp4, .webm, .mp3…)</span>
+          <input
+            type="url"
+            value={direccion}
+            onChange={(evento) => setDireccion(evento.target.value)}
+            placeholder="https://…/video.mp4"
+            className={campo}
+            disabled={ocupada}
+          />
         </label>
       ) : (
         <label className="flex flex-col gap-1.5">
@@ -164,7 +202,7 @@ export function ControlSesion({ ocupada, inicial, alIniciar }: PropiedadesContro
       </label>
       <button
         type="submit"
-        disabled={ocupada || (tipoFuente === "archivo" && !archivo)}
+        disabled={ocupada || faltaLaFuente}
         className="rounded-sm bg-naranja px-5 py-3 font-mono text-xs font-bold uppercase tracking-widest text-ink shadow-sm hover:bg-ink hover:text-canvas disabled:cursor-not-allowed disabled:opacity-40 md:col-span-2 md:justify-self-start"
       >
         ● Iniciar sesión

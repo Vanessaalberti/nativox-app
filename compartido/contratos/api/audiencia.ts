@@ -22,6 +22,9 @@ export const esquemaAudiencia = v.object({
   salas: v.array(esquemaSalaPublica),
 });
 
+// El link que el administrador comparte con la audiencia: /a/<token>.
+export const esquemaEnlaceDeAudiencia = v.object({ ok: v.literal(true), token: v.string() });
+
 export type Audiencia = v.InferOutput<typeof esquemaAudiencia>;
 export type SalaPublica = Audiencia["salas"][number];
 export type CharlaPublica = SalaPublica["charlas"][number];

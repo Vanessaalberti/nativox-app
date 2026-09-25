@@ -1,6 +1,13 @@
 import type { Idioma, Linea, Resultado } from "@compartido/contratos";
 import { leerGlosario } from "@compartido/glosario";
-import { abrirArchivo, abrirEntrada, type Captura } from "@navegador/modulos/captura-audio";
+import {
+  abrirArchivo,
+  abrirEnlace,
+  abrirEntrada,
+  abrirPestana,
+  type Captura,
+  type OpcionesCaptura,
+} from "@navegador/modulos/captura-audio";
 import { crearCortador } from "@navegador/modulos/cortador-audio";
 import {
   crearFlujoSubtitulos,
@@ -21,7 +28,10 @@ import {
 import type { ModelosListos } from "./preparar-modelos";
 
 type Fuente =
-  { tipo: "entrada"; idDispositivo: string | null } | { tipo: "archivo"; archivo: File };
+  | { tipo: "entrada"; idDispositivo: string | null }
+  | { tipo: "pestana" }
+  | { tipo: "enlace"; direccion: string }
+  | { tipo: "archivo"; archivo: File };
 
 export interface ConfiguracionSesion {
   fuente: Fuente;
@@ -53,6 +63,19 @@ function picoDe(bloque: Float32Array): number {
   let pico = 0;
   for (const muestra of bloque) pico = Math.max(pico, Math.abs(muestra));
   return Math.min(1, pico);
+}
+
+function abrirFuente(fuente: Fuente, opciones: OpcionesCaptura): Promise<Resultado<Captura>> {
+  switch (fuente.tipo) {
+    case "archivo":
+      return abrirArchivo(fuente.archivo, opciones);
+    case "enlace":
+      return abrirEnlace(fuente.direccion, opciones);
+    case "pestana":
+      return abrirPestana(opciones);
+    case "entrada":
+      return abrirEntrada(fuente.idDispositivo, opciones);
+  }
 }
 
 export async function armarSesion(
@@ -97,10 +120,7 @@ export async function armarSesion(
     },
     alTerminar: eventos.alTerminarCaptura,
   };
-  const captura =
-    configuracion.fuente.tipo === "archivo"
-      ? await abrirArchivo(configuracion.fuente.archivo, opcionesCaptura)
-      : await abrirEntrada(configuracion.fuente.idDispositivo, opcionesCaptura);
+  const captura = await abrirFuente(configuracion.fuente, opcionesCaptura);
   if (!captura.ok) return captura;
   return { ok: true, valor: { captura: captura.valor, flujo } };
 }

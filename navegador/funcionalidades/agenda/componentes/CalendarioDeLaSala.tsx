@@ -110,17 +110,25 @@ export function CalendarioDeLaSala({
               {sala.nombre}
             </h1>
           </div>
-          {!soloLectura && (
-            <button
-              type="button"
-              onClick={() =>
-                setEditando({ modo: "nueva", datos: datosNuevos(semana[0] ?? hoy(), 9 * 60) })
-              }
-              className="inline-flex shrink-0 items-center gap-2 border-[3px] border-[#b8241f] bg-naranja px-5 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:bg-[#e67b00]"
+          <div className="flex shrink-0 flex-wrap items-center gap-3">
+            <Link
+              to={`/sala/${sala.id}/control`}
+              className="inline-flex items-center gap-2 border-[1.5px] border-[#443d30] px-5 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:border-ink hover:bg-ink hover:text-canvas"
             >
-              + Agregar al calendario
-            </button>
-          )}
+              Ver como operador →
+            </Link>
+            {!soloLectura && (
+              <button
+                type="button"
+                onClick={() =>
+                  setEditando({ modo: "nueva", datos: datosNuevos(semana[0] ?? hoy(), 9 * 60) })
+                }
+                className="inline-flex shrink-0 items-center gap-2 border-[3px] border-[#b8241f] bg-naranja px-5 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors hover:bg-[#e67b00]"
+              >
+                + Agregar al calendario
+              </button>
+            )}
+          </div>
         </div>
         <p className="mb-4 shrink-0 text-sm text-ink/60">
           {soloLectura

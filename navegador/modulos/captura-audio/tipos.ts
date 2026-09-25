@@ -18,4 +18,6 @@ export interface OpcionesCaptura {
 
 export interface Captura {
   detener(): void;
+  // Solo con un link: el video que se está reproduciendo, para mostrarlo en pantalla.
+  video?: HTMLVideoElement;
 }

@@ -1,6 +1,6 @@
 import type { Resultado } from "@compartido/contratos";
-import { NOMBRE_PROCESADOR, urlDelProcesador } from "./procesador";
-import { FRECUENCIA, type Captura, type FuenteAudio, type OpcionesCaptura } from "./tipos";
+import { abrirDesdeFlujo } from "./nodo-de-captura";
+import type { Captura, FuenteAudio, OpcionesCaptura } from "./tipos";
 
 export async function listarFuentes(): Promise<FuenteAudio[]> {
   const dispositivos = await navigator.mediaDevices.enumerateDevices();
@@ -24,30 +24,14 @@ export async function abrirEntrada(
   const flujo = await pedirMicrofono(idDispositivo, conFiltrosDeVoz);
   if (!flujo.ok) return flujo;
 
-  const contexto = new AudioContext({ sampleRate: FRECUENCIA });
-  const url = urlDelProcesador();
-  await contexto.audioWorklet.addModule(url);
-  URL.revokeObjectURL(url);
-
-  // Sin salidas: el nodo procesa igual y el audio nunca llega a los parlantes.
-  const nodo = new AudioWorkletNode(contexto, NOMBRE_PROCESADOR, { numberOfOutputs: 0 });
-  nodo.port.onmessage = (evento: MessageEvent<Float32Array>) => {
-    alRecibir(evento.data);
+  return {
+    ok: true,
+    valor: await abrirDesdeFlujo(
+      flujo.valor,
+      { alRecibir, alTerminar },
+      "Se cortó la entrada de audio (¿se desconectó el cable o el micrófono?).",
+    ),
   };
-  contexto.createMediaStreamSource(flujo.valor).connect(nodo);
-
-  const detener = () => {
-    for (const pista of flujo.valor.getTracks()) pista.stop();
-    nodo.port.onmessage = null;
-    void contexto.close();
-  };
-  for (const pista of flujo.valor.getAudioTracks()) {
-    pista.addEventListener("ended", () => {
-      detener();
-      alTerminar("Se cortó la entrada de audio (¿se desconectó el cable o el micrófono?).");
-    });
-  }
-  return { ok: true, valor: { detener } };
 }
 
 async function pedirMicrofono(

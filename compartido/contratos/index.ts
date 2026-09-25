@@ -84,6 +84,7 @@ export {
 } from "./api/operadores";
 export {
   esquemaAudiencia,
+  esquemaEnlaceDeAudiencia,
   type Audiencia,
   type CharlaPublica,
   type SalaPublica,
